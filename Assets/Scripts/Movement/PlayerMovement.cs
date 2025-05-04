@@ -34,7 +34,9 @@ public class PlayerMovement : MonoBehaviour
 
 
     //jump vars
-    [SerializeField] public float verticalVelocity { get; private set; }
+    [SerializeField] public float verticalVelocity { get;  set; }
+
+
     [SerializeField] private bool isJumping;
     [SerializeField] private bool isFastFalling;
     [SerializeField] private bool isFalling;
@@ -83,55 +85,36 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool isDashFastFalling;
     [SerializeField] private float dashFastFallTime;
     [SerializeField] private float dashFastFallReleaseSpeed;
-
+ 
     private void Awake()
     {
-        isFacingRight = true;
         rb = GetComponent<Rigidbody2D>();
-
+   
+        isFacingRight = true;
+ 
     }
-    private void Update()
+     
+    public void handleMove()
     {
-        countTimers();
-        jumpChecks();
-        landCheck();
-        wallJumpCheck();
-        wallSlideCheck();
-        dashCheck();
-
-    }
-    void FixedUpdate()
-    {
-        collisionChecks();
-
-        jump();
-        fall();
-        wallSlide();
-        wallJump();
-        dash();
-
         if (isGrounded)
         {
             move(moveStats.groundAcceleration, moveStats.groundDecceleration, InputManager.movement);
-
         }
         else
         {
             if (useWallJumpMoveStats)
             {
                 move(moveStats.wallJumpMoveAcceleration, moveStats.wallJumpMoveDecceleration, InputManager.movement);
-
             }
             else
             {
                 move(moveStats.airAcceleration, moveStats.airDecceleration, InputManager.movement);
             }
         }
-        applyVelocity();
     }
     #region jumps
 
-    private void jumpChecks()
+    public void jumpChecks()
     {
         // WHEN WE PRESS THE JUMP BUTTON 
         if (InputManager.jumpWasPressed)
@@ -160,10 +143,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (isPastApexThreshold)
                 {
-                    isPastApexThreshold = false;
-                    isFastFalling = true;
-                    fastFallTime = moveStats.timeForUpwardsCancel;
-                    verticalVelocity = 0f;
+                    resetJumpValuesOnPastApexThreshold();
                 }
                 else
                 {
@@ -207,12 +187,20 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
-    private void initiateJump(int quantityOfJumps)
+    public void resetJumpValuesOnPastApexThreshold()
+    {
+        isPastApexThreshold = false;
+        isFastFalling = true;
+        fastFallTime = moveStats.timeForUpwardsCancel;
+        verticalVelocity = 0f;
+    }
+    public void initiateJump(int quantityOfJumps)
     {
 
         if (!isJumping)
         {
             isJumping = true;
+
         }
         resetWallJumpValues();
         jumpBufferTimer = 0f;
@@ -220,12 +208,13 @@ public class PlayerMovement : MonoBehaviour
         verticalVelocity = moveStats.initialJumpVelocity;
 
     }
-    private void jump()
+    public void jump()
     {
         // apply gravity while jumping 
         if (isJumping)
         {
             // check for headBump
+
             if (isbumpedHead)
             {
                 isFastFalling = true;
@@ -302,7 +291,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
-    private void resetJumpValues()
+    public void resetJumpValues()
     {
         isJumping = false;
         isFalling = false;
@@ -327,7 +316,7 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
     #region landCheck
-    private void landCheck()
+    public void landCheck()
     {
         if ((isJumping || isFalling || isWallJumpFalling || isWallJumping || isWallSlideFalling || isWallSliding || isDashFastFalling) && isGrounded && verticalVelocity <= 0f)
         {
@@ -352,7 +341,7 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
     #region timers
-    private void countTimers()
+    public void countTimers()
     {
         //jump buffer timer 
         jumpBufferTimer -= Time.deltaTime;
@@ -379,7 +368,7 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
     #region Movement
-    void move(float acceleration, float decceleration, Vector2 moveInput)
+    public void move(float acceleration, float decceleration, Vector2 moveInput)
     {
         if (!isDashing)
         {
@@ -391,8 +380,26 @@ public class PlayerMovement : MonoBehaviour
                 if (InputManager.runIsHeld)
                 {
                     targetVelocity = moveInput.x * moveStats.maxRunSpeed;
+
+
+                    // if(stateMachine.CurrentState != runState) // CRUCIAL TO ENTER THE STATE
+                    // {
+                    //     // first time entering run state 
+                    //     stateMachine.ChangeState(runState);
+                    // }
                 }
-                else { targetVelocity = moveInput.x * moveStats.maxWalkSpeed; }
+                else
+                {
+
+                    targetVelocity = moveInput.x * moveStats.maxWalkSpeed;
+                    // if(stateMachine.CurrentState != moveState) // CRUCIAL TO ENTER THE STATE
+                    // {
+                    //     // first time entering run state 
+                    //     stateMachine.ChangeState(moveState);
+                    // }
+
+
+                }
                 horizontalVelocity = Mathf.Lerp(horizontalVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
 
 
@@ -401,13 +408,21 @@ public class PlayerMovement : MonoBehaviour
             else if (Mathf.Abs(moveInput.x) < moveStats.moveThreshold)
             {
                 horizontalVelocity = Mathf.Lerp(horizontalVelocity, 0, decceleration * Time.fixedDeltaTime);
+                // if (stateMachine.CurrentState != idleState) // CRUCIAL TO ENTER THE STATE
+                // {
+                //     // first time entering idle state 
+                //     stateMachine.ChangeState(idleState);
+                // }
+
 
 
             }
+
         }
     }
-    void turnCheck(Vector2 moveInput)
+    public void turnCheck(Vector2 moveInput)
     {
+        // animacion.turn
         if (isFacingRight && moveInput.x < 0)
         {
             turn(false);
@@ -417,7 +432,7 @@ public class PlayerMovement : MonoBehaviour
             turn(true);
         }
     }
-    void turn(bool turnRight)
+    public void turn(bool turnRight)
     {
         if (turnRight)
         {
@@ -458,6 +473,7 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = true;
         }
         else { isGrounded = false; }
+
         #region Debug Visualization
         if (moveStats.debugShowIsGroundedBox)
         {
@@ -575,7 +591,7 @@ public class PlayerMovement : MonoBehaviour
 
     }
     #endregion
-    void collisionChecks()
+    public void collisionChecks()
     {
         checkIsGrounded();
         bumpedHead();
@@ -584,7 +600,7 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
     #region wallSlide and wallJump
-    private void wallSlideCheck()
+    public void wallSlideCheck()
     {
         if (isTouchingWall && !isGrounded && !isDashing)
         {
@@ -633,7 +649,7 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
-    private void wallSlide()
+    public void wallSlide()
     {
         if (isWallSliding)
         {
@@ -641,7 +657,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
-    private void    checkIsTouchingWall()
+    private void checkIsTouchingWall()
     {
         float originEndPoint = 0f;
         if (isFacingRight)
@@ -682,7 +698,7 @@ public class PlayerMovement : MonoBehaviour
         #endregion
     }
 
-    private void wallJumpCheck()
+    public void wallJumpCheck()
     {
         if (shouldApplyPostWallJumpBuffer())
         {
@@ -716,7 +732,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
-    private void initiateWallJump()
+    public void initiateWallJump()
     {
         if (!isWallJumping)
         {
@@ -736,7 +752,7 @@ public class PlayerMovement : MonoBehaviour
         else { dirMultiplier = 1; }
         horizontalVelocity = MathF.Abs(moveStats.wallJumpDirection.x) * dirMultiplier;
     }
-    private void wallJump()
+    public void wallJump()
     {
         if (isWallJumping)
         {
@@ -767,7 +783,7 @@ public class PlayerMovement : MonoBehaviour
                         {
                             verticalVelocity = 0f;
                         }
-                        else    
+                        else
                         {
                             verticalVelocity = -0.01f;
                         }
@@ -778,7 +794,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     verticalVelocity += moveStats.wallJumpGravity * Time.fixedDeltaTime;
                     if (isPastWallJumpApexThreshold)
-                    {    
+                    {
                         isPastWallJumpApexThreshold = false;
                     }
                 }
@@ -821,8 +837,8 @@ public class PlayerMovement : MonoBehaviour
         }
         else { return false; }
     }
-    private void resetWallJumpValues()
-    {   
+    public void resetWallJumpValues()
+    {
         isWallSlideFalling = false;
         useWallJumpMoveStats = false;
         isWallJumping = false;
@@ -836,7 +852,7 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region dashes
-    private void dashCheck()
+    public void dashCheck()
     {
         if (InputManager.dashWasPressed)
         {
@@ -861,7 +877,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-    private void initiateDash()
+    public void initiateDash()
     {
         dashDirection = InputManager.movement;
         Vector2 closestDirection = Vector2.zero;
@@ -879,7 +895,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 distance -= moveStats.dashDiagnallyBias;
             }
-            else if (distance < minDistance)    
+            else if (distance < minDistance)
             {
                 minDistance = distance;
                 closestDirection = moveStats.dashDirections[i];
@@ -904,7 +920,7 @@ public class PlayerMovement : MonoBehaviour
         resetWallJumpValues();
         stopWallSlide();
     }
-    private void dash()
+    public void dash()
     {
         if (isDashing)
         {
@@ -957,20 +973,66 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-    private void resetDashValues()
+    public void resetDashValues()
     {
         isDashFastFalling = false;
         dashOnGroundTime = -0.01f;
 
     }
-    private void resetDashes()
+    public void resetDashes()
     {
         numberOfDashesUsed = 0;
 
     }
     #endregion
 
-
+    #region getters and setters
+    public bool IsGrounded { get => isGrounded; set => isGrounded = value; }
+    public bool IsbumpedHead { get => isbumpedHead; set => isbumpedHead = value; }
+    public bool IsTouchingWall { get => isTouchingWall; set => isTouchingWall = value; }
+    public bool IsJumping { get => isJumping; set => isJumping = value; }
+    public bool IsFastFalling { get => isFastFalling; set => isFastFalling = value; }
+    public bool IsFalling { get => isFalling; set => isFalling = value; }
+    public float FastFallTime { get => fastFallTime; set => fastFallTime = value; }
+    public float FastFallReleaseSpeed { get => fastFallReleaseSpeed; set => fastFallReleaseSpeed = value; }
+    public float ApexPoint { get => apexPoint; set => apexPoint = value; }
+    public float TimePastApexThreshold { get => timePastApexThreshold; set => timePastApexThreshold = value; }
+    public bool IsPastApexThreshold { get => isPastApexThreshold; set => isPastApexThreshold = value; }
+    public float JumpBufferTimer { get => jumpBufferTimer; set => jumpBufferTimer = value; }
+    public bool JumpReleasedDuringBuffer { get => jumpReleasedDuringBuffer; set => jumpReleasedDuringBuffer = value; }
+    public float CoyoteTimer { get => coyoteTimer; set => coyoteTimer = value; }
+    public bool IsWallSliding { get => isWallSliding; set => isWallSliding = value; }
+    public bool IsWallSlideFalling { get => isWallSlideFalling; set => isWallSlideFalling = value; }
+    public bool IsWallFalling { get => isWallFalling; set => isWallFalling = value; }
+    public bool UseWallJumpMoveStats { get => useWallJumpMoveStats; set => useWallJumpMoveStats = value; }
+    public bool IsWallJumping { get => isWallJumping; set => isWallJumping = value; }
+    public float WallJumpTime { get => wallJumpTime; set => wallJumpTime = value; }
+    public bool IsWallJumpFastFalling { get => isWallJumpFastFalling; set => isWallJumpFastFalling = value; }
+    public bool IsWallJumpFalling { get => isWallJumpFalling; set => isWallJumpFalling = value; }
+    public float WallJumpFastFallTime { get => wallJumpFastFallTime; set => wallJumpFastFallTime = value; }
+    public float WallJumpFastFallReleaseSpeed { get => wallJumpFastFallReleaseSpeed; set => wallJumpFastFallReleaseSpeed = value; }
+    public float WallJumpPostBufferTime { get => wallJumpPostBufferTime; set => wallJumpPostBufferTime = value; }
+    public float WallJumpApexPoint { get => wallJumpApexPoint; set => wallJumpApexPoint = value; }
+    public float TimePastWallJumpApexThreshold { get => timePastWallJumpApexThreshold; set => timePastWallJumpApexThreshold = value; }
+    public bool IsPastWallJumpApexThreshold { get => isPastWallJumpApexThreshold; set => isPastWallJumpApexThreshold = value; }
+    public bool IsDashing { get => isDashing; set => isDashing = value; }
+    public bool IsAirDashing { get => isAirDashing; set => isAirDashing = value; }
+    public float DashTimer { get => dashTimer; set => dashTimer = value; }
+    public float DashOnGroundTime { get => dashOnGroundTime; set => dashOnGroundTime = value; }
+    public int NumberOfDashesUsed { get => numberOfDashesUsed; set => numberOfDashesUsed = value; }
+    public Vector2 DashDirection { get => dashDirection; set => dashDirection = value; }
+    public bool IsDashFastFalling { get => isDashFastFalling; set => isDashFastFalling = value; }
+    public float DashFastFallTime { get => dashFastFallTime; set => dashFastFallTime = value; }
+    public float DashFastFallReleaseSpeed { get => dashFastFallReleaseSpeed; set => dashFastFallReleaseSpeed = value; }
+    public float HorizontalVelocity { get => horizontalVelocity; set => horizontalVelocity = value; }
+    public bool IsFacingRight { get => isFacingRight; set => isFacingRight = value; }
+    public RaycastHit2D GroundHit { get => groundHit; set => groundHit = value; }
+    public RaycastHit2D HeadHit { get => headHit; set => headHit = value; }
+    public RaycastHit2D WallHit { get => wallHit; set => wallHit = value; }
+    public RaycastHit2D LastWallHit { get => lastWallHit; set => lastWallHit = value; }
+ 
+    public int NumberOfJumpsUsed { get => numberOfJumpsUsed; set => numberOfJumpsUsed = value; }
+    #endregion
 
 
 }

@@ -6,19 +6,19 @@ using UnityEngine;
 public class PlayerMovementStats : ScriptableObject
 {
     [Header("Walk")]
-    [Range(1, 100f)] public float maxWalkSpeed=12.5f;
-    [Range(0.25f, 50f)] public float groundAcceleration=5f;
-    [Range(0.25f, 50f)] public float groundDecceleration=20f;
+    [Range(0, 100f)] public float maxWalkSpeed=12.5f;
+    [Range(0, 50f)] public float groundAcceleration=5f;
+    [Range(0, 50f)] public float groundDecceleration=20f;
     [Range(0, 1)] public float moveThreshold = 0.25f;
-    [Range(0.25f, 50f)] public float airAcceleration=5f;
-    [Range(0.25f, 50f)] public float airDecceleration= 5f;
-    [Range(0.25f, 50f)] public float wallJumpMoveAcceleration=5f;
-    [Range(0.25f, 50f)] public float wallJumpMoveDecceleration=5f;
+    [Range(0, 50f)] public float airAcceleration=5f;
+    [Range(0, 50f)] public float airDecceleration= 5f;
+    [Range(0, 50f)] public float wallJumpMoveAcceleration=5f;
+    [Range(0, 50f)] public float wallJumpMoveDecceleration=5f;
     
 
 
     [Header("Run")]
-    [Range(1f, 100f)] public float maxRunSpeed = 20f;
+    [Range(0, 100f)] public float maxRunSpeed = 20f;
 
     [Header("Grounded/Collision Checks")]
     public LayerMask groundLayer;
@@ -30,21 +30,21 @@ public class PlayerMovementStats : ScriptableObject
 
     [Header("Jump")]
     public float jumpHeight = 6.5f;
-    [Range(1f, 1.1f)] public float jumpHeightCompensationFactor = 1.054f;
+    [Range(0, 1.1f)] public float jumpHeightCompensationFactor = 1.054f;
     public float timeTillJumpApex = 0.35f;
-    [Range(0.01f, 5f)] public float gravityOnReleaseMultiplier = 2f;
+    [Range(0f, 5f)] public float gravityOnReleaseMultiplier = 2f;
     public float maxFallSpeed = 26f;
-    [Range(1, 5)] public int    numberOfJumpsAllowed = 2;
+    [Range(0, 5)] public int    numberOfJumpsAllowed = 2;
 
     [Header("Reset jump option")]
     public bool resetJumpOnWallSlide =true;
 
     [Header("Jump Cut")]
-    [Range(0.02f, 0.3f)] public float timeForUpwardsCancel = 0.027f;
+    [Range(0f, 0.3f)] public float timeForUpwardsCancel = 0.027f;
 
     [Header("Jump Apex")]
-    [Range(0.5f, 1f)] public float apexThreshold = 0.97f;
-    [Range(0.01f, 1f)] public float apexHangTime = 0.075f;
+    [Range(0f, 1f)] public float apexThreshold = 0.97f;
+    [Range(0f, 1f)] public float apexHangTime = 0.075f;
 
     [Header("Jump Buffer")]
     [Range(0f, 1f)] public float jumpBufferTime = 0.125f;
@@ -53,25 +53,25 @@ public class PlayerMovementStats : ScriptableObject
     [Range(0f, 1f)] public float jumpCoyoteTime = 0.1f;
 
     [Header("Wall slide")]
-    [Min(0.01f)] public float wallSlideSpeed=5f;
-    [Range(0.25f, 50f)] public float wallSlideDeccelerationSpeed = 50f;
+    [Min(0f)] public float wallSlideSpeed=5f;
+    [Range(0f, 50f)] public float wallSlideDeccelerationSpeed = 50f;
 
     [Header("Wall jump")]
     public Vector2 wallJumpDirection = new Vector2(-20f, 6.5f);
-    [Range(0.01f, 50f)] public float wallJumpPostBufferTime = 0.125f;
-    [Range(0.01f, 50f)] public float wallJumpGravityOnReleaseMultiplier = 1f;
+    [Range(0f, 50f)] public float wallJumpPostBufferTime = 0.125f;
+    [Range(0f, 50f)] public float wallJumpGravityOnReleaseMultiplier = 1f;
 
     [Header("Dash stats")]
     [Range(0f,1f)] public float dashTime =.11f;
-    [Range(1f,200f)] public float dashSpeed =40f;
+    [Range(0f,200f)] public float dashSpeed =40f;
     [Range(0,1)] public float timeBtwnDashesOnGround = 0.225f;
     public bool resetDashOnWallSlide=true;
     [Range(0,5)] public int numberOfDashes=2;
     [Range(0,0.5f)] public float dashDiagnallyBias= 0.4f;
 
     [Header("Dash cancel time")]
-    [Range(0.01f, 5f)] public float dashGravityOnReleaseMultiplier = 1f;
-    [Range(0.02f, 0.3f)] public float dashTimeUpwardsCancel = 0.027f;
+    [Range(0f, 5f)] public float dashGravityOnReleaseMultiplier = 1f;
+    [Range(0f, 0.3f)] public float dashTimeUpwardsCancel = 0.027f;
 
 
 
