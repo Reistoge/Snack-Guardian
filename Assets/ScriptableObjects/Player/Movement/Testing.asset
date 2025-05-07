@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf8580fe62a55dd4493d58550c42b2c4, type: 3}
-  m_Name: onBarrel
+  m_Name: Testing
   m_EditorClassIdentifier: 
-  maxWalkSpeed: 0
-  groundAcceleration: 0
-  groundDecceleration: 0
-  moveThreshold: 0
-  airAcceleration: 0
-  airDecceleration: 0
-  wallJumpMoveAcceleration: 0
-  wallJumpMoveDecceleration: 0
-  maxRunSpeed: 20
+  maxWalkSpeed: 1.7
+  groundAcceleration: 5
+  groundDecceleration: 20
+  moveThreshold: 0.25
+  airAcceleration: 5
+  airDecceleration: 5
+  wallJumpMoveAcceleration: 0.25
+  wallJumpMoveDecceleration: 0.25
+  maxRunSpeed: 1.7
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -29,9 +29,9 @@ MonoBehaviour:
   headWidth: 0.75
   wallDetectionRayLength: 0.125
   wallDetectionRayHeightMultiplier: 0.9
-  jumpHeight: 0
+  jumpHeight: 2
   jumpHeightCompensationFactor: 1.054
-  timeTillJumpApex: 0
+  timeTillJumpApex: 0.35
   gravityOnReleaseMultiplier: 2
   maxFallSpeed: 20
   numberOfJumpsAllowed: 2
@@ -46,7 +46,7 @@ MonoBehaviour:
   wallJumpDirection: {x: -8, y: 10}
   wallJumpPostBufferTime: 0.125
   wallJumpGravityOnReleaseMultiplier: 1
-  dashTime: 1
+  dashTime: 0.11
   dashSpeed: 40
   timeBtwnDashesOnGround: 0.225
   resetDashOnWallSlide: 1
