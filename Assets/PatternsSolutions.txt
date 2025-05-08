@@ -1,0 +1,20 @@
+A. You want to make an object fall and also set specific layers to collide the ground or fall
+    1. Add the Fall.cs and create a FallSO
+    2. add a feet collider and a body collider and set it on the serialize of the Fall.cs
+    3. the ground layer in the SO corresponds the main layer that enables ongrounded this will not excluye or include any collision
+    4. if you want to include or exclude layers go to feet or body and exclude or include the layers for the collision
+    5. the layer of the object cant be the same as the ground layer setted in the SO, it will not work.
+
+
+B. You want to create an object with an animator and physics and the sprite is resized or something like that or maybe you want to add a new component with specific script
+    1. create a parent object, name it ex: MainObject.cs
+    2. create a chill object named Sprite&SFX add here all the components for the animations and the sprite renderer
+        2.1 create an AnimHandler class that will have public methods calling the animations or rendering options
+        2.2 if needed add a reference of the MainObject.cs (ex: you want to destroy the object in a certain frame using animation events,
+         you have to create the function inside AnimHandler to use it on the animator and you need the reference of the object to destroy it in the function)
+    3. create a second object named feet & body 
+        2.1 if collisions need a certain script to function, add to each object the necesarry script and reference the MainObject.cs if needed
+         (dont over-referenece use only for specific mechanics, in some cases reference the colliders in the MainObject.cs via the inspector is just right) 
+    Note: if you want to add a new child with a certain set of scripts and component just create a Handler.cs that communicates 
+    the MainObject.cs and the new component keeping the logic or the connection to MainObject.cs of the new component in Handler.cs
+     where here if you want you can reference the MainObject.cs and in MainObject.cs you can also reference the Handler.cs always keeping a good dependency 

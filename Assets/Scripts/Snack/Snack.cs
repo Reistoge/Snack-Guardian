@@ -8,8 +8,8 @@ public class Snack : MonoBehaviour
     [SerializeField] bool touchingPlayer = false;
     SnackAnimator animatorHandler;
 
-    
 
+    
 
 
     private void OnCollisionEnter2D(Collision2D collision)

@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf8580fe62a55dd4493d58550c42b2c4, type: 3}
   m_Name: Testing
   m_EditorClassIdentifier: 
-  maxWalkSpeed: 1.7
-  groundAcceleration: 5
-  groundDecceleration: 20
+  maxWalkSpeed: 7.5
+  groundAcceleration: 3
+  groundDecceleration: 12
   moveThreshold: 0.25
-  airAcceleration: 5
-  airDecceleration: 5
-  wallJumpMoveAcceleration: 0.25
-  wallJumpMoveDecceleration: 0.25
-  maxRunSpeed: 1.7
+  airAcceleration: 3
+  airDecceleration: 3
+  wallJumpMoveAcceleration: 3
+  wallJumpMoveDecceleration: 3
+  maxRunSpeed: 12
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 448
   groundDetectionRayLength: 0.02
   headDetectionRayLength: 0.02
   headWidth: 0.75
@@ -31,9 +31,9 @@ MonoBehaviour:
   wallDetectionRayHeightMultiplier: 0.9
   jumpHeight: 2
   jumpHeightCompensationFactor: 1.054
-  timeTillJumpApex: 0.35
-  gravityOnReleaseMultiplier: 2
-  maxFallSpeed: 20
+  timeTillJumpApex: 0.2
+  gravityOnReleaseMultiplier: 1.1
+  maxFallSpeed: 11
   numberOfJumpsAllowed: 2
   resetJumpOnWallSlide: 1
   timeForUpwardsCancel: 0.027
@@ -41,25 +41,25 @@ MonoBehaviour:
   apexHangTime: 0.075
   jumpBufferTime: 0.125
   jumpCoyoteTime: 0.1
-  wallSlideSpeed: 4
-  wallSlideDeccelerationSpeed: 50
-  wallJumpDirection: {x: -8, y: 10}
+  wallSlideSpeed: 3
+  wallSlideDeccelerationSpeed: 30
+  wallJumpDirection: {x: -6, y: 2}
   wallJumpPostBufferTime: 0.125
   wallJumpGravityOnReleaseMultiplier: 1
   dashTime: 0.11
-  dashSpeed: 40
+  dashSpeed: 16.8
   timeBtwnDashesOnGround: 0.225
   resetDashOnWallSlide: 1
   numberOfDashes: 2
   dashDiagnallyBias: 0.4
   dashGravityOnReleaseMultiplier: 1
   dashTimeUpwardsCancel: 0.027
-  debugShowIsGroundedBox: 1
-  debugShowHeadBumpBox: 1
-  debugShowWallDetectionBox: 1
-  showWalkJumpArc: 1
-  showRunJumpArc: 1
+  debugShowIsGroundedBox: 0
+  debugShowHeadBumpBox: 0
+  debugShowWallDetectionBox: 0
+  showWalkJumpArc: 0
+  showRunJumpArc: 0
   stopOnCollision: 1
   drawRight: 1
-  arcResolution: 59
+  arcResolution: 20
   visualizationSteps: 90

@@ -295,6 +295,7 @@ public class Fall : MonoBehaviour
         groundHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.down, fallStats.groundDetectionRayLength, fallStats.groundLayer);
         if (groundHit.collider != null)
         {
+            print(groundHit.collider.gameObject);
             isGrounded = true;
 
         }
