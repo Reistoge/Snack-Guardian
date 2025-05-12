@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Snack_Damage
   m_EditorClassIdentifier: 
   type: 1
-  amount: 20
+  amount: 50
   effectColor: {r: 1, g: 1, b: 1, a: 1}
   effectParticles: {fileID: 0}

@@ -29,6 +29,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     void OnEnable()
     {
         healthSystem.onDamageTaken += OnDamageTaken;
+        healthSystem.onDie += ()=> {Destroy(gameObject);};
         
     }
     void OnDisable()

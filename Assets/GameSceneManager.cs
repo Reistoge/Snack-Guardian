@@ -13,7 +13,9 @@ public class GameSceneManager : MonoBehaviour
     [SerializeField] PlayerMovementStats playerMovementStats;
     [SerializeField] Transform spawnPoint;
 
-
+    public static Action onPlayerSpawned;
+    public static Action onPlayerDied;
+    public static Action onPlayerRespawned;
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.P))
@@ -56,7 +58,6 @@ public class GameSceneManager : MonoBehaviour
     void loadPlayer()
     {
         // Check if the player is already spawned
-   
         GameManager.Instance.setPlayer(playerPrefab);
             
         

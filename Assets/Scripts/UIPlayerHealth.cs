@@ -15,7 +15,7 @@ public class UIPlayerHealth : MonoBehaviour
     {
         GameManager.onPlayerLoaded += loadHealthSystem;
         
-        loadHealthText();
+        
 
     }
     private void OnDisable()
@@ -42,6 +42,7 @@ public class UIPlayerHealth : MonoBehaviour
         // Get the player object from the GameManager
         healthSystem = GameManager.Instance.getPlayerHealthSystem();
         healthSystem.onDamageTaken += UpdateHealthText;
+        loadHealthText();
         // Update the health text initially
     }
 
