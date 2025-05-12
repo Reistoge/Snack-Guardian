@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu(menuName = "Player Movement Stats")]
+[CreateAssetMenu(fileName = "Player Movement Stats",menuName = "Snack Guardian/PlayerMovementStats", order = 1)]
 public class PlayerMovementStats : ScriptableObject
 {
     [Header("Walk")]

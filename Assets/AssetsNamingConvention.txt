@@ -1,6 +1,8 @@
-BG : Background
-Anim : Animator
-W : Wall
-L : Left
-R : Right
-Handler: a class that basically communicates a component (child) of a mainObject (parent) 
+BG : Background.
+Anim : Animator.
+W : Wall.
+L : Left.
+R : Right.
+Handler: a class that basically communicates a component (child) of a mainObject (parent).
+SFX&VFX: an object that basically stores the animator, the spriteRenderer, particles and the sound effects, 
+probably this object has a AnimHandler script attached.

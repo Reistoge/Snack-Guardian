@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,9 +51,7 @@ public class Fall : MonoBehaviour
     //coyote time vars
     [SerializeField] private float coyoteTimer;
     [SerializeField] UnityEvent onObjectLanded;
-
-
-
+    private bool wantToFall = true;
 
     private void Awake()
     {
@@ -63,14 +62,16 @@ public class Fall : MonoBehaviour
     }
 
 
-    public virtual void Update()
+    public void Update()
     {
         // Keep essential checks that ALL states need
         countTimers();
         landCheck();
+
+ 
     }
 
-    public virtual void FixedUpdate()
+    public void FixedUpdate()
     {
         // Keep essential physics that ALL states need
         collisionChecks();
@@ -102,6 +103,16 @@ public class Fall : MonoBehaviour
         numberOfJumpsUsed += quantityOfJumps;
         verticalVelocity = fallStats.initialJumpVelocity;
 
+    }
+    public void desactivateColliders()
+    {
+        feetColl.enabled = false;
+        bodyColl.enabled = false;
+    }
+    public void activateColliders()
+    {
+        feetColl.enabled = true;
+        bodyColl.enabled = true;
     }
     public void jump()
     {
@@ -279,11 +290,15 @@ public class Fall : MonoBehaviour
 
 
         verticalVelocity = Mathf.Clamp(verticalVelocity, -fallStats.maxFallSpeed, 50f);
-
         verticalVelocity = Mathf.Clamp(verticalVelocity, -50, 50f);
-        rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
+        if (wantToFall)
+        {
+            rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
+        }
+
 
     }
+
 
     #endregion
     #region collisionChecks
@@ -295,7 +310,7 @@ public class Fall : MonoBehaviour
         groundHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.down, fallStats.groundDetectionRayLength, fallStats.groundLayer);
         if (groundHit.collider != null)
         {
-            print(groundHit.collider.gameObject);
+            // print(groundHit.collider.gameObject);
             isGrounded = true;
 
         }
@@ -339,13 +354,14 @@ public class Fall : MonoBehaviour
 
         Vector2 boxCastSize = new Vector2(feetColl.bounds.size.x, fallStats.groundDetectionRayLength); // size of the boxCast 
         groundHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.down, fallStats.groundDetectionRayLength, fallStats.groundLayer);
-        if (groundHit.collider != null && groundHit.collider.gameObject.CompareTag(tag))
+        if (groundHit && groundHit.collider && groundHit.collider.gameObject && groundHit.collider.gameObject.CompareTag(tag))
         {
+
             return true;
 
         }
         else { return false; }
- 
+
     }
 
     private void bumpedHead()
@@ -385,6 +401,38 @@ public class Fall : MonoBehaviour
     {
         checkIsGrounded();
         bumpedHead();
+
+    }
+
+    public void stopFall()
+    {
+        // check if the variable setup is right
+        wantToFall = false;
+        isFalling = false;
+        verticalVelocity = 0f;
+        if(rb) rb.velocity = new Vector2(rb.velocity.x, 0f);
+        
+        isJumping = false;
+        isFastFalling = false;
+        fastFallTime = 0f;
+        isPastApexThreshold = false;
+        coyoteTimer = fallStats.jumpCoyoteTime;
+
+
+    }
+    public void startFall()
+    {
+        // check if the variable setup is right
+        wantToFall = true;
+        isFalling = true;
+        verticalVelocity = 0f;
+        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        isJumping = false;
+        isFastFalling = false;
+        fastFallTime = 0f;
+        isPastApexThreshold = false;
+        coyoteTimer = fallStats.jumpCoyoteTime;
+
 
     }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[CreateAssetMenu(fileName = "FallStats", menuName = "ScriptableObjects/FallStats", order = 1)]
+[CreateAssetMenu(fileName = "FallStats", menuName = "Snack Guardian/FallStats", order = 1)]
 public class FallStats : ScriptableObject
 {
     [Header("Grounded/Collision Checks")]
@@ -44,6 +44,7 @@ public class FallStats : ScriptableObject
     public float initialWallJumpVelocity { get; private set; }
     public bool debugShowIsGroundedBox;
     public bool debugShowHeadBumpBox;
+    
    
 
     private void OnValidate()

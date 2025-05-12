@@ -42,5 +42,6 @@ public class WallSlideState : PlayerBaseState
             player.StateMachine.ChangeState(new IdleState(player));
             return;
         }
+        
     }
 }

@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
     public PlayerMovementStats moveStats;
+    [SerializeField] PlayerMovementStats damagedStats;
+    PlayerMovementStats tempMoveStats;
     [SerializeField] private Collider2D feetColl;
     [SerializeField] private Collider2D bodyColl;
 
@@ -984,6 +986,45 @@ public class PlayerMovement : MonoBehaviour
         numberOfDashesUsed = 0;
 
     }
+    
+ 
+    public void changeMovementStats(PlayerMovementStats newMoveStats)
+    {
+        if(tempMoveStats != null)
+        {
+           resetMovementStats();
+        }
+        tempMoveStats = moveStats;
+        moveStats = newMoveStats;
+
+    }
+    public void resetMovementStats()
+    {
+        moveStats = tempMoveStats;
+        tempMoveStats = null;
+    }
+
+    internal void stopMovement()
+    {
+        horizontalVelocity = 0f;
+        verticalVelocity = 0f;
+        rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
+        isGrounded = false;
+        isJumping = false;
+        isFalling = false;
+        isFastFalling = false;
+        isWallJumping = false;
+        isWallSliding = false;
+        isDashing = false;
+        isAirDashing = false;
+        isDashFastFalling = false;
+    }
+
+    internal void changeToDamagedMovement()
+    {
+        changeMovementStats(damagedStats);
+    }
+
     #endregion
 
     #region getters and setters

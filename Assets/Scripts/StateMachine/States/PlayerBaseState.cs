@@ -52,7 +52,7 @@ public abstract class PlayerBaseState : IPlayerState
     protected virtual void CheckTransitions()
     {
 
-        if (InputManager.dashWasPressed==true  ){
+        if (InputManager.dashWasPressed==true){
             
             if (player.Movement.IsGrounded && player.Movement.IsDashing )
             {
@@ -64,5 +64,11 @@ public abstract class PlayerBaseState : IPlayerState
 
             }
         }
+        if (player.isTakingDamage() && !(this is DamagedState))
+        {
+            player.StateMachine.ChangeState(new DamagedState(player));
+            return;
+        }
+        
     }
 }
