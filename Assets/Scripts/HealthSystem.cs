@@ -13,6 +13,8 @@ public class HealthSystem : MonoBehaviour
     // [SerializeField] UIHealth healthBar;
     
     public Action onDamageTaken;
+    public Action onDie;
+    
 
     bool isTakingDamage;
     bool isInvincible;
@@ -38,24 +40,25 @@ public class HealthSystem : MonoBehaviour
             die();
         }
     }
-
     void die()
     {
         // Handle player death (e.g., respawn, game over, etc.)
-        Debug.Log("Player has died.");
-
-         
+        Debug.Log("object has die.");    
+        onDie?.Invoke();
     }
     public float getCurrentHealth()
     {
         return currentHealth;
+    }
+    public float getMaxHealth()
+    {
+        return maxHealth;
     }
 
     public void handleHeal(float amount)
     {
 
     }
-
     public bool getIsTakingDamage()
     {
         return isTakingDamage;

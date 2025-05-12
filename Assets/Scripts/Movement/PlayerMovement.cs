@@ -988,7 +988,7 @@ public class PlayerMovement : MonoBehaviour
     }
     
  
-    public void changeMovementStats(PlayerMovementStats newMoveStats)
+    public void setMovementStats(PlayerMovementStats newMoveStats)
     {
         if(tempMoveStats != null)
         {
@@ -1022,7 +1022,7 @@ public class PlayerMovement : MonoBehaviour
 
     internal void changeToDamagedMovement()
     {
-        changeMovementStats(damagedStats);
+        setMovementStats(damagedStats);
     }
 
     #endregion

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -13,7 +14,8 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     [SerializeField] PlayerAnimHandler anim;
     [SerializeField] HealthSystem healthSystem;
     [SerializeField] ObjectEffect playerEffect;
-    
+
+
 
     public PlayerMovement Movement { get => movement; set => movement = value; }
     public PlayerAnimHandler PlayerAnimation { get => anim; set => anim = value; }
@@ -27,6 +29,12 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     void OnEnable()
     {
         healthSystem.onDamageTaken += OnDamageTaken;
+        
+    }
+    void OnDisable()
+    {
+        healthSystem.onDamageTaken -= OnDamageTaken;
+        
     }
     private void Update()
     {
@@ -36,6 +44,10 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         stateMachine.FixedUpdate();
 
+    }
+    void Start()
+    {
+        
     }
     public void onInteract(IInteractor interactor)
     {
@@ -117,4 +129,5 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         // 
     }
+
 }

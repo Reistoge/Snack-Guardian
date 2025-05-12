@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,18 +10,49 @@ public class UIPlayerHealth : MonoBehaviour
     [SerializeField] TextMeshProUGUI healthText;
     [SerializeField] HealthSystem healthSystem;
 
+
     private void OnEnable()
     {
-        healthSystem.onDamageTaken += UpdateHealthText;
+        GameManager.onPlayerLoaded += loadHealthSystem;
+        
+        loadHealthText();
+
     }
     private void OnDisable()
     {
-        healthSystem.onDamageTaken -= UpdateHealthText;
+        GameManager.onPlayerLoaded -= loadHealthSystem;
+        if (healthSystem != null)
+        {
+            healthSystem.onDamageTaken -= UpdateHealthText;
+        }
     }
     private void UpdateHealthText()
     {
+        if (healthSystem == null)
+        {
+            Debug.LogWarning("Health system is not loaded yet.");
+            healthSystem = GameManager.Instance.getPlayerHealthSystem();
+            return;
+        }
         healthText.text = "Health: " + healthSystem.getCurrentHealth().ToString();
     }
 
+    void loadHealthSystem()
+    {
+        // Get the player object from the GameManager
+        healthSystem = GameManager.Instance.getPlayerHealthSystem();
+        healthSystem.onDamageTaken += UpdateHealthText;
+        // Update the health text initially
+    }
 
+    private void loadHealthText()
+    {
+        if (healthSystem == null)
+        {
+            Debug.LogWarning("Health system is not loaded yet.");
+            healthSystem = GameManager.Instance.getPlayerHealthSystem();
+            return;
+        }
+        healthText.text = "Health: " + healthSystem.getMaxHealth().ToString();
+    }
 }
