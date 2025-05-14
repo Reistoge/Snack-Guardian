@@ -1,16 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class SnackAnimHandler : MonoBehaviour
 {
     [SerializeField] Animator anim;
     [SerializeField] Snack snack;
+    [SerializeField] SpriteRenderer spriteRenderer;
 
-    [SerializeField] float finalScale = 1f; // final object scale when leaving the spiral tray
 
-    [SerializeField] float leaveDuration = 1f; // duration of the scale change when leaving the spiral tray
+    float finalScale = 1f; // final object scale when leaving the spiral tray
+
+    float leaveDuration = 1f; // duration of the scale change when leaving the spiral tray
     private readonly int destroyHash = Animator.StringToHash("Destroy");
     private readonly int idleHash = Animator.StringToHash("Idle");
     private readonly int fallHash = Animator.StringToHash("Fall");
@@ -24,7 +28,15 @@ public class SnackAnimHandler : MonoBehaviour
     // items in idle has a relucent flash anim.
 
 
-
+ 
+    public void setLeaveDuration(float duration)
+    {
+        leaveDuration = duration;
+    }
+    public void setScale(float scale)
+    {
+        transform.localScale = new Vector3(snack.getInitScale(), snack.getInitScale(), snack.getInitScale());
+    }
     public void playDestroyAnimation()
     {
 
@@ -107,9 +119,14 @@ public class SnackAnimHandler : MonoBehaviour
         readyToFall = true;
     }
 
+    internal void setAnimator(AnimatorController animController)
+    {
+        anim.runtimeAnimatorController = animController;
 
+    }
 
-
-
-
+    internal void setOrderInLayer(int count)
+    {
+        spriteRenderer.sortingOrder = count;
+    }
 }

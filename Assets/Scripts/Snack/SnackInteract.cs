@@ -47,6 +47,14 @@ public class SnackInteract : MonoBehaviour,IInteractor
             snack.applyEffect(effect);
         }
     }
+    public void desactivateCollider()
+    {
+        snackDetectorCollider.enabled = false;
+    }
+    public void activateCollider()
+    {
+        snackDetectorCollider.enabled = true;
+    }
  
 
 

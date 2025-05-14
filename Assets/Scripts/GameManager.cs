@@ -1,117 +1,81 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
- 
-[DefaultExecutionOrder(-10)]
+
 public class GameManager : GenericSingleton<GameManager>
 {
-    // Start is called before the first frame update
-     
-    public static Action OnGameSceneLoaded;
-    public static Action onPlayerLoaded;
-    GameObject player;
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private PlayerMovementStats defaultMovementStats;
 
+    public static Action OnGameSceneLoaded;
+    public static Action OnPlayerSpawned;
+
+    private GameObject currentPlayer;
 
     void Awake()
     {
         base.Awake();
-        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+        SceneManager.sceneLoaded += onLevelFinishedLoading;
+        GameEvents.onPlayerDeath+= () =>
+        {
+            Destroy(currentPlayer);
+            currentPlayer = null;
+            loadScene("MainMenu");
+        };
     }
-    void OnEnable()
+    private void OnDestroy()
     {
-        // Remove from OnEnable since we're handling it in Awake
-        // SceneManager.sceneLoaded += OnLevelFinishedLoading;
-        
+        SceneManager.sceneLoaded -= onLevelFinishedLoading;
     }
 
-    
-
-    void OnDestroy()
+    private void onLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
-        // Make sure to unsubscribe when the GameObject is destroyed
-        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
-    }
-
-    public void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
-    {   
-        Debug.Log($"Scene loaded: {scene.name} in mode: {mode}");
-        
         switch (scene.name)
         {
-            case "MainMenu":
-                Debug.Log("Main Menu scene initialized");
-                break;
-                
             case "GameScene":
-                Debug.Log("Game Scene initialized");
                 OnGameSceneLoaded?.Invoke();
+                spawnPlayer();
                 break;
-                
-            default:
-                Debug.Log($"Unknown scene loaded: {scene.name}");
+
+            case "MainMenu":
+                // Handle main menu initialization
                 break;
         }
     }
-    bool checkSceneLoaded(string sceneName)
+
+    private void spawnPlayer()
     {
-        // Check if the scene is loaded
-        for (int i = 0; i < SceneManager.sceneCount; i++)
+        if (currentPlayer == null)
         {
-            Scene scene = SceneManager.GetSceneAt(i);
-            if (scene.name == sceneName && scene.isLoaded)
+            Vector3 spawnPosition = getSpawnPosition();
+            currentPlayer = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+
+            if (currentPlayer.TryGetComponent<Player>(out var playerComponent))
             {
-                return true;
+                playerComponent.Movement.setMovementStats(defaultMovementStats);
             }
+
+            OnPlayerSpawned?.Invoke();
+            GameEvents.triggerPlayerSpawned(currentPlayer);
         }
-        return false;
     }
-    // void getPlayerOnGameScene()
-    // {
-    //     // Check if the player is already spawned
-    //     if (playerOnGameScene == null)
-    //     {
-    //         playerOnGameScene = GameObject.FindGameObjectWithTag("Player");
-    //     }
-         
-    // }
-    public void setPlayer(GameObject player)
+
+    private Vector3 getSpawnPosition()
     {
-        this.player = player;
-        onPlayerLoaded?.Invoke();
+        // Find spawn point or use default position
+        var spawnPoint = GameObject.FindGameObjectWithTag("PlayerSpawn");
+        return spawnPoint != null ? spawnPoint.transform.position : Vector3.zero;
     }
-    public HealthSystem getPlayerHealthSystem()
-    {
-        if (player != null)
-        {
-           Debug.Log("Player correctly referenced");
-           return player.GetComponent<HealthSystem>();
-            
-        }
-        else
-        {
-            Debug.LogError("Player is not referenced in GameManager ");
-            player = GameObject.FindGameObjectWithTag("Player");
-            if(player){
-                Debug.LogError("Player found by ObjectWithTag");
-                return player.GetComponent<HealthSystem>();
-            }else{
-                Debug.LogError("Player not found ");
-                return null;
-            }
-            
-             
-        }
-    }
+
     public void loadScene(string sceneName)
     {
-        // Load the scene asynchronously
         SceneManager.LoadScene(sceneName);
     }
- 
 
+    public HealthSystem getPlayerHealth()
+    {
+        return currentPlayer?.GetComponent<HealthSystem>();
+    }
 
 
 }

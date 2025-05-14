@@ -179,7 +179,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Play
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 581491443}
   - component: {fileID: 581491442}
   - component: {fileID: 581491441}
+  - component: {fileID: 581491444}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -585,8 +586,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1004561424}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 581491444}
+        m_TargetAssemblyTypeName: UIButton, Assembly-CSharp
         m_MethodName: loadScene
         m_Mode: 5
         m_Arguments:
@@ -635,6 +636,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 581491439}
   m_CullTransparentMesh: 1
+--- !u!114 &581491444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581491439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc22ea2c4dc5e8141bc66f01272c0104, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1004561423
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,6 +677,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97858cac25a4b8b4d9894fd8086d8c2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 6329384649287051715, guid: c2a25338b213b724db4ce74a654c8ab4, type: 3}
+  defaultMovementStats: {fileID: 11400000, guid: 0ef15f9ddb02c474480a009aeb867bb2, type: 2}
 --- !u!4 &1004561425
 Transform:
   m_ObjectHideFlags: 0

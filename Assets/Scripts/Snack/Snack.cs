@@ -5,34 +5,49 @@ using UnityEngine;
 
 public class Snack : MonoBehaviour, IInteractable,IInteractor
 {
+    [SerializeField] SnackConfig snackConfig;
     [SerializeField] Fall fall;
-    [SerializeField] ObjectEffect snackEffect;
     [SerializeField] SnackAnimHandler animatorHandler;
     [SerializeField] SnackInteract catchDetector;
+    ObjectEffect snackEffect;
     Coroutine leavingSpiralTrayRoutine;
+    [SerializeField] float initScale = 0.5f;
+    [SerializeField] float leaveDuration = 1f;
+    
 
-
-
-    void Update()
+    
+    public float getInitScale()
     {
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            startLeavingSpiralTray();
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            stopLeavingSpiralTrayCorutine();
-        }
+        return initScale;
     }
-    void Awake()
+    public void setInitScale(float scale)
     {
-        fall.stopFall();
-
+        initScale = scale;
     }
+    public float getLeaveDuration()
+    {
+        return leaveDuration;
+    }
+    public void setLeaveDuration(float duration)
+    {
+        leaveDuration = duration;
+    }
+    void OnEnable()
+    {
+        
+        loadConfig();
+        fall.getOnObjectLanded().AddListener(() => animatorHandler.playIdleAnimation());
+         
+    }
+
+   
+ 
     void Start()
     {
+          
+        fall.stopFall();
         animatorHandler.playIdleAnimation();
+        //catchDetector.desactivateCollider();
         //  fall.startFall();   
     }
     public void startLeavingSpiralTray()
@@ -57,13 +72,9 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     {
         fall.startFall();
         animatorHandler.playFallAnimation();
+        catchDetector.activateCollider();
     }
-    public void isTouchedByPlayer()
-    {
-        fall.stopFall();
-        destroySnack();
-
-    }
+ 
     public void destroySnack()
     {
         stopLeavingSpiralTrayCorutine();
@@ -102,5 +113,25 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     {
         // what happens or what we can do with this effects in this object ?.
          // here we can apply the effect a effect to the snack
+    }
+    void loadConfig()
+    {
+        snackEffect = snackConfig.objectEffect;
+        fall.setFallStats(snackConfig.fallStats);
+        animatorHandler.setAnimator(snackConfig.animator);
+        animatorHandler.setScale(initScale);
+        animatorHandler.setLeaveDuration(leaveDuration);
+        // animatorHandler.setSprite(snackConfig.spriteRenderer);
+    }
+    public void setConfig(SnackConfig config)
+    {
+        snackConfig = config;
+         
+        // animatorHandler.setSprite(snackConfig.spriteRenderer);
+    }
+
+    internal void setOrderInLayer(int count)
+    {
+        animatorHandler.setOrderInLayer(count);
     }
 }

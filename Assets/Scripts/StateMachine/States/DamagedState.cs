@@ -25,7 +25,7 @@ public class DamagedState : PlayerBaseState
     public override void Exit()
     {
         base.Exit();
-        player.addInvincibility();
+            
         player.resetMovementStats();
         // player.Movement.setIsDamaged(false);
     }

@@ -262,8 +262,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 0
-  isTakingDamageTime: 1
+  currentHealth: 100
+  isTakingDamageTime: 0.5
+  invincibilityTime: 2
 --- !u!1 &6911479239602254739
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,6 +463,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anim: {fileID: 8377065742779495517}
   sprite: {fileID: 6461073020625236503}
+  defaultMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  invincibleMaterial: {fileID: 2100000, guid: 29bdcbf41b8ab1c4abd2f31825900b13, type: 2}
 --- !u!1 &9105915779149805450
 GameObject:
   m_ObjectHideFlags: 0

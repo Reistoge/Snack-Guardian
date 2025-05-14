@@ -5,25 +5,8 @@ using UnityEngine;
 public class PlayerInteract : MonoBehaviour, IInteractor
 {
     [SerializeField] Player player;
-    // Start is called before the first frame update
-    // void Start()
-    // {
+    [SerializeField] LayerMask EnemyLayerInteract;
 
-    // }
-
-    // Update is called once per frame
-    // void Update()
-    // {
-
-    // }
-    // void OnTriggerEnter2D(Collider2D collider){
-
-
-    // }
-
-
-    // template dont change this, 
-    // this method pass the effect to the main player script
     public void applyEffect(ObjectEffect effect)
     {
         if (player != null)
@@ -46,4 +29,6 @@ public class PlayerInteract : MonoBehaviour, IInteractor
 
 
     }
+    
+
 }

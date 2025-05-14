@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class PlayerAnimHandler : MonoBehaviour{
     
@@ -13,9 +14,20 @@ public class PlayerAnimHandler : MonoBehaviour{
     private readonly int fastFallSpeedAnimationState = Animator.StringToHash("FastFall");
     private readonly int damagedAnimationState = Animator.StringToHash("Damaged");
 
-    
+    void OnEnable()
+    {
+        GameEvents.onInvincibilityStart += setInvincibleMaterial;
+        GameEvents.onInvincibilityEnd += setDefaultMaterial;
+    }
+    void OnDisable()
+    {
+        GameEvents.onInvincibilityStart -= setInvincibleMaterial;
+        GameEvents.onInvincibilityEnd -= setDefaultMaterial;
+    }
     [SerializeField] Animator anim;
     [SerializeField] SpriteRenderer sprite;
+    [SerializeField] Material defaultMaterial;
+    [SerializeField] Material invincibleMaterial;
     
     public void playEnterDash(){
         anim.Play(dashAnimationState);
@@ -45,5 +57,16 @@ public class PlayerAnimHandler : MonoBehaviour{
     public void playDamagedAnimation()
     {
         anim.Play(damagedAnimationState);
+    }
+    
+    public void setInvincibleMaterial( )
+    {
+        sprite.material = invincibleMaterial;
+         
+    
+    }
+    public void setDefaultMaterial()
+    {
+        sprite.material = defaultMaterial;
     }
 }

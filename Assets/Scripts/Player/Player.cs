@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -28,13 +29,24 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     }
     void OnEnable()
     {
-        healthSystem.onDamageTaken += OnDamageTaken;
-        healthSystem.onDie += ()=> {Destroy(gameObject);};
+        // healthSystem.onDamageTaken += OnDamageTaken;
+        healthSystem.onDie += die;
         
+         
+
+         
+        
+    }
+    public void die(){
+        GameEvents.triggerPlayerDeath();
+
     }
     void OnDisable()
     {
-        healthSystem.onDamageTaken -= OnDamageTaken;
+        // healthSystem.onDamageTaken -= OnDamageTaken;
+        // healthSystem.onDie -= ()=> {Destroy(gameObject);};
+         GameEvents.onPlayerDeath -= die;
+         
         
     }
     private void Update()
@@ -91,16 +103,16 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     public void takeDamage(float amount)
     {
         // here we damage the player when interacts with the object
-        if (healthSystem.canTakeDamage() == false) return;
+        if (healthSystem.canTakeDamage()) healthSystem.handleDamage(amount);;
         // here we check if the player is damaged
-        healthSystem.handleDamage(amount);
+       
     }
-    private void OnDamageTaken()
-    {
+    
+    
 
-        // Any additional damage-related logic
-    }
-        public void activateDamagedMovement()
+        
+    
+    public void activateDamagedMovement()
     {
         // here we change the player state to damaged
         movement.changeToDamagedMovement();
@@ -125,10 +137,6 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         movement.stopMovement();
     }
-
-    internal void addInvincibility()
-    {
-        // 
-    }
+ 
 
 }

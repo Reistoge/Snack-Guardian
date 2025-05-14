@@ -52,7 +52,11 @@ public class Fall : MonoBehaviour
     [SerializeField] private float coyoteTimer;
     [SerializeField] UnityEvent onObjectLanded;
     private bool wantToFall = true;
-
+    public UnityEvent getOnObjectLanded()
+    {
+        return onObjectLanded;
+    }
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -434,6 +438,11 @@ public class Fall : MonoBehaviour
         coyoteTimer = fallStats.jumpCoyoteTime;
 
 
+    }
+
+    internal void setFallStats(FallStats fallStats)
+    {
+        this.fallStats = fallStats;
     }
 
 

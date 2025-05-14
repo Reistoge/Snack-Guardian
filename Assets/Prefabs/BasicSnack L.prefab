@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 765231162663567036}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -75,10 +75,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15284aba1740d5a4e8d170a1657dee3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snackConfig: {fileID: 0}
   fall: {fileID: 261352393528663625}
-  snackEffect: {fileID: 11400000, guid: 6a0fd88d1ab54564eaca939539dfc932, type: 2}
   animatorHandler: {fileID: 2787436680678484143}
   catchDetector: {fileID: 6524130655069053719}
+  initScale: 0.5
+  leaveDuration: 1
 --- !u!114 &261352393528663625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,8 +290,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anim: {fileID: 5767780908418753434}
   snack: {fileID: 1764845875293924743}
-  finalScale: 1
-  leaveDuration: 2
+  spriteRenderer: {fileID: 0}
   readyToDestroy: 0
 --- !u!95 &5767780908418753434
 Animator:

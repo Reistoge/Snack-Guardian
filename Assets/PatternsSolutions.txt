@@ -18,3 +18,6 @@ B. You want to create an object with an animator and physics and the sprite is r
     Note: if you want to add a new child with a certain set of scripts and component just create a Handler.cs that communicates 
     the MainObject.cs and the new component keeping the logic or the connection to MainObject.cs of the new component in Handler.cs
      where here if you want you can reference the MainObject.cs and in MainObject.cs you can also reference the Handler.cs always keeping a good dependency 
+
+
+C. Interact and interactor, this patterns basically needs 2 gameobjects that holds this references 
