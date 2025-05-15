@@ -32,12 +32,7 @@ public class SnackSpawner : MonoBehaviour
         }
         
     }
-    void Update()
-    {
 
-
-
-    }
     private void checkErrors()
     {
         if (snackPrefabTemplate == null)
@@ -78,15 +73,22 @@ public class SnackSpawner : MonoBehaviour
         Snack snack = snackPrefabTemplate.GetComponent<Snack>();
 
         // snack setup
-        snack.setConfig(config);
-        snack.setInitScale((snackStack.Count + 1) * scaleFactor);
-        snack.setLeaveDuration((maxSnacks - snackStack.Count) * leaveDurationSpeedFactor);
-        snack.setOrderInLayer(snackStack.Count);
+        snack = setupSnack(config, snack);
 
         // instantiate the snack and add to the stack
         GameObject newSnack = Instantiate(snackPrefabTemplate, transform.position, Quaternion.identity);
         snackStack.Push(newSnack.GetComponent<Snack>());
     }
+
+    private Snack setupSnack(SnackConfig config, Snack snack)
+    {
+        snack.setConfig(config);
+        snack.setInitScale((snackStack.Count + 1) * scaleFactor);
+        snack.setLeaveDuration((maxSnacks - snackStack.Count) * leaveDurationSpeedFactor);
+        snack.setOrderInLayer(snackStack.Count);
+        return snack;
+    }
+
     public void multiplyLeaveDurationSpeedFactor(float newSpeedFactor)
     {
         leaveDurationSpeedFactor *= newSpeedFactor;
@@ -134,6 +136,7 @@ public class SnackSpawner : MonoBehaviour
         }
 
     }
+    
 
 
 
