@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Animations;
+
 using UnityEngine;
 
 public class SnackAnimHandler : MonoBehaviour
@@ -119,7 +119,7 @@ public class SnackAnimHandler : MonoBehaviour
         readyToFall = true;
     }
 
-    internal void setAnimator(AnimatorController animController)
+    internal void setAnimator(RuntimeAnimatorController animController)
     {
         anim.runtimeAnimatorController = animController;
 

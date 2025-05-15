@@ -678,7 +678,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 6329384649287051715, guid: c2a25338b213b724db4ce74a654c8ab4, type: 3}
-  defaultMovementStats: {fileID: 11400000, guid: 0ef15f9ddb02c474480a009aeb867bb2, type: 2}
+  defaultMovementStats: {fileID: 11400000, guid: 9fe520151b0e35e4e87bab610d31e094, type: 2}
 --- !u!4 &1004561425
 Transform:
   m_ObjectHideFlags: 0

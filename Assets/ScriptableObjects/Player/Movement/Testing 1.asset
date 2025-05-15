@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxWalkSpeed: 7.5
   groundAcceleration: 3
-  groundDecceleration: 25
+  groundDecceleration: 12
   moveThreshold: 0.25
   airAcceleration: 3
   airDecceleration: 3
