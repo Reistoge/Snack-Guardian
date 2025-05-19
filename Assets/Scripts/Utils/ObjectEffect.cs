@@ -1,9 +1,10 @@
 using UnityEngine;
 
-public enum EffectType 
+public enum EffectType
 {
     Heal,
-    Damage
+    Damage,
+     
 }
 
 [CreateAssetMenu(fileName = "New Effect", menuName = "Snack Guardian/Object Effect")]
@@ -13,4 +14,5 @@ public class ObjectEffect : ScriptableObject
     public int amount;
     public Color effectColor = Color.white;
     public GameObject effectParticles;
+    
 }

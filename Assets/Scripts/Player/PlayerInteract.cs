@@ -18,6 +18,7 @@ public class PlayerInteract : MonoBehaviour, IInteractor
                     print("Heal the player");
                     break;
                 case EffectType.Damage:
+                    
                     player.takeDamage(effect.amount);
                     print("Damage the player");
                     break;

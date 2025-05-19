@@ -29,11 +29,11 @@ MonoBehaviour:
   headWidth: 0.75
   wallDetectionRayLength: 0.125
   wallDetectionRayHeightMultiplier: 0.9
-  jumpHeight: 0
+  jumpHeight: 0.01
   jumpHeightCompensationFactor: 1.054
   timeTillJumpApex: 0.2
   gravityOnReleaseMultiplier: 2
-  maxFallSpeed: 5
+  maxFallSpeed: 50
   numberOfJumpsAllowed: 0
   resetJumpOnWallSlide: 0
   timeForUpwardsCancel: 0.027

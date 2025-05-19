@@ -21,3 +21,5 @@ B. You want to create an object with an animator and physics and the sprite is r
 
 
 C. Interact and interactor, this patterns basically needs 2 gameobjects that holds this references 
+D. Remember, animator will always cancel script lerp and instead will constraint the default value of the object scale for that just use spritesheets.
+E. 

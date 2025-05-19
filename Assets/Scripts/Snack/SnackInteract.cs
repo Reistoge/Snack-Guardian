@@ -1,12 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class SnackInteract : MonoBehaviour,IInteractor
 {
     [SerializeField] Snack snack;
 
     [SerializeField] Collider2D snackDetectorCollider;
+    
+
 
  
 
@@ -23,10 +27,11 @@ public class SnackInteract : MonoBehaviour,IInteractor
         // }
 
         var interactor = collision.GetComponent<IInteractor>();
-        if (interactor != null && snack != null)
+        if (interactor != null && snack != null )
         {
             snackDetectorCollider.enabled = false;
             snack.onInteract(interactor);
+            
         }
     }
     void OnTriggerExit2D(Collider2D collision)
@@ -55,7 +60,6 @@ public class SnackInteract : MonoBehaviour,IInteractor
     {
         snackDetectorCollider.enabled = true;
     }
+
  
-
-
 }

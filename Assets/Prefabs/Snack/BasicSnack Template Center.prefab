@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6213554377848743202}
   - component: {fileID: 4053112428503254058}
   - component: {fileID: 487807837637208363}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: catchDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59,10 +59,10 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 8
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 375
+    m_Bits: 4087
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -79,7 +79,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.5}
+  m_Offset: {x: 0, y: 0.16}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 8494729040559705834}
   - component: {fileID: 3315465292840821790}
   - component: {fileID: 5430668983576227317}
-  m_Layer: 3
+  m_Layer: 11
   m_Name: SFX&VFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2882605555896360674}
@@ -172,7 +172,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -193,6 +193,7 @@ MonoBehaviour:
   anim: {fileID: 5430668983576227317}
   snack: {fileID: 6063409312758606029}
   spriteRenderer: {fileID: 8494729040559705834}
+  leaveDuration: 1
   readyToDestroy: 0
 --- !u!95 &5430668983576227317
 Animator:
@@ -227,7 +228,7 @@ GameObject:
   - component: {fileID: 156853964239261855}
   - component: {fileID: 6063409312758606029}
   - component: {fileID: 7930278489831744563}
-  m_Layer: 3
+  m_Layer: 11
   m_Name: BasicSnack Template Center
   m_TagString: Snack
   m_Icon: {fileID: 0}
@@ -245,7 +246,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7626044072523358616}
   - {fileID: 9146711756353099302}
@@ -338,7 +339,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6421988807021355217}
   - component: {fileID: 1847196682302915098}
-  m_Layer: 3
+  m_Layer: 11
   m_Name: feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -375,7 +376,7 @@ BoxCollider2D:
     m_Bits: 128
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 328
+    m_Bits: 2376
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -415,7 +416,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8960792034631159714}
   - component: {fileID: 66900107998124742}
-  m_Layer: 3
+  m_Layer: 11
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -444,7 +445,7 @@ CapsuleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6677096809707908871}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -452,7 +453,7 @@ CapsuleCollider2D:
     m_Bits: 128
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 328
+    m_Bits: 2376
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -481,7 +482,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7626044072523358616}
-  m_Layer: 3
+  m_Layer: 11
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}

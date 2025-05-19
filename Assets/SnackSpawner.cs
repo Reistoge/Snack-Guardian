@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -71,12 +71,11 @@ public class SnackSpawner : MonoBehaviour
         SnackConfig config = snackConfigs[indexConfig]; // can be randomized later
         // Instantiate the snack prefab and set its properties
         Snack snack = snackPrefabTemplate.GetComponent<Snack>();
-
+        
         // snack setup
         snack = setupSnack(config, snack);
-
         // instantiate the snack and add to the stack
-        GameObject newSnack = Instantiate(snackPrefabTemplate, transform.position, Quaternion.identity);
+        GameObject newSnack = Instantiate(snack.gameObject, transform.position, Quaternion.identity);
         snackStack.Push(newSnack.GetComponent<Snack>());
     }
 

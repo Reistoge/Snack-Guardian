@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf8580fe62a55dd4493d58550c42b2c4, type: 3}
   m_Name: Testing
   m_EditorClassIdentifier: 
-  maxWalkSpeed: 4.5
+  maxWalkSpeed: 3
   groundAcceleration: 3
-  groundDecceleration: 12
+  groundDecceleration: 15
   moveThreshold: 0.25
   airAcceleration: 3
-  airDecceleration: 3
+  airDecceleration: 5
   wallJumpMoveAcceleration: 3
   wallJumpMoveDecceleration: 3
   maxRunSpeed: 12
@@ -33,7 +33,7 @@ MonoBehaviour:
   jumpHeightCompensationFactor: 1.054
   timeTillJumpApex: 0.2
   gravityOnReleaseMultiplier: 1.1
-  maxFallSpeed: 11
+  maxFallSpeed: 6
   numberOfJumpsAllowed: 2
   resetJumpOnWallSlide: 0
   timeForUpwardsCancel: 0.027

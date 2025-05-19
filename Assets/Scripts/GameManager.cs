@@ -42,6 +42,7 @@ public class GameManager : GenericSingleton<GameManager>
                 break;
         }
     }
+ 
 
     private void spawnPlayer()
     {

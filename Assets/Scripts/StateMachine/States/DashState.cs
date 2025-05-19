@@ -13,8 +13,9 @@ public class DashState : PlayerBaseState
     public override void Enter()
     {
         base.Enter();
-        
+
         player.PlayerAnimation.playEnterDash();
+        player.setIsInvincible(true); // check if works with a spike.
         
         // player.initiateDash();
     }
@@ -22,7 +23,7 @@ public class DashState : PlayerBaseState
     public override void Exit()
     {
         base.Exit();
-         
+        player.setIsInvincible(false);
         // player.IsDashing = false;
         // player.IsAirDashing = false;
     }

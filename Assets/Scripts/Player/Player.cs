@@ -32,6 +32,8 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
         // healthSystem.onDamageTaken += OnDamageTaken;
         healthSystem.onDie += die;
         
+        healthSystem.setIsTakingDamageTime(anim.getDamagedAnimationDuration());
+        
          
 
          
@@ -103,9 +105,19 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     public void takeDamage(float amount)
     {
         // here we damage the player when interacts with the object
-        if (healthSystem.canTakeDamage()) healthSystem.handleDamage(amount);;
+        if (healthSystem.canTakeDamage())
+        {
+            healthSystem.handleDamage(amount);
+            
+            
+        }
+        
         // here we check if the player is damaged
-       
+
+    }
+    public void setIsInvincible(bool isInvincible)
+    {
+        healthSystem.setIsInvincible( isInvincible);
     }
     
     
@@ -116,7 +128,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         // here we change the player state to damaged
         movement.changeToDamagedMovement();
-        
+
     }
     public void resetMovementStats()
     {
@@ -131,6 +143,12 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     public void playDamagedAnimation()
     {
         anim.playDamagedAnimation();
+    }
+    public void playerBump()
+    {
+        // here we play the bump animation
+        
+
     }
 
     public void stopMovement()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -20,6 +21,11 @@ public class HealthSystem : MonoBehaviour
 
     bool isTakingDamage;
     bool isInvincible;
+
+    public void setIsTakingDamageTime(float seconds)
+    {
+        this.isTakingDamageTime = seconds;
+     }
 
     void Start()
     {
@@ -69,7 +75,14 @@ public class HealthSystem : MonoBehaviour
 
     public bool canTakeDamage()
     {
+        // if in invincibility time, return false
+        // if in taking damage time, return false
+        
         return isTakingDamage == false && isInvincible == false;
+    }
+    public void setIsInvincible(bool isInvincible)
+    {
+        this.isInvincible = isInvincible;
     }
     public void startDamageTimer()
     {

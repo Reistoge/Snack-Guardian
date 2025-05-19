@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class Snack : MonoBehaviour, IInteractable,IInteractor
+public class Snack : MonoBehaviour, IInteractable, IInteractor
 {
     [SerializeField] SnackConfig snackConfig;
     [SerializeField] Fall fall;
@@ -13,9 +15,9 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     Coroutine leavingSpiralTrayRoutine;
     [SerializeField] float initScale = 0.5f;
     [SerializeField] float leaveDuration = 1f;
-    
 
-    
+
+
     public float getInitScale()
     {
         return initScale;
@@ -23,6 +25,7 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     public void setInitScale(float scale)
     {
         initScale = scale;
+        animatorHandler.setScale(initScale);
     }
     public float getLeaveDuration()
     {
@@ -34,17 +37,17 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     }
     void OnEnable()
     {
-        
+
         loadConfig();
-        fall.getOnObjectLanded().AddListener(() => animatorHandler.playIdleAnimation());
-         
+        fall.getOnObjectLanded().AddListener(() => snackLandedOnGround()); // it would be better with actions.
+
     }
 
-   
- 
+
+
     void Start()
     {
-          
+
         fall.stopFall();
         animatorHandler.playIdleAnimation();
         //catchDetector.desactivateCollider();
@@ -70,11 +73,14 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     }
     public void startFalling()
     {
+        
         fall.startFall();
         animatorHandler.playFallAnimation();
         catchDetector.activateCollider();
+        //fall.setActiveBody(true);
+        // fall.setActiveFeet(true);
     }
- 
+
     public void destroySnack()
     {
         stopLeavingSpiralTrayCorutine();
@@ -112,13 +118,14 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     public void applyEffect(ObjectEffect effect)
     {
         // what happens or what we can do with this effects in this object ?.
-         // here we can apply the effect a effect to the snack
+        // here we can apply the effect a effect to the snack
     }
     void loadConfig()
     {
         snackEffect = snackConfig.objectEffect;
         fall.setFallStats(snackConfig.fallStats);
         animatorHandler.setAnimator(snackConfig.animator);
+        // print(initScale);
         animatorHandler.setScale(initScale);
         animatorHandler.setLeaveDuration(leaveDuration);
         // animatorHandler.setSprite(snackConfig.spriteRenderer);
@@ -126,12 +133,31 @@ public class Snack : MonoBehaviour, IInteractable,IInteractor
     public void setConfig(SnackConfig config)
     {
         snackConfig = config;
-         
+
         // animatorHandler.setSprite(snackConfig.spriteRenderer);
     }
 
     internal void setOrderInLayer(int count)
     {
         animatorHandler.setOrderInLayer(count);
+    }
+    void snackLandedOnGround()
+    {
+        //animatorHandler.playTouchGroundAnimation();
+        catchDetector.desactivateCollider();
+        int direction = Random.Range(0, 2) == 0 ? 1 : -1;
+        float randomOffset = Random.Range(0, 0.15f);
+        transform.position= new Vector3(transform.position.x+(randomOffset*direction), transform.position.y, 0);
+        if (Random.Range(0, 2) == 1)
+        {
+            //destroySnack();
+            //destroy drop particles.
+        }
+        else
+        {
+
+            // do not destroy just stay in ground.
+        }
+
     }
 }

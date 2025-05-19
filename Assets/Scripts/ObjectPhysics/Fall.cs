@@ -74,6 +74,16 @@ public class Fall : MonoBehaviour
 
  
     }
+    public void setActiveFeet(bool active)
+    {
+        feetColl.enabled = active;
+    }
+    public void setActiveBody(bool active)
+    {
+        bodyColl.enabled = active;
+    }
+    
+
 
     public void FixedUpdate()
     {

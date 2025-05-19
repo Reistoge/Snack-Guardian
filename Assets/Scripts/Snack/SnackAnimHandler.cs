@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class SnackAnimHandler : MonoBehaviour
 {
@@ -14,13 +15,22 @@ public class SnackAnimHandler : MonoBehaviour
 
     float finalScale = 1f; // final object scale when leaving the spiral tray
 
-    float leaveDuration = 1f; // duration of the scale change when leaving the spiral tray
-    private readonly int destroyHash = Animator.StringToHash("Destroy");
-    private readonly int idleHash = Animator.StringToHash("Idle");
-    private readonly int fallHash = Animator.StringToHash("Fall");
-    private readonly int catchHash = Animator.StringToHash("Catch");
-    private readonly int leavingSpiralTrayHash = Animator.StringToHash("LeavingSpiralTray");
 
+    [SerializeField] float leaveDuration = 1f; // duration of the scale change when leaving the spiral tray
+
+    private const string IDLE_ANIMATION_STATE = "Idle";
+    private const string FALL_ANIMATION_STATE = "Fall";
+    private const string CATCH_ANIMATION_STATE = "Catch";
+    private const string DESTROY_ANIMATION_STATE = "Destroy";
+    private const string LEAVING_SPIRAL_TRAY_ANIMATION_STATE = "LeavingSpiralTray"; 
+     
+    private readonly int destroyHash = Animator.StringToHash(DESTROY_ANIMATION_STATE);
+    private readonly int idleHash = Animator.StringToHash(IDLE_ANIMATION_STATE);
+    private readonly int fallHash = Animator.StringToHash(FALL_ANIMATION_STATE);
+    private readonly int catchHash = Animator.StringToHash(CATCH_ANIMATION_STATE);
+    private readonly int leavingSpiralTrayHash = Animator.StringToHash(LEAVING_SPIRAL_TRAY_ANIMATION_STATE);
+    // private readonly int touchGroundRightHash = Animator.StringToHash("TouchGroundRight");
+    // private readonly int touchGroundLeftHash = Animator.StringToHash("TouchGroundLeft");
     Coroutine scaleRoutine;
     bool readyToFall; // bool to check if the object is ready to fall
     public bool readyToDestroy; // bool to check if the object is ready to be destroyed
@@ -35,7 +45,7 @@ public class SnackAnimHandler : MonoBehaviour
     }
     public void setScale(float scale)
     {
-        transform.localScale = new Vector3(snack.getInitScale(), snack.getInitScale(), snack.getInitScale());
+        transform.localScale = new Vector3(scale, scale, scale);
     }
     public void playDestroyAnimation()
     {
@@ -80,6 +90,31 @@ public class SnackAnimHandler : MonoBehaviour
             anim.Play(leavingSpiralTrayHash);
         }
     }
+    // public void playTouchGroundAnimation()
+    // {
+    //     int randomSign = Random.value < 0.5f ? 1 : -1;
+    //     if(randomSign == 1)
+    //     {
+    //         anim.Play(touchGroundRightHash);
+    //     }
+    //     else
+    //     {
+    //         anim.Play(touchGroundLeftHash);
+    //     }
+        
+        
+ 
+
+    // }
+    // public float getTouchGroundAnimationDuration()
+    // {
+    //     foreach (var clip in anim.runtimeAnimatorController.animationClips)
+    //     {
+    //         if (clip.name =="TouchGround") // Replace with your damaged animation's name
+    //             return clip.length;
+    //     }
+    //     return 0f; // Or throw an exception if not found
+    // }
     public void stopLeavingSpiralTrayAnimation()
     {
 
@@ -98,11 +133,12 @@ public class SnackAnimHandler : MonoBehaviour
 
     IEnumerator changeScale(float targetScale, float duration)
     {
+        
         // change the scale when the object is leaving the spiral tray.
         Vector3 startScale = transform.localScale;
         Vector3 endScale = new Vector3(targetScale, targetScale, targetScale);
         float elapsedTime = 0f;
-
+        
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
@@ -114,6 +150,7 @@ public class SnackAnimHandler : MonoBehaviour
             transform.localScale = Vector3.Lerp(startScale, endScale, t);
             yield return null;
         }
+        
 
         transform.localScale = endScale;
         readyToFall = true;
