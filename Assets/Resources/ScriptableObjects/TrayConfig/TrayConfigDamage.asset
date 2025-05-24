@@ -16,6 +16,6 @@ MonoBehaviour:
   spawnerPrefabTemplate: {fileID: 1923812698212707859, guid: f546c09cc3b58954ba72cf3e1bc58147, type: 3}
   platformPrefabTemplate: {fileID: 6525422854364634684, guid: 18f040cb5d2c7f54e9cb9948a792c356, type: 3}
   spawnerConfigs:
-  - {fileID: 11400000, guid: 84397e5acd630ee43a6c0e6847c8144f, type: 2}
-  - {fileID: 11400000, guid: f7e2e895a4dd604448f9478c24974960, type: 2}
+  - {fileID: 11400000, guid: f1598bbc3677a06498075597bb0cfb13, type: 2}
+  - {fileID: 11400000, guid: 09b556b42ec7ffa45b56b205ba861e50, type: 2}
   platformShouldBreakOnStartChance: 0.5
