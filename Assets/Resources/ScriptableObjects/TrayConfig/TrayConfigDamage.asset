@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d772c999ddec2d84cbba5eefcd0d6e85, type: 3}
+  m_Name: TrayConfigDamage
+  m_EditorClassIdentifier: 
+  trayPrefab: {fileID: 7183843644925821168, guid: e47e3f822aa3d1542811e4464bdee132, type: 3}
+  spawnerPrefabTemplate: {fileID: 1923812698212707859, guid: f546c09cc3b58954ba72cf3e1bc58147, type: 3}
+  platformPrefabTemplate: {fileID: 6525422854364634684, guid: 18f040cb5d2c7f54e9cb9948a792c356, type: 3}
+  spawnerConfigs:
+  - {fileID: 11400000, guid: 84397e5acd630ee43a6c0e6847c8144f, type: 2}
+  - {fileID: 11400000, guid: f7e2e895a4dd604448f9478c24974960, type: 2}
+  platformShouldBreakOnStartChance: 0.5

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,29 +8,41 @@ public class PlayerInteract : MonoBehaviour, IInteractor
     [SerializeField] Player player;
     [SerializeField] LayerMask EnemyLayerInteract;
 
-    public void applyEffect(ObjectEffect effect)
+
+    public void interactionWithSnack(ObjectEffect effect)
     {
-        if (player != null)
+        
+        if (effect == null) return;
+        if (!player.isDashing() && effect.type == EffectType.Nothing)
         {
-            switch (effect.type)
-            {
-                case EffectType.Heal:
-                    player.heal(effect.amount);
-                    print("Heal the player");
-                    break;
-                case EffectType.Damage:
-                    
-                    player.takeDamage(effect.amount);
-                    print("Damage the player");
-                    break;
-            }
-            // pass the things to the main object.
-            player.applyEffect(effect);
-
+            player.bump();
         }
-
+        
+    
+        // if (effect.type == EffectType.Heal)
+        // { 
+        //     player.bump();
+        // }
 
     }
-    
+
+    public void applyEffect(ObjectEffect effect)
+    {
+        if (player == null) return;
+        switch (effect.type)
+        {
+            case EffectType.Heal:
+                player.heal(effect.amount);
+                break;
+
+            case EffectType.Damage:
+                if (!player.isDashing())
+                {
+                    player.takeDamage(effect.amount);
+                }
+                break;
+        }
+        player.applyEffect(effect);
+    }
 
 }

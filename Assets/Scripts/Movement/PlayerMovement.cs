@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,11 +15,14 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     public PlayerMovementStats moveStats;
     [SerializeField] PlayerMovementStats damagedStats;
-    PlayerMovementStats tempMoveStats;
+    [SerializeField] PlayerMovementStats bumpedStats;
+    [SerializeField] PlayerMovementStats tempMoveStats;
     [SerializeField] private Collider2D feetColl;
     [SerializeField] private Collider2D bodyColl;
 
+
     private Rigidbody2D rb;
+    private Vector2 movementBeforeStop;
 
     //movement vars
     private float horizontalVelocity;
@@ -36,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     //jump vars
-    [SerializeField] public float verticalVelocity { get;  set; }
+    [SerializeField] public float verticalVelocity { get; set; }
 
 
     [SerializeField] private bool isJumping;
@@ -87,15 +91,21 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool isDashFastFalling;
     [SerializeField] private float dashFastFallTime;
     [SerializeField] private float dashFastFallReleaseSpeed;
- 
+    private Vector2 dashVector;
+    private ImpactEffect currentImpact;
+    private bool isImpacted;
+    private bool isInFallPhase;
+
+    [SerializeField] float horizontalBumpVelocity;
+    [SerializeField] float verticalBumpVelocity;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-   
+
         isFacingRight = true;
- 
+
     }
-     
+
     public void handleMove()
     {
         if (isGrounded)
@@ -113,6 +123,7 @@ public class PlayerMovement : MonoBehaviour
                 move(moveStats.airAcceleration, moveStats.airDecceleration, InputManager.movement);
             }
         }
+
     }
     #region jumps
 
@@ -159,7 +170,7 @@ public class PlayerMovement : MonoBehaviour
         {
 
             initiateJump(1);
-            print("JUMP");
+            //print("JUMP");
             if (jumpReleasedDuringBuffer)
             {
                 isFastFalling = true;
@@ -364,6 +375,7 @@ public class PlayerMovement : MonoBehaviour
         {
             dashOnGroundTime -= Time.deltaTime;
         }
+
 
 
     }
@@ -948,6 +960,7 @@ public class PlayerMovement : MonoBehaviour
 
             }
             horizontalVelocity = moveStats.dashSpeed * dashDirection.x;
+
             if (dashDirection.y != 0f || isAirDashing)
             {
                 verticalVelocity = moveStats.dashSpeed * dashDirection.y;
@@ -974,6 +987,7 @@ public class PlayerMovement : MonoBehaviour
                 verticalVelocity += moveStats.gravity * moveStats.dashGravityOnReleaseMultiplier * Time.fixedDeltaTime;
             }
         }
+        DashVector = new Vector2(horizontalVelocity, verticalVelocity);
     }
     public void resetDashValues()
     {
@@ -986,13 +1000,13 @@ public class PlayerMovement : MonoBehaviour
         numberOfDashesUsed = 0;
 
     }
-    
- 
+
+
     public void setMovementStats(PlayerMovementStats newMoveStats)
     {
-        if(tempMoveStats != null)
+        if (tempMoveStats != null)
         {
-           resetMovementStats();
+            resetMovementStats();
         }
         tempMoveStats = moveStats;
         moveStats = newMoveStats;
@@ -1000,12 +1014,19 @@ public class PlayerMovement : MonoBehaviour
     }
     public void resetMovementStats()
     {
+        if (tempMoveStats == null) return;
         moveStats = tempMoveStats;
         tempMoveStats = null;
     }
 
-    internal void stopMovement()
+    public void stopMovement()
     {
+
+
+        movementBeforeStop = new Vector2(horizontalVelocity, verticalVelocity);
+        movementBeforeStop = new Vector2(rb.velocity.x, rb.velocity.y);
+        // Debug.Log($"Storing movement: {movementBeforeStop}");
+
         horizontalVelocity = 0f;
         verticalVelocity = 0f;
         rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
@@ -1019,13 +1040,153 @@ public class PlayerMovement : MonoBehaviour
         isAirDashing = false;
         isDashFastFalling = false;
     }
+    // public void changeToDamagedMovement()
+    // {
+    //     setMovementStats(damagedStats);
 
-    internal void changeToDamagedMovement()
+    //     feetColl.includeLayers = onDamagedLayerInclude;
+    //     feetColl.excludeLayers = onDamagedLayerExclude;
+
+    //     bodyColl.includeLayers = onDamagedLayerInclude;
+    //     bodyColl.excludeLayers = onDamagedLayerExclude;
+
+    //     Vector2 bumpDirection = -movementBeforeStop.normalized;
+
+    //     horizontalBumpVelocity = moveStats.bumpMovementSpeedHorizontal * bumpDirection.x;
+    //     verticalBumpVelocity = moveStats.bumpMovementSpeedVertical * (bumpDirection.y + moveStats.bumpMovementSpeedVertical * 0.1f);
+    // }
+    // public void changeToBumpedMovement()
+    // {
+    //     setMovementStats(bumpedStats);
+
+    //     Debug.Log($"Movement before stop: {movementBeforeStop}");
+
+    //     // Get direction from stored velocity
+    //     Vector2 bumpDirection = -movementBeforeStop.normalized;
+
+
+    //     horizontalBumpVelocity = moveStats.bumpMovementSpeedHorizontal * bumpDirection.x;
+    //     if (horizontalBumpVelocity > 0)
+    //     {
+    //         horizontalBumpVelocity = Mathf.Clamp(horizontalBumpVelocity, 3, 50);
+    //     }
+    //     else if (horizontalBumpVelocity < 0)
+    //     {
+    //         horizontalBumpVelocity = -Mathf.Clamp(horizontalBumpVelocity, 3, 50);
+    //     }
+    //     // 
+    //     verticalBumpVelocity = moveStats.bumpMovementSpeedVertical * bumpDirection.y;
+    //     if (verticalBumpVelocity > 0)
+    //     {
+    //         verticalBumpVelocity = Mathf.Clamp(verticalBumpVelocity, 3, 50);
+    //     }
+    //     else if (verticalBumpVelocity < 0)
+    //     {
+    //         verticalBumpVelocity = -Mathf.Clamp(verticalBumpVelocity, 3, 50);
+    //     }
+
+
+    // }
+    // Keep these essential impact methods
+    public void applyImpact(bool isDamaged)
     {
-        setMovementStats(damagedStats);
+        if (isDashing) return;
+
+        movementBeforeStop = rb.velocity;
+        currentImpact = isDamaged ? moveStats.damageEffect : moveStats.bumpEffect;
+
+        Vector2 impactVelocity = currentImpact.calculateImpactVelocity(
+            movementBeforeStop,
+            isFacingRight
+        );
+
+        horizontalBumpVelocity = impactVelocity.x;
+        verticalBumpVelocity = impactVelocity.y;
+        isImpacted = true;
+        isInFallPhase = false;
     }
 
+    public void applyBumpedVelocity(bool applyGravity)
+    {
+        if (!isDashing && isImpacted)
+        {
+            // if (isInFallPhase)
+            // {
+            //     // Apply fall phase physics
+            //     verticalBumpVelocity += currentImpact.fallGravity * Time.fixedDeltaTime;
+            //     verticalBumpVelocity = Mathf.Clamp(
+            //         verticalBumpVelocity,
+            //         -currentImpact.maxFallSpeed,
+            //         currentImpact.maxFallSpeed
+            //     );
+            //     rb.velocity = new Vector2(0, verticalBumpVelocity);
+            // }
+            // else
+            {
+                // Apply impact phase physics
+                rb.velocity = new Vector2(horizontalBumpVelocity, verticalBumpVelocity);
+
+                if (applyGravity && currentImpact.applyGravity)
+                {
+                    verticalBumpVelocity += moveStats.gravity * Time.fixedDeltaTime;
+                }
+            }
+        }
+    }
+
+    // public void startFallPhase()
+    // {
+    //     if (currentImpact != null && currentImpact.hasFallPhase)
+    //     {
+    //         isInFallPhase = true;
+    //         horizontalBumpVelocity = 0f;
+    //         // Start with downward velocity
+    //         verticalBumpVelocity = 0f;
+    //     }
+    // }
+
+    public void stopImpact()
+    {
+        isImpacted = false;
+        isInFallPhase = false;
+        horizontalBumpVelocity = 0f;
+        verticalBumpVelocity = 0f;
+        currentImpact = null;
+    }
+
+    // Update StopImpact to reset all impact-related values
+
+    // public bool isGroundedOnLayer(LayerMask layer)
+    // {
+    //     return Physics2D.BoxCast(
+    //         feetColl.bounds.center,
+    //         feetColl.bounds.size,
+    //         0f,
+    //         Vector2.down,
+    //         0.1f,
+    //         layer
+    //     ).collider != null;
+    // }
+
+
+    // public void updateCollisionLayers(LayerMask include, LayerMask exclude)
+    // {
+    //     feetColl.includeLayers = include;
+    //     feetColl.excludeLayers = exclude;
+    //     bodyColl.includeLayers = include;
+    //     bodyColl.excludeLayers = exclude;
+    // }
+
+    // private void resetCollisionLayers()
+    // {
+    //     updateCollisionLayers(moveStats.groundLayer, 0);
+    // }
+
+
     #endregion
+
+
+
 
     #region getters and setters
     public bool IsGrounded { get => isGrounded; set => isGrounded = value; }
@@ -1071,8 +1232,9 @@ public class PlayerMovement : MonoBehaviour
     public RaycastHit2D HeadHit { get => headHit; set => headHit = value; }
     public RaycastHit2D WallHit { get => wallHit; set => wallHit = value; }
     public RaycastHit2D LastWallHit { get => lastWallHit; set => lastWallHit = value; }
- 
+
     public int NumberOfJumpsUsed { get => numberOfJumpsUsed; set => numberOfJumpsUsed = value; }
+    public Vector2 DashVector { get => dashVector; set => dashVector = value; }
     #endregion
 
 

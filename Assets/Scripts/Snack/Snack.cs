@@ -11,6 +11,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     [SerializeField] Fall fall;
     [SerializeField] SnackAnimHandler animatorHandler;
     [SerializeField] SnackInteract catchDetector;
+
     ObjectEffect snackEffect;
     Coroutine leavingSpiralTrayRoutine;
     [SerializeField] float initScale = 0.5f;
@@ -73,10 +74,11 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     }
     public void startFalling()
     {
-        
+
         fall.startFall();
         animatorHandler.playFallAnimation();
-        catchDetector.activateCollider();
+
+
         //fall.setActiveBody(true);
         // fall.setActiveFeet(true);
     }
@@ -92,11 +94,15 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     {
         animatorHandler.playLeavingSpiralTrayAnimation();
         yield return new WaitUntil(() => animatorHandler.isReadyToFall());
+
         startFalling();
+        leavingSpiralTrayRoutine = null;
 
     }
+
     IEnumerator destroyObjectCorutine()
     {
+        
         animatorHandler.playDestroyAnimation();
         yield return new WaitUntil(() => animatorHandler.getReadyToDestroy());
         Destroy(gameObject);
@@ -108,9 +114,17 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
         // what happens to the snack when it interacts with the object ?
         // what happen when we have to pass a effect to a object
         fall.stopFall();
-        destroySnack();
         // here we pass the effect to the a object that implements the IInteractor interface
+
+        // if player is not dashing -> make damage
+        // if player is dashing -> make apply second effect
         interactor.applyEffect(snackEffect);
+
+        InteractorHandler.handleInteraction(this as IInteractable, interactor, snackEffect);
+        // GameManager.Instance.handleInteraction(this as IInteractable, interactor);
+        destroySnack();
+
+
 
 
     }
@@ -144,10 +158,11 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     void snackLandedOnGround()
     {
         //animatorHandler.playTouchGroundAnimation();
-        catchDetector.desactivateCollider();
+        // catchDetector.desactivateCollider();
+        canBeCatched(false);
         int direction = Random.Range(0, 2) == 0 ? 1 : -1;
         float randomOffset = Random.Range(0, 0.15f);
-        transform.position= new Vector3(transform.position.x+(randomOffset*direction), transform.position.y, 0);
+        transform.position = new Vector3(transform.position.x + (randomOffset * direction), transform.position.y, 0);
         if (Random.Range(0, 2) == 1)
         {
             //destroySnack();
@@ -159,5 +174,22 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
             // do not destroy just stay in ground.
         }
 
+    } 
+    public void canBeCatched(bool canBeCatched)
+    {
+        if (canBeCatched)
+        {
+            catchDetector.activateCollider();
+        }
+        else
+        {
+            catchDetector.desactivateCollider();
+        }
+    }
+
+
+    public bool isReadyToFall()
+    {
+        return leavingSpiralTrayRoutine == null;
     }
 }

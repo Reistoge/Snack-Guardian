@@ -5,16 +5,17 @@ using UnityEngine.Video;
 public class PlayerAnimHandler : MonoBehaviour
 {
 
-    private const string IDLE_ANIMATION_STATE = "Idle";
-    private const string RUN_ANIMATION_STATE = "Run";
-    private const string JUMP_ANIMATION_STATE = "Jump";
-    private const string WALL_JUMP_ANIMATION_STATE = "WallJump";
-    private const string DASH_ANIMATION_STATE = "Dash";
-    private const string FALL_ANIMATION_STATE = "Fall";
-    private const string WALK_ANIMATION_STATE = "Walk";
-    private const string FAST_FALL_ANIMATION_STATE = "FastFall";
-    private const string DAMAGED_ANIMATION_STATE = "Damaged";
-     
+    public static readonly string IDLE_ANIMATION_STATE = "Idle";
+    public static readonly string RUN_ANIMATION_STATE = "Run";
+    public static readonly string JUMP_ANIMATION_STATE = "Jump";
+    public static readonly string WALL_JUMP_ANIMATION_STATE = "WallJump";
+    public static readonly string DASH_ANIMATION_STATE = "Dash";
+    public static readonly string FALL_ANIMATION_STATE = "Fall";
+    public static readonly string WALK_ANIMATION_STATE = "Walk";
+    public static readonly string FAST_FALL_ANIMATION_STATE = "FastFall";
+    public static readonly string DAMAGED_ANIMATION_STATE = "Damaged";
+    public static readonly string BUMP_ANIMATION_STATE = "Bump";
+
     private readonly int idleAnimationHash = Animator.StringToHash(IDLE_ANIMATION_STATE);
     private readonly int runAnimationHash = Animator.StringToHash(RUN_ANIMATION_STATE);
     private readonly int jumpAnimationHash = Animator.StringToHash(JUMP_ANIMATION_STATE);
@@ -24,7 +25,7 @@ public class PlayerAnimHandler : MonoBehaviour
     private readonly int walkAnimationHash = Animator.StringToHash(WALK_ANIMATION_STATE);
     private readonly int fastFallSpeedAnimationHash = Animator.StringToHash(FAST_FALL_ANIMATION_STATE);
     private readonly int damagedAnimationHash = Animator.StringToHash(DAMAGED_ANIMATION_STATE);
-
+    private readonly int bumpAnimationHash = Animator.StringToHash(BUMP_ANIMATION_STATE);
     void OnEnable()
     {
         GameEvents.onInvincibilityStart += setInvincibleMaterial;
@@ -94,7 +95,17 @@ public class PlayerAnimHandler : MonoBehaviour
     {
         foreach (var clip in anim.runtimeAnimatorController.animationClips)
         {
-            if (clip.name ==DAMAGED_ANIMATION_STATE) // Replace with your damaged animation's name
+            if (clip.name == DAMAGED_ANIMATION_STATE) // Replace with your damaged animation's name
+                return clip.length;
+        }
+        return 0f; // Or throw an exception if not found
+    }
+
+    public float getClipDuration(string clipName)
+    {
+        foreach (var clip in anim.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name == clipName) // Replace with your damaged animation's name
                 return clip.length;
         }
         return 0f; // Or throw an exception if not found

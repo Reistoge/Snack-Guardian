@@ -18,17 +18,19 @@ public class SnackAnimHandler : MonoBehaviour
 
     [SerializeField] float leaveDuration = 1f; // duration of the scale change when leaving the spiral tray
 
-    private const string IDLE_ANIMATION_STATE = "Idle";
-    private const string FALL_ANIMATION_STATE = "Fall";
-    private const string CATCH_ANIMATION_STATE = "Catch";
-    private const string DESTROY_ANIMATION_STATE = "Destroy";
-    private const string LEAVING_SPIRAL_TRAY_ANIMATION_STATE = "LeavingSpiralTray"; 
-     
+    public static readonly string IDLE_ANIMATION_STATE = "Idle";
+    public static readonly string FALL_ANIMATION_STATE = "Fall";
+    public static readonly string CATCH_ANIMATION_STATE = "Catch";
+    public static readonly string DESTROY_ANIMATION_STATE = "Destroy";
+    public static readonly string LEAVING_SPIRAL_TRAY_ANIMATION_STATE = "LeavingSpiralTray";
+    public static readonly string FLIP_ANIMATION_STATE = "Flip";
+
     private readonly int destroyHash = Animator.StringToHash(DESTROY_ANIMATION_STATE);
     private readonly int idleHash = Animator.StringToHash(IDLE_ANIMATION_STATE);
     private readonly int fallHash = Animator.StringToHash(FALL_ANIMATION_STATE);
     private readonly int catchHash = Animator.StringToHash(CATCH_ANIMATION_STATE);
     private readonly int leavingSpiralTrayHash = Animator.StringToHash(LEAVING_SPIRAL_TRAY_ANIMATION_STATE);
+    private readonly int flipHash = Animator.StringToHash(FLIP_ANIMATION_STATE);
     // private readonly int touchGroundRightHash = Animator.StringToHash("TouchGroundRight");
     // private readonly int touchGroundLeftHash = Animator.StringToHash("TouchGroundLeft");
     Coroutine scaleRoutine;
@@ -38,7 +40,7 @@ public class SnackAnimHandler : MonoBehaviour
     // items in idle has a relucent flash anim.
 
 
- 
+
     public void setLeaveDuration(float duration)
     {
         leaveDuration = duration;
@@ -52,6 +54,10 @@ public class SnackAnimHandler : MonoBehaviour
 
         anim.Play(destroyHash);
 
+    }
+    public void playFlipAnimation()
+    {
+        anim.Play(flipHash);
     }
     public void isReadyToDestroy()
     {
@@ -90,6 +96,8 @@ public class SnackAnimHandler : MonoBehaviour
             anim.Play(leavingSpiralTrayHash);
         }
     }
+
+ 
     // public void playTouchGroundAnimation()
     // {
     //     int randomSign = Random.value < 0.5f ? 1 : -1;
@@ -101,9 +109,9 @@ public class SnackAnimHandler : MonoBehaviour
     //     {
     //         anim.Play(touchGroundLeftHash);
     //     }
-        
-        
- 
+
+
+
 
     // }
     // public float getTouchGroundAnimationDuration()
@@ -133,12 +141,12 @@ public class SnackAnimHandler : MonoBehaviour
 
     IEnumerator changeScale(float targetScale, float duration)
     {
-        
+
         // change the scale when the object is leaving the spiral tray.
         Vector3 startScale = transform.localScale;
         Vector3 endScale = new Vector3(targetScale, targetScale, targetScale);
         float elapsedTime = 0f;
-        
+
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
@@ -150,9 +158,12 @@ public class SnackAnimHandler : MonoBehaviour
             transform.localScale = Vector3.Lerp(startScale, endScale, t);
             yield return null;
         }
-        
+
 
         transform.localScale = endScale;
+        playFlipAnimation();
+        snack.canBeCatched(true);
+        yield return new WaitForSeconds(getClipDuration(FLIP_ANIMATION_STATE));
         readyToFall = true;
     }
 
@@ -165,5 +176,14 @@ public class SnackAnimHandler : MonoBehaviour
     internal void setOrderInLayer(int count)
     {
         spriteRenderer.sortingOrder = count;
+    }
+    public float getClipDuration(string clipName)
+    {
+        foreach (var clip in anim.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name == clipName) // Replace with your damaged animation's name
+                return clip.length; 
+        }
+        return 0f; // Or throw an exception if not found
     }
 }

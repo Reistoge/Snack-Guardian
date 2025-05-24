@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c821689a7deb8946905e5f78c12d312, type: 3}
+  m_Name: SpawnerConfig3Bump
+  m_EditorClassIdentifier: 
+  snackConfigs:
+  - {fileID: 11400000, guid: 260a6a4db8cc5c44ba3edf68752cbbde, type: 2}
+  - {fileID: 11400000, guid: 6a47f0090df4e5741870df14232500b5, type: 2}
+  maxSnacks: 10
+  maxScale: 1
+  leaveDurationSpeedFactor: 0.5
+  spawnDelay: 3
+  spawnChance: 0.5

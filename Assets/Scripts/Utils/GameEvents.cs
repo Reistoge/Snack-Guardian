@@ -8,6 +8,8 @@ public static class GameEvents
     public static event Action onPlayerDeath;
     public static event Action onInvincibilityStart;
     public static event Action onInvincibilityEnd;
+    public static event Action onConnectedToServer;
+    public static event Action onSnackIsRequested;
 
     // Scene/Player events
     public static event Action<GameObject> onPlayerSpawned;
@@ -15,6 +17,14 @@ public static class GameEvents
     public static void triggerHealthChanged(float current, float max)
     {
         OnHealthChanged?.Invoke(current, max);
+    }
+    public static void triggerConnectedToServer()
+    {
+        onConnectedToServer?.Invoke();
+        
+    }
+    public static void triggerOnSnackIsRequested(){
+        onSnackIsRequested?.Invoke();
     }
 
     public static void triggerPlayerDeath()

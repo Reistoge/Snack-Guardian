@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b8dbed6266b4c948b8b6df35d1005e7, type: 3}
+  m_Name: TraySpawnerConfigBump
+  m_EditorClassIdentifier: 
+  trayConfig: {fileID: 11400000, guid: be0c52a7ca0f9d545ba436603c1d7d22, type: 2}
+  trayPrefab: {fileID: 7183843644925821168, guid: a090596cc25968d4084110e0cf72b10c, type: 3}
+  traySeparation: 1.1
+  trayCount: 10

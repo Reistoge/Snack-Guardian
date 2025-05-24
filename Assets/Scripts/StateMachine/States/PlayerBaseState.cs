@@ -15,11 +15,11 @@ public abstract class PlayerBaseState : IPlayerState
 
     public virtual void Enter()
     {
-        Debug.Log("Enter " + stateName);
+        // Debug.Log("Enter " + stateName);
     }
     public virtual void Exit()
     {
-        Debug.Log("Exit " + stateName);
+        // Debug.Log("Exit " + stateName);
     }
 
     public virtual void Update()
@@ -52,9 +52,10 @@ public abstract class PlayerBaseState : IPlayerState
     protected virtual void CheckTransitions()
     {
 
-        if (InputManager.dashWasPressed==true){
-            
-            if (player.Movement.IsGrounded && player.Movement.IsDashing )
+        if (InputManager.dashWasPressed == true)
+        {
+
+            if (player.Movement.IsGrounded && player.Movement.IsDashing)
             {
                 player.StateMachine.ChangeState(new DashState(player));
             }
@@ -69,6 +70,11 @@ public abstract class PlayerBaseState : IPlayerState
             player.StateMachine.ChangeState(new DamagedState(player));
             return;
         }
-        
+        if (player.getIsBumping() && !(this is BumpState))
+        {
+            player.StateMachine.ChangeState(new BumpState(player));
+            return;
+        }
+   
     }
 }

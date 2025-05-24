@@ -11,6 +11,7 @@ public class SnackConfig : ScriptableObject
     public FallStats fallStats;
     public RuntimeAnimatorController animator;
     public GameObject destroyParticlesPrefab;
+    public Sprite icon;
 
    
     

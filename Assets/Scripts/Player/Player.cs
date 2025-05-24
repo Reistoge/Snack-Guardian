@@ -18,6 +18,14 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
 
 
 
+
+
+
+    bool isBumping;
+    Coroutine bumpTimerRoutine;
+
+
+
     public PlayerMovement Movement { get => movement; set => movement = value; }
     public PlayerAnimHandler PlayerAnimation { get => anim; set => anim = value; }
     public PlayerStateMachine StateMachine { get => stateMachine; set => stateMachine = value; }
@@ -31,15 +39,16 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         // healthSystem.onDamageTaken += OnDamageTaken;
         healthSystem.onDie += die;
-        
-        healthSystem.setIsTakingDamageTime(anim.getDamagedAnimationDuration());
-        
-         
 
-         
-        
+        healthSystem.setIsTakingDamageTime(anim.getDamagedAnimationDuration());
+
+
+
+
+
     }
-    public void die(){
+    public void die()
+    {
         GameEvents.triggerPlayerDeath();
 
     }
@@ -47,9 +56,9 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         // healthSystem.onDamageTaken -= OnDamageTaken;
         // healthSystem.onDie -= ()=> {Destroy(gameObject);};
-         GameEvents.onPlayerDeath -= die;
-         
-        
+        GameEvents.onPlayerDeath -= die;
+
+
     }
     private void Update()
     {
@@ -62,11 +71,13 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     }
     void Start()
     {
-        
+
     }
     public void onInteract(IInteractor interactor)
     {
         // what happens to the player when it interacts with the object ?
+
+
         interactor.applyEffect(playerEffect);
 
 
@@ -108,28 +119,22 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
         if (healthSystem.canTakeDamage())
         {
             healthSystem.handleDamage(amount);
-            
-            
+
+
         }
-        
+
         // here we check if the player is damaged
 
     }
     public void setIsInvincible(bool isInvincible)
     {
-        healthSystem.setIsInvincible( isInvincible);
+        healthSystem.setIsInvincible(isInvincible);
     }
-    
-    
 
-        
-    
-    public void activateDamagedMovement()
-    {
-        // here we change the player state to damaged
-        movement.changeToDamagedMovement();
 
-    }
+
+
+
     public void resetMovementStats()
     {
         // reset to the default movements stats
@@ -144,17 +149,52 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         anim.playDamagedAnimation();
     }
-    public void playerBump()
-    {
-        // here we play the bump animation
-        
-
-    }
 
     public void stopMovement()
     {
         movement.stopMovement();
     }
- 
+    public bool isDashing()
+    {
+        // here we check if the player is dashing
+        return stateMachine.CurrentState is DashState;
+    }
 
+    #region Bump
+
+
+    public void initiateBumpTimer()
+    {
+        bumpTimerRoutine = StartCoroutine(bumpTimer());
+    }
+ 
+    public void bump()
+    {
+        if (bumpTimerRoutine != null)
+        {
+            StopCoroutine(bumpTimerRoutine);
+        }
+        bumpTimerRoutine = StartCoroutine(bumpTimer());
+    }
+
+    private IEnumerator bumpTimer()
+    {
+        isBumping = true;
+        yield return new WaitForSeconds(getBumpDuration());
+        isBumping = false;
+    }
+
+    public float getBumpDuration()
+    {
+        return movement.moveStats.bumpEffect.impactDuration;
+    }
+     
+
+    // Add this getter method
+    public bool getIsBumping()
+    {
+        return isBumping;
+    }
+
+    #endregion
 }

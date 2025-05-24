@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67a6d8faf6d792c40b49fca3cc156e71, type: 3}
+  m_Name: SnackRedChipsConfigCenterNothing
+  m_EditorClassIdentifier: 
+  objectEffect: {fileID: 11400000, guid: 96533bde0b909a44687cfa98a9efd650, type: 2}
+  fallStats: {fileID: 11400000, guid: 8ce7a1bc2039dd14c8791f27deb68ece, type: 2}
+  animator: {fileID: 9100000, guid: bb78dc36496d8e14087e52fcc7640a2a, type: 2}
+  destroyParticlesPrefab: {fileID: 4899138300643375227, guid: f36295c15cab9f140b91d0100eaff7b2, type: 3}
+  icon: {fileID: 21300000, guid: 2631c97bb98104e449a4a2e5709b0400, type: 3}
