@@ -44,7 +44,6 @@ public class PlayerInteract : MonoBehaviour, IInteractor
                 {
                     player.takeDamage(effect.amount);
                     player.applyEffect(effect);
-
                 }
                 break;
             case EffectType.Nothing:
