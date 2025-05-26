@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-100)] // initialization before other scripts.
 public class TrayManager : MonoBehaviour
 {
     public static TrayManager instance;
-    private  List<ITray> trays = new List<ITray>();
+    private List<ITray> trays = new List<ITray>();
+    public static event Action onTraysRegistered;
     const string trayIdPath = "ScriptableObjects/TrayIds";
 
     void Update()
@@ -15,9 +17,13 @@ public class TrayManager : MonoBehaviour
         {
             releaseRandomSnack();
         }
-     
-    }
 
+    }
+    public void triggerOnTraysRegistered()
+    {
+        onTraysRegistered?.Invoke();
+        Debug.Log("onTraysRegistered triggered");
+    }
     private void releaseRandomSnack()
     {
         if (trays.Count > 0)
@@ -25,10 +31,10 @@ public class TrayManager : MonoBehaviour
             int randomIndex = UnityEngine.Random.Range(0, trays.Count);
             Debug.Log("Random index: " + randomIndex);
             ITray tray = trays[randomIndex];
-            if (tray!=null)
+            if (tray != null)
             {
                 tray.releaseSnack();
-                
+
             }
             Debug.Log("Snack released: " + tray.getTrayId());
         }
@@ -49,16 +55,16 @@ public class TrayManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    public  void registerTray(ITray tray, string id)
+    public void registerTray(ITray tray, string id)
     {
         if (!trays.Contains(tray))
         {
             trays.Add(tray);
             tray.setTrayId(id);
         }
-        Debug.Log("Tray registered: " + tray.getTrayId() +"tray count: " + trays.Count);
+        Debug.Log("Tray registered: " + tray.getTrayId() + "tray count: " + trays.Count);
     }
-    public  void unRegisterTray(ITray tray)
+    public void unRegisterTray(ITray tray)
     {
         if (trays.Contains(tray))
         {
@@ -69,7 +75,7 @@ public class TrayManager : MonoBehaviour
             // tray.gameObject.SetActive(false);
         }
     }
-    public  void unRegisterTray(string id)
+    public void unRegisterTray(string id)
     {
         foreach (ITray tray in trays)
         {
@@ -83,13 +89,13 @@ public class TrayManager : MonoBehaviour
             }
         }
     }
-    public  List<ITray> getTrays()
+    public List<ITray> getTrays()
     {
         return trays;
     }
-    public  TrayId getTrayIdSO(string id)
+    public TrayId getTrayIdSO(string id)
     {
-        TrayId[] trayIdsSrc = Resources.LoadAll<TrayId>(trayIdPath); 
+        TrayId[] trayIdsSrc = Resources.LoadAll<TrayId>(trayIdPath);
         foreach (TrayId trayId in trayIdsSrc)
         {
 
@@ -98,7 +104,7 @@ public class TrayManager : MonoBehaviour
                 return trayId;
             }
         }
-         
+
         return trayIdsSrc[0];
     }
     public string getTrayId(ITray tray)
@@ -119,10 +125,14 @@ public class TrayManager : MonoBehaviour
             Debug.LogError("TrayId not found: " + tray.getTrayId());
             return "not loaded";
         }
-        
 
 
-         
+
+
+    }
+    public ITray getRandomTray()
+    {
+        return trays[UnityEngine.Random.Range(0, trays.Count)];
     }
 
 

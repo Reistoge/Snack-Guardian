@@ -85,10 +85,15 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
     public void destroySnack()
     {
+        detroyParticles();
         stopLeavingSpiralTrayCorutine();
         StartCoroutine(destroyObjectCorutine());
     }
 
+    private void detroyParticles()
+    {
+        Instantiate(snackConfig.destroyParticlesPrefab, transform.position, Quaternion.identity);
+    }
 
     IEnumerator startLeavingSpiralTrayCorutine()
     {
@@ -118,7 +123,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
         // if player is not dashing -> make damage
         // if player is dashing -> make apply second effect
-        interactor.applyEffect(snackEffect);
+        interactor.applyEffect(snackEffect);    
 
         InteractorHandler.handleInteraction(this as IInteractable, interactor, snackEffect);
         // GameManager.Instance.handleInteraction(this as IInteractable, interactor);
@@ -191,5 +196,10 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     public bool isReadyToFall()
     {
         return leavingSpiralTrayRoutine == null;
+    }
+
+    public SnackConfig getConfig()
+    {
+        return snackConfig;
     }
 }

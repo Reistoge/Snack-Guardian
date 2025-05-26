@@ -6,6 +6,7 @@ public static class GameEvents
     // Health events
     public static event Action<float, float> OnHealthChanged; // current, max
     public static event Action onPlayerDeath;
+    public static event Action onPlayerDamaged;
     public static event Action onInvincibilityStart;
     public static event Action onInvincibilityEnd;
     public static event Action onConnectedToServer;
@@ -18,12 +19,10 @@ public static class GameEvents
     {
         OnHealthChanged?.Invoke(current, max);
     }
-    public static void triggerConnectedToServer()
+    
+
+    public static void triggerOnSnackIsRequested()
     {
-        onConnectedToServer?.Invoke();
-        
-    }
-    public static void triggerOnSnackIsRequested(){
         onSnackIsRequested?.Invoke();
     }
 
@@ -43,5 +42,11 @@ public static class GameEvents
     public static void triggerInvincibilityEnd()
     {
         onInvincibilityEnd?.Invoke();
+    }
+
+    public static void triggerPlayerIsDamaged()
+    {
+        Debug.Log("Player is damaged");
+        onPlayerDamaged?.Invoke();
     }
 }

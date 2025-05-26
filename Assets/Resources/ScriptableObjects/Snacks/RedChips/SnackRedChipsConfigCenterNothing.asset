@@ -15,5 +15,5 @@ MonoBehaviour:
   objectEffect: {fileID: 11400000, guid: 96533bde0b909a44687cfa98a9efd650, type: 2}
   fallStats: {fileID: 11400000, guid: 8ce7a1bc2039dd14c8791f27deb68ece, type: 2}
   animator: {fileID: 9100000, guid: bb78dc36496d8e14087e52fcc7640a2a, type: 2}
-  destroyParticlesPrefab: {fileID: 4899138300643375227, guid: f36295c15cab9f140b91d0100eaff7b2, type: 3}
+  destroyParticlesPrefab: {fileID: 4899138300643375227, guid: 3f7f2462e84cca247a0adfb274afdf4e, type: 3}
   icon: {fileID: 21300000, guid: 2631c97bb98104e449a4a2e5709b0400, type: 3}

@@ -11,14 +11,18 @@ public class PlayerInteract : MonoBehaviour, IInteractor
 
     public void interactionWithSnack(ObjectEffect effect)
     {
-        
+
         if (effect == null) return;
         if (!player.isDashing() && effect.type == EffectType.Nothing)
         {
             player.bump();
         }
-        
-    
+        // if (player.isDashing())
+        // {
+        //     player.bump();
+        // }
+
+
         // if (effect.type == EffectType.Heal)
         // { 
         //     player.bump();
@@ -39,10 +43,16 @@ public class PlayerInteract : MonoBehaviour, IInteractor
                 if (!player.isDashing())
                 {
                     player.takeDamage(effect.amount);
+                    player.applyEffect(effect);
+
                 }
                 break;
+            case EffectType.Nothing:
+                player.applyEffect(effect);
+                break;
+            
         }
-        player.applyEffect(effect);
+        
     }
 
 }

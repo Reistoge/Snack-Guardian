@@ -31,5 +31,8 @@ public interface ITray
     public void setTrayId(string id);
     public string getTrayId();
     TrayConfig getTrayConfig();
-    
+    SnackSpawner getSnackSpawnerLoaded();
+    bool hasSnacksAvailable();
+
 }
+ 

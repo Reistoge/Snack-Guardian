@@ -119,6 +119,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
         if (healthSystem.canTakeDamage())
         {
             healthSystem.handleDamage(amount);
+            GameEvents.triggerPlayerIsDamaged();
 
 
         }

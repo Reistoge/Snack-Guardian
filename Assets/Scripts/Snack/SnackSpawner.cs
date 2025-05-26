@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -159,14 +160,18 @@ public class SnackSpawner : MonoBehaviour
 
     }
 
-   
- 
+    public bool hasSnacksAvailable()
+    {
+        return snackStack.Count > 0;
+    }
 
- 
-
-
-
-
-
-
+    internal Sprite getCurrentSnackSprite()
+    {
+        snackStack.TryPeek(out Snack snack);
+        if (snack != null)
+        {
+            return snack.getConfig().icon;
+        }
+        return null;
+    }
 }

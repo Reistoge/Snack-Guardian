@@ -46,3 +46,6 @@ TagManager:
   - name: Snacks
     uniqueID: 2790605685
     locked: 0
+  - name: Player
+    uniqueID: 3405122637
+    locked: 0
