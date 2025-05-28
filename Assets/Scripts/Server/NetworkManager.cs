@@ -1,23 +1,27 @@
 using UnityEngine;
 using Netly;
 using System;
+using System.Net.WebSockets;
 
 public class NetworkManager : MonoBehaviour
 {
     public static NetworkManager Instance { get; private set; }
     public HTTP.WebSocket WebSocket { get => webSocket; set => webSocket = value; }
 
-    [SerializeField] private string serverUrl = "ws://your-server.com/ws";
+    [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/";
     private HTTP.WebSocket webSocket;
-    private string playerId;
+    [SerializeField] private string playerId;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            print("NetworkManager instance created");
             DontDestroyOnLoad(gameObject);
             initializeWebSocket();
+            connect();
+
         }
         else
         {
@@ -51,6 +55,7 @@ public class NetworkManager : MonoBehaviour
         {
             handleServerEvent(eventName, data);
         });
+        
     }
 
     public void connect()
@@ -72,34 +77,36 @@ public class NetworkManager : MonoBehaviour
     private void handleServerEvent(string eventName, byte[] data)
     {
         string jsonData = System.Text.Encoding.UTF8.GetString(data);
+        Debug.Log($"Received event: {eventName} with data: {jsonData}"); // Debug line
 
         switch (eventName)
         {
             case "connected-to-server":
                 var connectionData = JsonUtility.FromJson<ConnectionData>(jsonData);
                 playerId = connectionData.Id;
-                break;
-
-            case "player-connected":
-                var playerData = JsonUtility.FromJson<PlayerData>(jsonData);
-                MultiplayerGameEvents.triggerPlayerConnected(playerData.Id);
+                Debug.Log($"Connected with ID: {playerId}"); // Debug line
+                MultiplayerGameEvents.triggerPlayerConnected(playerId);
                 break;
 
             case "public-message":
                 var publicMsg = JsonUtility.FromJson<ChatMessage>(jsonData);
+                Debug.Log($"Received message from {publicMsg.Id}: {publicMsg.Msg}"); // Debug line
                 MultiplayerGameEvents.triggerChatMessageReceived(publicMsg.Id, publicMsg.Msg);
-                break;
-            case "player-ready":
-                var readyData = JsonUtility.FromJson<ReadyStateData>(jsonData);
-                MultiplayerGameEvents.triggerPlayerReadyStateChanged(playerId, readyData.isReady);
                 break;
         }
     }
 
-    public void sendPublicMessage(string message)
+public void sendPublicMessage(string message)
     {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send message - not connected");
+            return;
+        }
+
         var msgData = new MessageData { message = message };
         string json = JsonUtility.ToJson(msgData);
+        Debug.Log($"Sending message: {json}"); // Debug line
         webSocket.To.Event("send-public-message", json, HTTP.Text);
     }
 
@@ -157,4 +164,10 @@ public class PrivateMessageData
 {
     public string id;
     public string message;
+}
+
+[Serializable]
+public class ReadyStateData
+{
+    public bool isReady;
 }

@@ -18,7 +18,7 @@ public static class MultiplayerGameEvents
     public static void triggerPlayerDisconnected(string id) => onPlayerDisconnected?.Invoke(id);
     public static void triggerChatMessageReceived(string id, string msg) => onChatMessageReceived?.Invoke(id, msg);
     public static void triggerGameStarted() => onGameStarted?.Invoke();
-
+    
     internal static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
     {
       

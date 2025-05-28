@@ -1,31 +1,52 @@
+using System;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System;
 
 public class LobbyUIManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField chatInput;
-    [SerializeField] private TextMeshProUGUI chatDisplay;
+    [SerializeField] private TextMeshProUGUI chatDisplay; // Change to TextMeshProUGUI
     [SerializeField] private TextMeshProUGUI playerList;
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button readyButton;
+    [SerializeField] private Button sendMessageButton;
+    
     private bool isReady = false;
+    private List<string> connectedPlayers = new List<string>();
+
     private void Start()
     {
         startGameButton.interactable = false;
         readyButton.onClick.AddListener(onReadyClick);
-
-        // Subscribe to events
+        sendMessageButton.onClick.AddListener(sendChatMessage);
+        
+        // Subscribe to all events
+        MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
+
+        // Initialize chat display
+        chatDisplay.text = "Chat initialized...";
+    }
+
+    private void onReadyClick()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void handlePlayerDisconnected(string obj)
+    {
+        throw new NotImplementedException();
     }
 
     public void sendChatMessage()
     {
         if (!string.IsNullOrEmpty(chatInput.text))
         {
+            Debug.Log($"Sending message: {chatInput.text}"); // Debug line
             NetworkManager.Instance.sendPublicMessage(chatInput.text);
             chatInput.text = "";
         }
@@ -33,48 +54,44 @@ public class LobbyUIManager : MonoBehaviour
 
     private void handleChatMessage(string playerId, string message)
     {
+        Debug.Log($"Handling chat message: {playerId}: {message}"); // Debug line
+        
+        // Ensure UI updates happen on main thread
+        if (!this) return;
+
         chatDisplay.text += $"\n{playerId}: {message}";
+        Canvas.ForceUpdateCanvases(); // Force UI refresh
+    }
+
+    private void handleConnectedToServer()
+    {
+        Debug.Log("Connected to server, clearing chat"); // Debug line
+        chatDisplay.text = "Connected to chat room";
+        connectedPlayers.Clear();
+        updatePlayerList();
     }
 
     private void handlePlayerConnected(string playerId)
     {
-        updatePlayerList();
-    }
-
-    private void handlePlayerDisconnected(string playerId)
-    {
-        updatePlayerList();
+        Debug.Log($"Player connected: {playerId}"); // Debug line
+        if (!connectedPlayers.Contains(playerId))
+        {
+            connectedPlayers.Add(playerId);
+            updatePlayerList();
+            chatDisplay.text += $"\n<color=green>Player {playerId} joined</color>";
+        }
     }
 
     private void updatePlayerList()
     {
-        // Update player list UI
-    }
-
-
-
-    private void onReadyClick()
-    {
-        isReady = !isReady;
-        var readyData = new ReadyStateData { isReady = isReady };
-        string json = JsonUtility.ToJson(readyData);
-        NetworkManager.Instance.WebSocket.To.Event("player-ready", json, Netly.HTTP.Text);
-
-        // Update button text
-        readyButton.GetComponentInChildren<TextMeshProUGUI>().text =
-            isReady ? "Not Ready" : "Ready";
+        throw new NotImplementedException();
     }
 
     private void OnDestroy()
     {
+        MultiplayerGameEvents.onConnectedToServer -= handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived -= handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected -= handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected -= handlePlayerDisconnected;
     }
-}
-
-[Serializable]
-public class ReadyStateData
-{
-    public bool isReady;
 }
