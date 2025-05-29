@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
- 
+
 public class LobbyUIManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField chatInput;
@@ -15,6 +15,22 @@ public class LobbyUIManager : MonoBehaviour
     private bool isReady = false;
     private List<string> connectedPlayers = new List<string>();
 
+    // private void Start()
+    // {
+    //     startGameButton.interactable = false;
+    //     readyButton.onClick.AddListener(onReadyClick);
+    //     sendMessageButton.onClick.AddListener(sendChatMessage);
+
+    //     // Subscribe to all events
+    //     MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
+    //     //Debug.Log("Subscribed to onChatMessageReceived");
+    //     MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
+    //     MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
+    //     MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
+
+    //     // Initialize chat display
+    //     chatDisplay.text = "Welcome to chat...";
+    // }
     private void Start()
     {
         startGameButton.interactable = false;
@@ -23,12 +39,11 @@ public class LobbyUIManager : MonoBehaviour
 
         // Subscribe to all events
         MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
-        //Debug.Log("Subscribed to onChatMessageReceived");
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
+        MultiplayerGameEvents.onPlayersListCleared += handlePlayersListCleared;
 
-        // Initialize chat display
         chatDisplay.text = "Welcome to chat...";
     }
 
@@ -39,7 +54,13 @@ public class LobbyUIManager : MonoBehaviour
 
     private void handlePlayerDisconnected(string obj)
     {
-        //throw new NotImplementedException();
+        Debug.Log($"Player disconnected: {obj}"); // Debug line
+        if (connectedPlayers.Contains(obj))
+        {
+            connectedPlayers.Remove(obj);
+            updatePlayerList();
+            chatDisplay.text += $"\n<color=red>Player {obj} left</color>";
+        }
     }
 
     public void sendChatMessage()
@@ -63,13 +84,19 @@ public class LobbyUIManager : MonoBehaviour
         Canvas.ForceUpdateCanvases(); // Force UI refresh
     }
 
+
+    private void handlePlayersListCleared()
+    {
+        connectedPlayers.Clear();
+        updatePlayerList();
+    }
+
     private void handleConnectedToServer()
     {
-        //Debug.Log("Connected to server, clearing chat"); // Debug line
         chatDisplay.text = "Connected to chat room";
         connectedPlayers.Clear();
         updatePlayerList();
-        
+        NetworkManager.Instance.getConnectedPlayers(); // Request player list after connection
     }
 
     private void handlePlayerConnected(string playerId)
@@ -101,5 +128,6 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onChatMessageReceived -= handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected -= handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected -= handlePlayerDisconnected;
+        MultiplayerGameEvents.onPlayersListCleared -= handlePlayersListCleared;
     }
 }

@@ -30,7 +30,7 @@ public class NetworkManager : MonoBehaviour
     }
     public void Update()
     {
-        if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             getConnectedPlayers();
         }
@@ -55,7 +55,7 @@ public class NetworkManager : MonoBehaviour
         webSocket.On.Event((eventName, data, type) =>
         {
             Debug.Log($"WebSocket Event received: {eventName} with data: {System.Text.Encoding.UTF8.GetString(data)}");
-            handleServerEvent(eventName, data);
+            handleServerData(eventName, data);
         });
         webSocket.On.Error((exception) =>
         {
@@ -72,7 +72,7 @@ public class NetworkManager : MonoBehaviour
             var baseEvent = JsonUtility.FromJson<ServerMessageBase>(json);
             if (baseEvent != null && !string.IsNullOrEmpty(baseEvent.@event))
             {
-                handleServerEvent(baseEvent.@event, data);
+                handleServerData(baseEvent.@event, data);
             }
             else
             {
@@ -101,7 +101,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    private void handleServerEvent(string eventName, byte[] data)
+    private void handleServerData(string eventName, byte[] data)
     {
         string jsonData = System.Text.Encoding.UTF8.GetString(data);
         Debug.Log($"Handling event '{eventName}' with data: {jsonData}");
@@ -128,7 +128,7 @@ public class NetworkManager : MonoBehaviour
                 }
                 Debug.Log($"Player connected: {playerWrapper.data.id}");
                 MultiplayerGameEvents.triggerPlayerConnected(playerWrapper.data.id);
-                 
+
                 break;
 
             case "public-message":
@@ -152,17 +152,21 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log($"Public message sent: {sendPublicMessageWrapper.data.message}");
                 break;
             case "get-connected-players":
-                var playersConnectedWrapper = JsonUtility.FromJson<ServerMessage<PlayersConnectedData>>(jsonData);
-                if (playersConnectedWrapper == null || playersConnectedWrapper.data == null)
+                var playersConnectedWrapper = JsonUtility.FromJson<PlayersConnectedData>(jsonData);
+                print(playersConnectedWrapper);
+                if (playersConnectedWrapper?.data != null)
                 {
-                    Debug.LogWarning("Failed to parse get-players-connected data");
-                    return;
+                    Debug.Log($"Connected players: {string.Join(", ", playersConnectedWrapper.data)}");
+                    // Clear existing players first
+                    MultiplayerGameEvents.triggerPlayersListCleared();
+                    // Add each player
+                    foreach (string playerId in playersConnectedWrapper.data)
+                    {
+                        print(playerId);
+                        MultiplayerGameEvents.triggerPlayerConnected(playerId);
+                    }
                 }
-                Debug.Log($"Connected players: {playersConnectedWrapper.data.data}");
-                MultiplayerGameEvents.triggerConnectedPlayers(playersConnectedWrapper.data.data);
                 break;
-            
-
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
                 break;
@@ -192,18 +196,7 @@ public class NetworkManager : MonoBehaviour
     {
         var msgData = new PrivateMessageData { id = targetId, message = message };
         string json = JsonUtility.ToJson(msgData);
-        webSocket.To.Event("send-private-message", json, HTTP.Text);
-    }
-
-    private void OnDestroy()
-    {
-        disconnect();
-    }
-    public void sendReadyState(bool isReady)
-    {
-        var readyData = new ReadyStateData { isReady = isReady };
-        string json = JsonUtility.ToJson(readyData);
-        webSocket.To.Event("player-ready", json, HTTP.Text);
+        webSocket.To.Data(json, HTTP.Text);
     }
     public void getConnectedPlayers()
     {
@@ -212,10 +205,26 @@ public class NetworkManager : MonoBehaviour
             Debug.LogWarning("Cannot get connected players - not connected");
             return;
         }
-        webSocket.To.Data("get-connected-players", HTTP.Text);
+
+        var getMessage = new ServerMessage<object>
+        {
+            @event = "get-connected-players",
+            data = null
+        };
+        string json = JsonUtility.ToJson(getMessage);
+        webSocket.To.Data(json, HTTP.Text);
     }
-
-
+    private void OnDestroy()
+    {
+        disconnect();
+    }
+    public void sendReadyState(bool isReady)
+    {
+        var readyData = new ReadyStateData { isReady = isReady };
+        string json = JsonUtility.ToJson(readyData);
+        webSocket.To.Data(json, HTTP.Text);
+    }
+ 
 
 }
 
@@ -258,10 +267,16 @@ public class ReadyStateData
 {
     public bool isReady;
 }
+// [Serializable]
+// public class PlayersConnectedData
+// {
+//     public string data;
+// }
 [Serializable]
 public class PlayersConnectedData
 {
-    public string data;
+    public string @event;
+    public string[] data; // Changed from string to string[] to match server response
 }
 
 [Serializable]
