@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+
+using UnityEngine;
 using Netly;
 using System;
 using System.Net.WebSockets;
