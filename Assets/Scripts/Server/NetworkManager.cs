@@ -44,6 +44,14 @@ public class NetworkManager : MonoBehaviour
             Debug.Log("Disconnected from server");
             MultiplayerGameEvents.triggerDisconnectedFromServer();
         });
+        webSocket.On.Event((eventName, data, type) =>
+        {
+            handleServerEvent(eventName, data);
+        });
+        webSocket.On.Data((eventname,type) =>
+        {
+            Debug.Log($"Received message: {eventname}");
+        });
 
         webSocket.On.Error((exception) =>
         {
@@ -51,6 +59,7 @@ public class NetworkManager : MonoBehaviour
             MultiplayerGameEvents.triggerConnectionError(exception.Message);
         });
 
+ 
         webSocket.On.Event((eventName, data, type) =>
         {
             Debug.Log($"WebSocket Event received: {eventName}"); // <-- Este debug confirma que llega el evento
@@ -73,6 +82,8 @@ public class NetworkManager : MonoBehaviour
                 Debug.LogWarning("No 'event' field found in message JSON");
             }
         });
+ 
+ 
 
 
     }
@@ -160,9 +171,9 @@ public class NetworkManager : MonoBehaviour
         string json = JsonUtility.ToJson(readyData);
         webSocket.To.Event("player-ready", json, HTTP.Text);
     }
-    
 
- 
+
+
 }
 
 [Serializable]

@@ -28,17 +28,17 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
         // Initialize chat display
-        chatDisplay.text = "Chat initialized...";
+        chatDisplay.text = "Welcome to chat...";
     }
 
     private void onReadyClick()
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     private void handlePlayerDisconnected(string obj)
     {
-        throw new NotImplementedException();
+         //throw new NotImplementedException();
     }
 
     public void sendChatMessage()
@@ -88,6 +88,7 @@ public class LobbyUIManager : MonoBehaviour
         {
             playerList.text += playerId + "\n";
         }
+
     }
 
     private void OnDestroy()
