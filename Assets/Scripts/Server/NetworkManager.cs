@@ -44,6 +44,14 @@ public class NetworkManager : MonoBehaviour
             Debug.Log("Disconnected from server");
             MultiplayerGameEvents.triggerDisconnectedFromServer();
         });
+        webSocket.On.Event((eventName, data, type) =>
+        {
+            handleServerEvent(eventName, data);
+        });
+        webSocket.On.Data((eventname,type) =>
+        {
+            Debug.Log($"Received message: {eventname}");
+        });
 
         webSocket.On.Error((exception) =>
         {
@@ -51,11 +59,8 @@ public class NetworkManager : MonoBehaviour
             MultiplayerGameEvents.triggerConnectionError(exception.Message);
         });
 
-        webSocket.On.Event((eventName, data, type) =>
-        {
-            handleServerEvent(eventName, data);
-        });
-        
+
+
     }
 
     public void connect()
@@ -96,7 +101,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-public void sendPublicMessage(string message)
+    public void sendPublicMessage(string message)
     {
         if (!webSocket.IsOpened)
         {
@@ -127,9 +132,9 @@ public void sendPublicMessage(string message)
         string json = JsonUtility.ToJson(readyData);
         webSocket.To.Event("player-ready", json, HTTP.Text);
     }
-    
 
- 
+
+
 }
 
 [Serializable]

@@ -1617,7 +1617,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58b8636af44b7494088482fdb7b8203e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverUrl: ws://ucn-game-server.martux.cl:4010/
+  serverUrl: ws://ucn-game-server.martux.cl:4010
   playerId: 
 --- !u!4 &1457407293
 Transform:
