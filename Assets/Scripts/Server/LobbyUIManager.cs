@@ -24,10 +24,9 @@ public class LobbyUIManager : MonoBehaviour
         
         // Subscribe to all events
         MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
+        Debug.Log("Subscribed to onChatMessageReceived");
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
-        MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
-
         // Initialize chat display
         chatDisplay.text = "Welcome to chat...";
     }
@@ -84,7 +83,12 @@ public class LobbyUIManager : MonoBehaviour
 
     private void updatePlayerList()
     {
-        // throw new NotImplementedException();
+        playerList.text = "Jugadores conectados:\n";
+        foreach (var playerId in connectedPlayers)
+        {
+            playerList.text += playerId + "\n";
+        }
+
     }
 
     private void OnDestroy()
