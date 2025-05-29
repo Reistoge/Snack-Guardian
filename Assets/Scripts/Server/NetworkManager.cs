@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Netly;
 using System;
 using System.Net.WebSockets;
@@ -53,9 +53,28 @@ public class NetworkManager : MonoBehaviour
 
         webSocket.On.Event((eventName, data, type) =>
         {
+            Debug.Log($"WebSocket Event received: {eventName}"); // <-- Este debug confirma que llega el evento
             handleServerEvent(eventName, data);
         });
-        
+
+        webSocket.On.Data((byte[] data, HTTP.MessageType messageType) =>
+        {
+            string json = System.Text.Encoding.UTF8.GetString(data);
+            Debug.Log($"Received raw JSON data: {json}");
+
+            // Extraemos solo el campo 'event'
+            var baseEvent = JsonUtility.FromJson<ServerMessageBase>(json);
+            if (baseEvent != null && !string.IsNullOrEmpty(baseEvent.@event))
+            {
+                handleServerEvent(baseEvent.@event, data);
+            }
+            else
+            {
+                Debug.LogWarning("No 'event' field found in message JSON");
+            }
+        });
+
+
     }
 
     public void connect()
@@ -77,26 +96,40 @@ public class NetworkManager : MonoBehaviour
     private void handleServerEvent(string eventName, byte[] data)
     {
         string jsonData = System.Text.Encoding.UTF8.GetString(data);
-        Debug.Log($"Received event: {eventName} with data: {jsonData}"); // Debug line
+        Debug.Log($"Handling event '{eventName}' with data: {jsonData}");
 
         switch (eventName)
         {
             case "connected-to-server":
-                var connectionData = JsonUtility.FromJson<ConnectionData>(jsonData);
-                playerId = connectionData.Id;
-                Debug.Log($"Connected with ID: {playerId}"); // Debug line
+                var connectionWrapper = JsonUtility.FromJson<ServerMessage<ConnectionData>>(jsonData);
+                if (connectionWrapper == null || connectionWrapper.data == null)
+                {
+                    Debug.LogWarning("Failed to parse connected-to-server data");
+                    return;
+                }
+                playerId = connectionWrapper.data.id;
+                Debug.Log($"Connected with ID: {playerId}");
                 MultiplayerGameEvents.triggerPlayerConnected(playerId);
                 break;
 
             case "public-message":
-                var publicMsg = JsonUtility.FromJson<ChatMessage>(jsonData);
-                Debug.Log($"Received message from {publicMsg.Id}: {publicMsg.Msg}"); // Debug line
-                MultiplayerGameEvents.triggerChatMessageReceived(publicMsg.Id, publicMsg.Msg);
+                var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<ChatMessage>>(jsonData);
+                if (publicMessageWrapper == null || publicMessageWrapper.data == null)
+                {
+                    Debug.LogWarning("Failed to parse public-message data");
+                    return;
+                }
+                Debug.Log($"Received message from {publicMessageWrapper.data.id}: {publicMessageWrapper.data.msg}");
+                MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.id, publicMessageWrapper.data.msg);
+                break;
+
+            default:
+                Debug.LogWarning($"Unhandled event: {eventName}");
                 break;
         }
     }
 
-public void sendPublicMessage(string message)
+    public void sendPublicMessage(string message)
     {
         if (!webSocket.IsOpened)
         {
@@ -135,22 +168,22 @@ public void sendPublicMessage(string message)
 [Serializable]
 public class ConnectionData
 {
-    public string Msg;
-    public string Id;
+    public string msg;
+    public string id;
 }
 
 [Serializable]
 public class PlayerData
 {
-    public string Msg;
-    public string Id;
+    public string msg;
+    public string id;
 }
 
 [Serializable]
 public class ChatMessage
 {
-    public string Id;
-    public string Msg;
+    public string id;
+    public string msg;
 }
 
 [Serializable]
@@ -170,4 +203,16 @@ public class PrivateMessageData
 public class ReadyStateData
 {
     public bool isReady;
+}
+
+[Serializable]
+public class ServerMessage<T>
+{
+    public string @event;
+    public T data;
+}
+
+public class ServerMessageBase
+{
+    public string @event;
 }
