@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public static class MultiplayerGameEvents 
 {
@@ -9,6 +10,8 @@ public static class MultiplayerGameEvents
     public static event Action<string> onPlayerConnected;
     public static event Action<string> onPlayerDisconnected;
     public static event Action<string, string> onChatMessageReceived;
+    public static event Action<string, bool> onPlayerReadyStateChanged;
+    public static event Action<string> onConnectedPlayers;
     public static event Action onGameStarted;
 
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
@@ -19,8 +22,21 @@ public static class MultiplayerGameEvents
     public static void triggerChatMessageReceived(string id, string msg) => onChatMessageReceived?.Invoke(id, msg);
     public static void triggerGameStarted() => onGameStarted?.Invoke();
     
-    internal static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
+    public static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
     {
       
+    }
+
+    public static void triggerConnectedPlayers(string data)
+    {
+        if (onConnectedPlayers != null)
+        {
+            onConnectedPlayers.Invoke(data);
+        }
+        else
+        {
+            Debug.LogWarning("No subscribers for onConnectedPlayers event");
+        }
+
     }
 }

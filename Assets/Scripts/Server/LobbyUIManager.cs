@@ -23,7 +23,7 @@ public class LobbyUIManager : MonoBehaviour
 
         // Subscribe to all events
         MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
-        Debug.Log("Subscribed to onChatMessageReceived");
+        //Debug.Log("Subscribed to onChatMessageReceived");
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
@@ -65,15 +65,16 @@ public class LobbyUIManager : MonoBehaviour
 
     private void handleConnectedToServer()
     {
-        Debug.Log("Connected to server, clearing chat"); // Debug line
+        //Debug.Log("Connected to server, clearing chat"); // Debug line
         chatDisplay.text = "Connected to chat room";
         connectedPlayers.Clear();
         updatePlayerList();
+        
     }
 
     private void handlePlayerConnected(string playerId)
     {
-        Debug.Log($"Player connected: {playerId}"); // Debug line
+        //Debug.Log($"Player connected: {playerId}"); // Debug line
         if (!connectedPlayers.Contains(playerId))
         {
             connectedPlayers.Add(playerId);
