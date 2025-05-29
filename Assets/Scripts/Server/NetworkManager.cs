@@ -130,6 +130,17 @@ public class NetworkManager : MonoBehaviour
                 MultiplayerGameEvents.triggerPlayerConnected(playerWrapper.data.id);
 
                 break;
+            case "player-disconnected":
+                var playerDisconnectedWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
+                if (playerDisconnectedWrapper == null || playerDisconnectedWrapper.data == null)
+                {
+                    Debug.LogWarning("Failed to parse player-disconnected data");
+                    return;
+                }
+                Debug.Log($"Player disconnected: {playerDisconnectedWrapper.data.id}");
+                MultiplayerGameEvents.triggerPlayerDisconnected(playerDisconnectedWrapper.data.id);
+                break;
+
 
             case "public-message":
                 var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<ChatMessage>>(jsonData);
@@ -138,6 +149,7 @@ public class NetworkManager : MonoBehaviour
                     Debug.LogWarning("Failed to parse public-message data");
                     return;
                 }
+                
                 Debug.Log($"Received message from {publicMessageWrapper.data.id}: {publicMessageWrapper.data.msg}");
                 MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.id, publicMessageWrapper.data.msg);
                 break;
@@ -166,6 +178,7 @@ public class NetworkManager : MonoBehaviour
                         MultiplayerGameEvents.triggerPlayerConnected(playerId);
                     }
                 }
+            
                 break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
