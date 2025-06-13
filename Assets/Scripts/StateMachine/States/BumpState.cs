@@ -25,6 +25,11 @@ public class BumpState : PlayerBaseState
         player.Movement.collisionChecks();
         player.Movement.applyBumpedVelocity(true);
     }
+    public override void Update()
+    {
+        
+        CheckTransitions();
+    }
 
     public override void Exit()
     {

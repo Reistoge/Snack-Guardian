@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 [DefaultExecutionOrder(-100)] // initialization before other scripts.
@@ -8,21 +9,20 @@ public class TrayManager : MonoBehaviour
 {
     public static TrayManager instance;
     private List<ITray> trays = new List<ITray>();
+    internal Coroutine rocksRoutine;
+
     public static event Action onTraysRegistered;
     const string trayIdPath = "ScriptableObjects/TrayIds";
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            releaseRandomSnack();
-        }
+   
 
-    }
+
+  
+  
     public void triggerOnTraysRegistered()
     {
         onTraysRegistered?.Invoke();
-        Debug.Log("onTraysRegistered triggered");
+        // Debug.Log("onTraysRegistered triggered");
     }
     private void releaseRandomSnack()
     {
@@ -62,7 +62,7 @@ public class TrayManager : MonoBehaviour
             trays.Add(tray);
             tray.setTrayId(id);
         }
-        Debug.Log("Tray registered: " + tray.getTrayId() + "tray count: " + trays.Count);
+        // Debug.Log("Tray registered: " + tray.getTrayId() + "tray count: " + trays.Count);
     }
     public void unRegisterTray(ITray tray)
     {
@@ -135,7 +135,37 @@ public class TrayManager : MonoBehaviour
         return trays[UnityEngine.Random.Range(0, trays.Count)];
     }
 
+    public void addRocksOnTrays()
+    {
+        GameEvents.triggerRocksAdded();
 
-
-
+        foreach (ITray tray in trays)
+        {
+            if (tray.getEmptyCount() >= 1)
+            {
+                tray.addRockSnack();
+                Debug.Log($"Added rock snack to tray: {tray.getTrayId()}");
+            }
+         
+        }
+    }
+    public List<Snack> addRocksOnTrays(char row)
+    {
+        GameEvents.triggerRocksAdded();
+        List<Snack> rocks = new List<Snack>();
+        foreach (ITray tray in trays)
+        {
+            if (tray.getTrayId().ToCharArray()[0] == row)
+            {
+                rocks.Add(tray.addRockSnack());
+                // Debug.Log($"Added rock snack to tray: {tray.getTrayId()}");
+            }
+            else
+            {
+               // Debug.LogWarning($"Tray {tray.getTrayId()} has no snacks available or does not match row {row}.");
+            }
+        }
+        return rocks;
+         
+    }
 }

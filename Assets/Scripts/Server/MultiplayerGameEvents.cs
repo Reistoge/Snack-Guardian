@@ -11,6 +11,9 @@ public static class MultiplayerGameEvents
     public static event Action<string> onPlayerDisconnected;
     public static event Action<string, string> onChatMessageReceived;
     public static event Action<string, bool> onPlayerReadyStateChanged;
+
+    public static event Action<string> onPlayerSendAttack;
+    public static event Action<string> onPlayerReceiveAttack;
    
     public static event Action onGameStarted;
     public static event Action onPlayersListCleared;
@@ -24,7 +27,9 @@ public static class MultiplayerGameEvents
     public static void triggerGameStarted() => onGameStarted?.Invoke();
     public static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
     {
-
+        onPlayerReadyStateChanged?.Invoke(playerId, isReady);
     }
+    public static void triggerPlayerSendAttack(string attackData) => onPlayerSendAttack?.Invoke(attackData);
+    public static void triggerPlayerReceiveAttack(string attackData) => onPlayerReceiveAttack?.Invoke(attackData);
     public static void triggerPlayersListCleared() => onPlayersListCleared?.Invoke(); 
 }

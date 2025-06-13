@@ -28,11 +28,18 @@ public class DamagedState : PlayerBaseState
         player.Movement.collisionChecks();
         player.Movement.applyBumpedVelocity(true); // Apply gravity like BumpState
     }
+    public override void Update()
+    {
+        // Check for transitions similar to BumpState
+        CheckTransitions();
+        
+ 
+    }
 
     protected override void CheckTransitions()
     {
         // Similar to BumpState's transition check
-        if (!player.isTakingDamage()  )
+        if (!player.isTakingDamage())
         {
             player.StateMachine.ChangeState(new IdleState(player));
         }

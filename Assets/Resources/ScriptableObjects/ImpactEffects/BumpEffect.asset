@@ -15,10 +15,12 @@ MonoBehaviour:
   horizontalForce: 4
   verticalForce: 5
   impactDuration: 0.3
+  maxSpeed: 50
+  minSpeed: 1
   applyGravity: 1
   hasFallPhase: 0
-  fallGravity: 5
-  maxFallSpeed: 1
+  fallGravity: 0.5
+  maxFallSpeed: 2
   groundLayerCheck:
     serializedVersion: 2
     m_Bits: 128

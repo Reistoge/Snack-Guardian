@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using UnityEngine;
  
@@ -9,41 +10,75 @@ public class TraySpawner : MonoBehaviour
     [SerializeField] TraySpawnerConfig traySpawnerConfig;
     private List<Tray> spawnedTrays = new List<Tray>();
 
+    [SerializeField] string id;
+
+    private void Awake()
+    {
+        if (traySpawnerConfig == null)
+        {
+            Debug.LogError("TraySpawnerConfig is not set in TraySpawner.");
+            return;
+        }
+
+ 
+    }
     void Start()
     {
+       StartCoroutine(spawnTrayRoutine());
+    }
+    public void startSpawnTray()
+    {
+        if (traySpawnerConfig == null)
+        {
+            Debug.LogError("TraySpawnerConfig is not set in TraySpawner.");
+            return;
+        }
         StartCoroutine(spawnTrayRoutine());
     }
 
     private IEnumerator spawnTrayRoutine()
     {
+
+        if (transform.childCount > 0)
+        {
+            TrayManager.instance.getTrays().Clear();
+            Debug.LogWarning("TraySpawner already has children. Clearing existing trays.");
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
         for (int i = 0; i < traySpawnerConfig.trayCount; i++)
         {
             GameObject tray = Instantiate(traySpawnerConfig.trayConfig.trayPrefab, transform);
             Tray trayComponent = tray.GetComponent<Tray>();
-            
+
             // Set config before initialization
             trayComponent.setTrayConfig(traySpawnerConfig.trayConfig);
-            
+
             // Position setup
             tray.transform.localPosition = new Vector3(i * traySpawnerConfig.traySeparation, 0, 0);
             tray.transform.localScale = Vector3.one;
-            
+
             string id = transform.name.Split(' ')[1] + (i + 1);
             TrayManager.instance.registerTray(trayComponent, id);
-            
+
             spawnedTrays.Add(trayComponent);
-            
+
             // Wait a frame between spawns
             yield return null;
         }
 
         // Verify initialization
         yield return new WaitForSeconds(0.1f); // Small delay to ensure components are ready
-        
-        bool allTraysInitialized = spawnedTrays.All(t => 
-            t.getTrayConfig() != null && 
+         
+        bool allTraysInitialized = spawnedTrays.All(t =>
+            t.getTrayConfig() != null &&
             t.hasSnacksAvailable()
         );
+     
+
+
 
         if (allTraysInitialized)
         {

@@ -1,27 +1,22 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
-using TMPro;
-using Unity.Mathematics;
-using Unity.VisualScripting;
+ 
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Processors;
+ 
 using Vector2 = UnityEngine.Vector2;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
     public PlayerMovementStats moveStats;
-    [SerializeField] PlayerMovementStats damagedStats;
-    [SerializeField] PlayerMovementStats bumpedStats;
+ 
     [SerializeField] PlayerMovementStats tempMoveStats;
+ 
     [SerializeField] private Collider2D feetColl;
     [SerializeField] private Collider2D bodyColl;
 
 
     private Rigidbody2D rb;
+    
     private Vector2 movementBeforeStop;
 
     //movement vars
@@ -100,9 +95,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float verticalBumpVelocity;
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        Rb = GetComponent<Rigidbody2D>();
 
         isFacingRight = true;
+        
 
     }
 
@@ -470,7 +466,7 @@ public class PlayerMovement : MonoBehaviour
         {
             verticalVelocity = Mathf.Clamp(verticalVelocity, -50, 50f);
         }
-        rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
+        Rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
 
     }
 
@@ -512,7 +508,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector2 boxCastOrigin = new Vector2(feetColl.bounds.center.x, bodyColl.bounds.max.y);
         Vector2 boxCastSize = new Vector2(feetColl.bounds.size.x * moveStats.headWidth, moveStats.headDetectionRayLength);
-        headHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.up, moveStats.headDetectionRayLength, moveStats.groundLayer);
+        headHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.up, moveStats.headDetectionRayLength, moveStats.bumpedHeadLayer);
         if (headHit.collider != null)
         {
             isbumpedHead = true;
@@ -683,7 +679,8 @@ public class PlayerMovement : MonoBehaviour
         float adjustedHeight = bodyColl.bounds.size.y * moveStats.wallDetectionRayHeightMultiplier;
         Vector2 boxCastOrigin = new Vector2(originEndPoint, bodyColl.bounds.center.y);
         Vector2 boxCastSize = new Vector2(moveStats.wallDetectionRayLength, adjustedHeight);
-        wallHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, transform.right, moveStats.wallDetectionRayLength, moveStats.groundLayer);
+        //wallHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, transform.right, moveStats.wallDetectionRayLength, moveStats.groundLayer);
+        wallHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, transform.right, moveStats.wallDetectionRayLength, moveStats.wallLayer);
         if (wallHit.collider != null)
         {
             lastWallHit = wallHit;
@@ -1024,12 +1021,12 @@ public class PlayerMovement : MonoBehaviour
 
 
         movementBeforeStop = new Vector2(horizontalVelocity, verticalVelocity);
-        movementBeforeStop = new Vector2(rb.velocity.x, rb.velocity.y);
+        movementBeforeStop = new Vector2(Rb.velocity.x, Rb.velocity.y);
         // Debug.Log($"Storing movement: {movementBeforeStop}");
 
         horizontalVelocity = 0f;
         verticalVelocity = 0f;
-        rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
+        Rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
         isGrounded = false;
         isJumping = false;
         isFalling = false;
@@ -1040,6 +1037,7 @@ public class PlayerMovement : MonoBehaviour
         isAirDashing = false;
         isDashFastFalling = false;
     }
+    
     // public void changeToDamagedMovement()
     // {
     //     setMovementStats(damagedStats);
@@ -1092,7 +1090,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isDashing) return;
 
-        movementBeforeStop = rb.velocity;
+        movementBeforeStop = Rb.velocity;
         currentImpact = isDamaged ? moveStats.damageEffect : moveStats.bumpEffect;
 
         Vector2 impactVelocity = currentImpact.calculateImpactVelocity(
@@ -1102,6 +1100,7 @@ public class PlayerMovement : MonoBehaviour
 
         horizontalBumpVelocity = impactVelocity.x;
         verticalBumpVelocity = impactVelocity.y;
+        print($"Applying impact: {currentImpact.name}, Horizontal: {horizontalBumpVelocity}, Vertical: {verticalBumpVelocity}");
         isImpacted = true;
         isInFallPhase = false;
     }
@@ -1124,11 +1123,11 @@ public class PlayerMovement : MonoBehaviour
             // else
             {
                 // Apply impact phase physics
-                rb.velocity = new Vector2(horizontalBumpVelocity, verticalBumpVelocity);
+                Rb.velocity = new Vector2(horizontalBumpVelocity, verticalBumpVelocity);
 
                 if (applyGravity && currentImpact.applyGravity)
                 {
-                    verticalBumpVelocity += moveStats.gravity * Time.fixedDeltaTime;
+                    verticalBumpVelocity += moveStats.gravity*currentImpact.fallGravity * Time.fixedDeltaTime;
                 }
             }
         }
@@ -1144,7 +1143,7 @@ public class PlayerMovement : MonoBehaviour
     //         verticalBumpVelocity = 0f;
     //     }
     // }
-
+ 
     public void stopImpact()
     {
         isImpacted = false;
@@ -1235,6 +1234,7 @@ public class PlayerMovement : MonoBehaviour
 
     public int NumberOfJumpsUsed { get => numberOfJumpsUsed; set => numberOfJumpsUsed = value; }
     public Vector2 DashVector { get => dashVector; set => dashVector = value; }
+    public Rigidbody2D Rb { get => rb; set => rb = value; }
     #endregion
 
 

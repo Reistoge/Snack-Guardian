@@ -6,7 +6,7 @@ using Debug = UnityEngine.Debug;
 public abstract class PlayerBaseState : IPlayerState
 {
     protected Player player;
-    protected string stateName;
+    protected string stateName; 
 
     protected PlayerBaseState(Player player)
     {
@@ -24,6 +24,7 @@ public abstract class PlayerBaseState : IPlayerState
 
     public virtual void Update()
     {
+    
         // Keep essential checks that ALL states need
         player.Movement.countTimers();
         player.Movement.jumpChecks();
@@ -37,6 +38,7 @@ public abstract class PlayerBaseState : IPlayerState
     public virtual void FixedUpdate()
     {
         // Keep essential physics that ALL states need
+    
         player.Movement.collisionChecks();
         player.Movement.handleMove();
         player.Movement.jump();

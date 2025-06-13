@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
  
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Platform : MonoBehaviour
 {
@@ -11,6 +12,19 @@ public class Platform : MonoBehaviour
     public event Action onPlatformLanded;
     [SerializeField] TrayId trayId;
     [SerializeField] SpriteRenderer idSpriteRenderer;
+    [SerializeField] Light2D light2D;
+    void OnEnable()
+    {
+        GameEvents.onGameOver += turnOffLight;
+        GameEvents.turnOnLight += turnOnLight;
+        GameEvents.turnOffLight += turnOffLight;
+    }
+    void OnDisable()
+    {
+        GameEvents.onGameOver -= turnOffLight;
+        GameEvents.turnOnLight -= turnOnLight;
+        GameEvents.turnOffLight -= turnOffLight;
+    }
 
     // Start is called before the first frame update
     public void loadTrayIdSprite()
@@ -31,7 +45,22 @@ public class Platform : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
+        onPlatformLanded?.Invoke();
         platformAnimHandler.playOnLandedObjectAnimation();
+    }
+    public void turnOffLight()
+    {
+        if (light2D != null)
+        {
+            light2D.enabled = false;
+        }
+    }
+    public void turnOnLight()
+    {
+        if (light2D != null)
+        {
+            light2D.enabled = true;
+        }
     }
     public void destroyPlatform()
     {
@@ -39,6 +68,7 @@ public class Platform : MonoBehaviour
         // Disable the collider
         boxCollider.enabled = false;
         platformAnimHandler.playBrokeAnimation();
+        idSpriteRenderer.enabled = false; // Hide the tray ID sprite
 
         // Play the broke animation
 
@@ -49,6 +79,8 @@ public class Platform : MonoBehaviour
         boxCollider.enabled = true;
         // Play the idle animation
         platformAnimHandler.playRepairAnimation();
+        idSpriteRenderer.enabled = true; // Hide the tray ID sprite
+
     }
     // IEnumerator waitForAnimationToFinish(string animationName, Action postAnimationAction)
     // {

@@ -11,6 +11,7 @@ public class NetworkManager : MonoBehaviour
     [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/";
     private HTTP.WebSocket webSocket;
     [SerializeField] private string playerId;
+  
 
     private void Awake()
     {
@@ -83,6 +84,10 @@ public class NetworkManager : MonoBehaviour
 
 
 
+    }
+    public void receiveAttackFromPlayer(string attackData)
+    {
+        MultiplayerGameEvents.triggerPlayerReceiveAttack(attackData);
     }
 
     public void connect()

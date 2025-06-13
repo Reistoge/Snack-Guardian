@@ -35,7 +35,7 @@ public class FallState : PlayerBaseState
             return;
         }
 
-        if (player.Movement.IsTouchingWall && !player.Movement.IsGrounded)
+        if (player.Movement.IsTouchingWall && player.Movement.IsWallSliding)
         {
             player.StateMachine.ChangeState(new WallSlideState(player));
             return;

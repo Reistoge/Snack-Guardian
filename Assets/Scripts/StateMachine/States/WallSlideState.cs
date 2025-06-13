@@ -7,7 +7,7 @@ public class WallSlideState : PlayerBaseState
     public override void Enter()
     {
         base.Enter();
-        //player.PlayerAnimation.playEnterWallSlide();
+        player.PlayerAnimation.playEnterWallSlide();
         
         // player.IsWallSliding = true;
         // player.IsWallSlideFalling = false;
@@ -30,7 +30,7 @@ public class WallSlideState : PlayerBaseState
             return;
         }
 
-        if (!player.Movement.IsTouchingWall && !player.Movement.IsGrounded)
+        if (!player.Movement.IsTouchingWall && !player.Movement.IsGrounded )
         {
             player.Movement.IsWallSlideFalling = true;
             player.StateMachine.ChangeState(new FallState(player));

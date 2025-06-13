@@ -17,11 +17,11 @@ public class SnackSpawner : MonoBehaviour
     [SerializeField] float spawnChance = 0.5f;
     float scaleFactor = 0.1f;
     SpawnerConfig spawnerConfig;
-   
+
     Stack<Snack> snackStack = new Stack<Snack>();
 
-    
- 
+
+
     public void initialize()
     {
         if (spawnPoint == null)
@@ -37,7 +37,11 @@ public class SnackSpawner : MonoBehaviour
 
         }
     }
-     void loadConfig(SpawnerConfig spawnerConfig)
+    public int getEmptyCount()
+    {
+        return maxSnacks - snackStack.Count;
+    }
+    void loadConfig(SpawnerConfig spawnerConfig)
     {
         this.spawnerConfig = spawnerConfig;
         snackConfigs = spawnerConfig.snackConfigs;
@@ -48,13 +52,13 @@ public class SnackSpawner : MonoBehaviour
         spawnChance = spawnerConfig.spawnChance;
         scaleFactor = maxScale / maxSnacks;
 
-      
-    }   
+
+    }
     public void initialize(SpawnerConfig spawnerConfig)
     {
         if (spawnPoint == null)
         {
-             
+            spawnPoint = transform;
             loadConfig(spawnerConfig);
             fillSnacks();
             // spawnSnacks(maxSnacks, 0);
@@ -84,6 +88,47 @@ public class SnackSpawner : MonoBehaviour
         }
 
 
+    }
+    public void addSnack(SnackConfig config)
+    {
+        if (snackStack.Count >= maxSnacks)
+        {
+            Debug.LogWarning("Max snacks reached, cannot spawn more.");
+            return;
+        }
+
+        // Instantiate the snack prefab and set its properties
+        Snack snack = snackPrefabTemplate.GetComponent<Snack>();
+
+        // snack setup
+        snack = setupSnack(config, snack);
+        // instantiate the snack and add to the stack
+        GameObject newSnack = Instantiate(snack.gameObject, spawnPoint.position, Quaternion.identity, transform);
+        snackStack.Push(newSnack.GetComponent<Snack>());
+    }
+    public void addSnack(SnackConfig config, bool releaseImmediately)
+    {
+        addSnack(config);
+        if (releaseImmediately)
+        {
+            releaseSnack();
+        }
+    }
+    public Snack addRockSnack(SnackConfig config, bool releaseImmediately)
+    {
+        // Instantiate the snack prefab and set its properties
+        Snack rock = snackPrefabTemplate.GetComponent<Snack>();
+
+        // snack setup
+        rock = setupRock(config, rock);
+        // instantiate the snack and add to the stack
+        GameObject newSnack = Instantiate(rock.gameObject, spawnPoint.position, Quaternion.identity, transform);
+        snackStack.Push(newSnack.GetComponent<Snack>());
+        if (releaseImmediately)
+        {
+            return releaseSnack();
+        }
+        return rock;
     }
     void addSnack(int indexConfig)
     {
@@ -117,6 +162,14 @@ public class SnackSpawner : MonoBehaviour
         snack.setOrderInLayer(snackStack.Count);
         return snack;
     }
+    private Snack setupRock(SnackConfig config, Snack snack)
+    {
+        snack.setConfig(config);
+        snack.setInitScale((snackStack.Count + 1) * scaleFactor);
+        snack.setLeaveDuration(0.5f); // rock snacks have a fixed leave duration
+        snack.setOrderInLayer(snackStack.Count);
+        return snack;
+    }
 
     public void multiplyLeaveDurationSpeedFactor(float newSpeedFactor)
     {
@@ -147,10 +200,10 @@ public class SnackSpawner : MonoBehaviour
     }
     public Snack releaseSnack()
     {
-        
+
         if (snackStack.Count > 0)
         {
-            
+
             Snack snack = snackStack.Pop();
             snack.transform.SetParent(null);
             snack.startLeavingSpiralTray();

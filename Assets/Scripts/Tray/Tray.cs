@@ -11,9 +11,14 @@ public class Tray : MonoBehaviour, ITray
     [SerializeField] SnackSpawner snackSpawnerLoaded;
     [SerializeField] Platform platformLoaded;
     Coroutine waitForSnack;
-    string id;
+    [SerializeField] string id;
     bool platformDestroyedOnStart = false;
     TrayConfig trayConfig;
+
+    void OnEnable()
+    {
+        GameEvents.onTraysCleared += fillTray; 
+    }
 
     private void Start()
     {
@@ -26,6 +31,16 @@ public class Tray : MonoBehaviour, ITray
         initializePlatform();
         initializeSnackSpawner();
     }
+    public int getEmptyCount()
+    {
+        if (snackSpawnerLoaded == null)
+        {
+            Debug.LogError($"SnackSpawner not initialized for tray {id}");
+            return 0;
+        }
+        return snackSpawnerLoaded.getEmptyCount();
+    }
+ 
 
     // void Start()
     // {
@@ -38,7 +53,26 @@ public class Tray : MonoBehaviour, ITray
     //     // TrayManager.registerTray(this);
     //     // isPlatformBroken = Random.Range(0, 2) ? 0 : 1; // 50% chance to be broken.
     // }
+    public Snack addRockSnack()
+    {
+        if (snackSpawnerLoaded == null)
+        {
+            Debug.LogError($"SnackSpawner not initialized for tray {id}");
+            return null;
+        }
 
+        return snackSpawnerLoaded.addRockSnack(trayConfig.rockConfig, true);
+    }
+    public void fillTray()
+    {
+        if (snackSpawnerLoaded == null)
+        {
+            Debug.LogError($"SnackSpawner not initialized for tray {id}");
+            return;
+        }
+
+        snackSpawnerLoaded.fillSnacks();
+    }
 
     private void initializeSnackSpawner()
     {
@@ -64,7 +98,7 @@ public class Tray : MonoBehaviour, ITray
         snackSpawnerLoaded.initialize(trayConfig.spawnerConfigs[Random.Range(0, trayConfig.spawnerConfigs.Length)]);
         snackSpawnerLoaded.transform.SetParent(platformLoaded.getPlatformAnimHandler().transform);
 
-        Debug.Log($"SnackSpawner initialized for tray {id}");
+        //Debug.Log($"SnackSpawner initialized for tray {id}");
     }
 
     // private void initializeSnackSpawner()
@@ -88,6 +122,22 @@ public class Tray : MonoBehaviour, ITray
         }
         platformLoaded.setTrayIdSO(TrayManager.instance.getTrayIdSO(id));
         platformLoaded.loadTrayIdSprite();
+        platformLoaded.onPlatformLanded += deterMineReleaseRandomSnackProbability;
+
+    }
+    public void deterMineReleaseRandomSnackProbability()
+    {
+        if (snackSpawnerLoaded == null)
+        {
+            Debug.LogError($"SnackSpawner not initialized for tray {id}");
+            return;
+        }
+        bool release = Random.value < trayConfig.chanceToReleaseRandomSnack;
+        if (release)
+        {
+            snackSpawnerLoaded.releaseSnack();
+        }
+
 
     }
     public void determinePlatformBreakOnStartProbability()
@@ -128,13 +178,13 @@ public class Tray : MonoBehaviour, ITray
             {
                 //snack.startLeavingSpiralTray();
                 waitForSnackToLeave(snack);
-                Debug.Log("Snack releasing from tray: " + id);
+                //Debug.Log("Snack releasing from tray: " + id);
             }
 
         }
         else
         {
-            Debug.Log("There is a snack leaving the tray, please wait.");
+            // Debug.Log("There is a snack leaving the tray, please wait.");
         }
 
     }
@@ -169,11 +219,11 @@ public class Tray : MonoBehaviour, ITray
         return snackSpawnerLoaded.hasSnacksAvailable();
     }
 
- 
-  
+
+
     public SnackSpawner getSnackSpawnerLoaded()
     {
-       return snackSpawnerLoaded;
+        return snackSpawnerLoaded;
     }
 }
 
