@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class MainMenuCanvas : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    void OnEnable()
     {
-        
+        MainMenuCigarette.onCigarette += activateChilds;
+         
+
+    }
+    void OnDisable()
+    {
+        MainMenuCigarette.onCigarette -= activateChilds;
+    }
+    public void activateChilds()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.gameObject.activeSelf == false)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

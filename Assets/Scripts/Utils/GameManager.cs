@@ -8,6 +8,7 @@ public class GameManager : GenericSingleton<GameManager>
     [SerializeField] private PlayerMovementStats defaultMovementStats;
     [SerializeField] GameDataSO gameData;
     public static Action OnGameSceneLoaded;
+    public static Action OnMainMenuLoaded;
     public static Action OnPlayerSpawned;
     
 
@@ -47,6 +48,7 @@ public class GameManager : GenericSingleton<GameManager>
 
     private void onLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
+        AudioManager.Instance.stopAllAudio();
         switch (scene.name)
         {
             case "GameScene":
@@ -68,6 +70,7 @@ public class GameManager : GenericSingleton<GameManager>
         else if (Input.GetKeyDown(KeyCode.F1))
         {
             loadScene("GameScene");
+
         }
         else if (Input.GetKeyDown(KeyCode.Backspace))
         {
@@ -101,6 +104,7 @@ public class GameManager : GenericSingleton<GameManager>
 
             OnPlayerSpawned?.Invoke();
             GameEvents.triggerPlayerSpawned(currentPlayer);
+            
         }
     }
 

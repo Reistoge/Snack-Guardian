@@ -121,7 +121,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2882605555896360674}
@@ -166,7 +166,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1504361611
   m_SortingLayer: 1
-  m_SortingOrder: 4
+  m_SortingOrder: 5
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -291,12 +291,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15284aba1740d5a4e8d170a1657dee3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snackConfig: {fileID: 11400000, guid: 260a6a4db8cc5c44ba3edf68752cbbde, type: 2}
+  snackConfig: {fileID: 11400000, guid: ada44408cd6c03649b11c6bfb6f33be9, type: 2}
   fall: {fileID: 7930278489831744563}
   animatorHandler: {fileID: 3315465292840821790}
   catchDetector: {fileID: 4053112428503254058}
   landed: 0
-  initScale: 1
+  initScale: 1.2
   leaveDuration: 0.5
 --- !u!114 &7930278489831744563
 MonoBehaviour:
