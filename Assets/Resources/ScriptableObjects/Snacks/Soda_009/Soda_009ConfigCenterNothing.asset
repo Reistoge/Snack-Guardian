@@ -16,6 +16,6 @@ MonoBehaviour:
   fallStats: {fileID: 11400000, guid: 8ce7a1bc2039dd14c8791f27deb68ece, type: 2}
   animator: {fileID: 9100000, guid: 51815693489c8a3429d23e69496c20a3, type: 2}
   destroyParticlesPrefab: {fileID: 4899138300643375227, guid: 89f83c9f9aebd3e459b2061b5b7de51a, type: 3}
-  icon: {fileID: 21300000, guid: 35f06d2b52b9f0b4e8096f9d414ea87c, type: 3}
+  icon: {fileID: 21300000, guid: 88a66cddb4cc2a74d93e0adeee4a434c, type: 3}
   destroyOnFall: 1
   isRock: 0
