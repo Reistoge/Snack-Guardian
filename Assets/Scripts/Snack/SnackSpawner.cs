@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 public class SnackSpawner : MonoBehaviour
 {
@@ -196,7 +197,7 @@ public class SnackSpawner : MonoBehaviour
     }
     public void fillSnacks()
     {
-        addSnacks(maxSnacks - snackStack.Count, 0);
+        addSnacks(maxSnacks - snackStack.Count, Random.Range(0, snackConfigs.Length));
     }
     public Snack releaseSnack()
     {
