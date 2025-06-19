@@ -8,7 +8,7 @@ public class PlayerInteract : MonoBehaviour, IInteractor
     [SerializeField] Player player;
     [SerializeField] LayerMask EnemyLayerInteract;
 
-
+    
     public void interactionWithSnack(ObjectEffect effect)
     {
 
@@ -16,6 +16,15 @@ public class PlayerInteract : MonoBehaviour, IInteractor
         if (!player.isDashing() && effect.type == EffectType.Nothing)
         {
             player.bump();
+            GameEvents.triggerSnackCaptured(false);
+            StartCoroutine(stopTime(0.1f));
+
+        }
+        if (player.isDashing())
+        {
+            GameEvents.triggerSnackCaptured(true);
+            StartCoroutine(stopTime(0.1f));
+            print("Player destroys the snack while dashing .");
         }
         // if (player.isDashing())
         // {
@@ -28,6 +37,13 @@ public class PlayerInteract : MonoBehaviour, IInteractor
         //     player.bump();
         // }
 
+    }
+    IEnumerator stopTime(float time)
+    {
+        Time.timeScale = 0f;
+        yield return new WaitForSecondsRealtime(time);
+        Time.timeScale = 1f;
+         
     }
 
     public void applyEffect(ObjectEffect effect)
@@ -49,9 +65,9 @@ public class PlayerInteract : MonoBehaviour, IInteractor
             case EffectType.Nothing:
                 player.applyEffect(effect);
                 break;
-            
+
         }
-        
+
     }
 
 }

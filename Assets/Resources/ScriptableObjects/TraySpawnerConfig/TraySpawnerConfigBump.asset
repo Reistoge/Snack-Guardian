@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: TraySpawnerConfigBump
   m_EditorClassIdentifier: 
   trayConfig: {fileID: 11400000, guid: be0c52a7ca0f9d545ba436603c1d7d22, type: 2}
-  trayPrefab: {fileID: 7183843644925821168, guid: a090596cc25968d4084110e0cf72b10c, type: 3}
   traySeparation: 1.1
   trayCount: 10

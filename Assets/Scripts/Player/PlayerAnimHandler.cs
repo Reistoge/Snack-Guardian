@@ -15,6 +15,9 @@ public class PlayerAnimHandler : MonoBehaviour
     public static readonly string FAST_FALL_ANIMATION_STATE = "FastFall";
     public static readonly string DAMAGED_ANIMATION_STATE = "Damaged";
     public static readonly string BUMP_ANIMATION_STATE = "Bump";
+    public static readonly string GAMEOVER_ANIMATION_STATE = "GameOver";
+
+    public static readonly string WALL_SLIDE_ANIMATION_STATE = "WallSlide";
 
     private readonly int idleAnimationHash = Animator.StringToHash(IDLE_ANIMATION_STATE);
     private readonly int runAnimationHash = Animator.StringToHash(RUN_ANIMATION_STATE);
@@ -26,6 +29,8 @@ public class PlayerAnimHandler : MonoBehaviour
     private readonly int fastFallSpeedAnimationHash = Animator.StringToHash(FAST_FALL_ANIMATION_STATE);
     private readonly int damagedAnimationHash = Animator.StringToHash(DAMAGED_ANIMATION_STATE);
     private readonly int bumpAnimationHash = Animator.StringToHash(BUMP_ANIMATION_STATE);
+    private readonly int gameOverAnimationHash = Animator.StringToHash(GAMEOVER_ANIMATION_STATE);
+    private readonly int wallSlideAnimationHash = Animator.StringToHash(WALL_SLIDE_ANIMATION_STATE);
     void OnEnable()
     {
         GameEvents.onInvincibilityStart += setInvincibleMaterial;
@@ -109,5 +114,15 @@ public class PlayerAnimHandler : MonoBehaviour
                 return clip.length;
         }
         return 0f; // Or throw an exception if not found
+    }
+
+    public void playGameOverAnimation()
+    {
+       anim.Play(gameOverAnimationHash);
+    }
+
+    public void playEnterWallSlide()
+    {
+         anim.Play(wallSlideAnimationHash);
     }
 }

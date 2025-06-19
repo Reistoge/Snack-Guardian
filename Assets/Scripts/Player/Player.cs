@@ -49,14 +49,18 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     }
     public void die()
     {
-        GameEvents.triggerPlayerDeath();
+        //movement.stopMovement();
+        //anim.playGameOverAnimation();
+        stateMachine.ChangeState(new GameOverState(this));
+        
+        //gameObject.SetActive(false);
 
     }
     void OnDisable()
     {
         // healthSystem.onDamageTaken -= OnDamageTaken;
         // healthSystem.onDie -= ()=> {Destroy(gameObject);};
-        GameEvents.onPlayerDeath -= die;
+        GameEvents.onGameOver -= die;
 
 
     }
@@ -155,6 +159,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         movement.stopMovement();
     }
+ 
     public bool isDashing()
     {
         // here we check if the player is dashing

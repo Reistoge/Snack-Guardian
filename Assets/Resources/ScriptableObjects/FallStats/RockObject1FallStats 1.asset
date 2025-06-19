@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcbf2abea795b7f4d8e2156d5a1aec95, type: 3}
+  m_Name: RockObject1FallStats 1
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  groundDetectionRayLength: 0.02
+  headDetectionRayLength: 0.02
+  headWidth: 0.75
+  wallDetectionRayLength: 0.125
+  wallDetectionRayHeightMultiplier: 0.9
+  jumpHeight: 6.5
+  jumpHeightCompensationFactor: 1.054
+  timeTillJumpApex: 0.35
+  gravityOnReleaseMultiplier: 1
+  maxFallSpeed: 5
+  numberOfJumpsAllowed: 2
+  resetJumpOnWallSlide: 1
+  timeForUpwardsCancel: 0.027
+  apexThreshold: 0.97
+  apexHangTime: 0.075
+  jumpBufferTime: 0.125
+  jumpCoyoteTime: 0.1
+  debugShowIsGroundedBox: 0
+  debugShowHeadBumpBox: 0

@@ -36,8 +36,8 @@ public class FastFallState : PlayerBaseState
             player.StateMachine.ChangeState(new IdleState(player));
             return;
         }
-
-        if (player.Movement.IsTouchingWall && !player.Movement.IsGrounded)
+        // (player.Movement.IsWallSliding || player.Movement.IsWallSlideFalling)&&
+        if (  player.Movement.IsTouchingWall && !player.Movement.IsGrounded)
         {
             player.StateMachine.ChangeState(new WallSlideState(player));
             return;

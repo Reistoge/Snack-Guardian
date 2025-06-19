@@ -24,6 +24,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 448
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 4096
   groundDetectionRayLength: 0.02
   headDetectionRayLength: 0.02
   headWidth: 0.75
@@ -43,7 +46,7 @@ MonoBehaviour:
   jumpCoyoteTime: 0.1
   wallSlideSpeed: 3
   wallSlideDeccelerationSpeed: 30
-  wallJumpDirection: {x: -6, y: 2}
+  wallJumpDirection: {x: -3, y: 2.3}
   wallJumpPostBufferTime: 0.125
   wallJumpGravityOnReleaseMultiplier: 1
   dashTime: 0.16

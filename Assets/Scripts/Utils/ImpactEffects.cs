@@ -9,6 +9,8 @@ public class ImpactEffect : ScriptableObject
     public float horizontalForce = 8f;
     public float verticalForce = 5f;
     public float impactDuration = 0.3f;
+    public float maxSpeed = 50f; // Added this to limit the maximum speed of the impact effect
+    public float minSpeed = 3f; // Added this to limit the minimum speed of the impact effect
     public bool applyGravity = true;  // Added this
 
     [Header("Fall Phase Settings")]
@@ -42,8 +44,6 @@ public class ImpactEffect : ScriptableObject
 
     private float clampVelocity(float velocity)
     {
-        const float minSpeed = 3f;
-        const float maxSpeed = 50f;
         
         if (velocity == 0) return 0;
         return velocity > 0 

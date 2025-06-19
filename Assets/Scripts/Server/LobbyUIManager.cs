@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -12,33 +11,56 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button readyButton;
     [SerializeField] private Button sendMessageButton;
-    
+
     private bool isReady = false;
     private List<string> connectedPlayers = new List<string>();
 
+    // private void Start()
+    // {
+    //     startGameButton.interactable = false;
+    //     readyButton.onClick.AddListener(onReadyClick);
+    //     sendMessageButton.onClick.AddListener(sendChatMessage);
+
+    //     // Subscribe to all events
+    //     MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
+    //     //Debug.Log("Subscribed to onChatMessageReceived");
+    //     MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
+    //     MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
+    //     MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
+
+    //     // Initialize chat display
+    //     chatDisplay.text = "Welcome to chat...";
+    // }
     private void Start()
     {
         startGameButton.interactable = false;
         readyButton.onClick.AddListener(onReadyClick);
         sendMessageButton.onClick.AddListener(sendChatMessage);
-        
+
         // Subscribe to all events
         MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
-        Debug.Log("Subscribed to onChatMessageReceived");
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
-        // Initialize chat display
-        chatDisplay.text = "Chat initialized...";
+        MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
+        MultiplayerGameEvents.onPlayersListCleared += handlePlayersListCleared;
+
+        chatDisplay.text = "Welcome to chat...";
     }
 
     private void onReadyClick()
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     private void handlePlayerDisconnected(string obj)
     {
-        throw new NotImplementedException();
+        Debug.Log($"Player disconnected: {obj}"); // Debug line
+        if (connectedPlayers.Contains(obj))
+        {
+            connectedPlayers.Remove(obj);
+            updatePlayerList();
+            chatDisplay.text += $"\n<color=red>Player {obj} left</color>";
+        }
     }
 
     public void sendChatMessage()
@@ -54,7 +76,7 @@ public class LobbyUIManager : MonoBehaviour
     private void handleChatMessage(string playerId, string message)
     {
         Debug.Log($"Handling chat message: {playerId}: {message}"); // Debug line
-        
+
         // Ensure UI updates happen on main thread
         if (!this) return;
 
@@ -62,17 +84,24 @@ public class LobbyUIManager : MonoBehaviour
         Canvas.ForceUpdateCanvases(); // Force UI refresh
     }
 
-    private void handleConnectedToServer()
+
+    private void handlePlayersListCleared()
     {
-        Debug.Log("Connected to server, clearing chat"); // Debug line
-        chatDisplay.text = "Connected to chat room";
         connectedPlayers.Clear();
         updatePlayerList();
     }
 
+    private void handleConnectedToServer()
+    {
+        chatDisplay.text = "Connected to chat room";
+        connectedPlayers.Clear();
+        updatePlayerList();
+        NetworkManager.Instance.getConnectedPlayers(); // Request player list after connection
+    }
+
     private void handlePlayerConnected(string playerId)
     {
-        Debug.Log($"Player connected: {playerId}"); // Debug line
+        //Debug.Log($"Player connected: {playerId}"); // Debug line
         if (!connectedPlayers.Contains(playerId))
         {
             connectedPlayers.Add(playerId);
@@ -83,18 +112,22 @@ public class LobbyUIManager : MonoBehaviour
 
     private void updatePlayerList()
     {
+        // throw new NotImplementedException();
         playerList.text = "Jugadores conectados:\n";
         foreach (var playerId in connectedPlayers)
         {
             playerList.text += playerId + "\n";
         }
+
     }
 
     private void OnDestroy()
     {
+        // Unsubscribe from all events
         MultiplayerGameEvents.onConnectedToServer -= handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived -= handleChatMessage;
         MultiplayerGameEvents.onPlayerConnected -= handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected -= handlePlayerDisconnected;
+        MultiplayerGameEvents.onPlayersListCleared -= handlePlayersListCleared;
     }
 }

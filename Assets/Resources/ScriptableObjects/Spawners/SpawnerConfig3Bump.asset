@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snackConfigs:
   - {fileID: 11400000, guid: 260a6a4db8cc5c44ba3edf68752cbbde, type: 2}
-  maxSnacks: 10
+  maxSnacks: 5
   maxScale: 1
   leaveDurationSpeedFactor: 0.5
   spawnDelay: 3
