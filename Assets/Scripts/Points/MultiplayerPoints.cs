@@ -15,6 +15,7 @@ public class MultiplayerPoints : MonoBehaviour
     [SerializeField] int attack2Cost = 6;
     [SerializeField] int attack3Cost = 9;
 
+
     void OnEnable()
     {
         GameEvents.onSnackCaptured += fillWhenSnackCaptured;
@@ -45,15 +46,16 @@ public class MultiplayerPoints : MonoBehaviour
         }
         if (fillLevel >= attack1Cost && fillLevel < attack2Cost)
         {
-            sendAttack(attack1Cost);
+            sendAttack(attack1Cost, AttackType.Attack1);
         }
         else if (fillLevel >= attack2Cost && fillLevel < attack3Cost)
         {
-            sendAttack(attack2Cost);
+            sendAttack(attack2Cost, AttackType.Attack2);
         }
         else if (fillLevel >= attack3Cost)
         {
-            sendAttack(attack3Cost);
+            sendAttack(attack3Cost, AttackType.Attack3);
+
         }
         
         
@@ -66,7 +68,19 @@ public class MultiplayerPoints : MonoBehaviour
     {
         fillLevel -= attackCost;
         fillToLevel(fillLevel);
+        
+        MultiplayerGameEvents.triggerPlayerSendAttack(attackCost.ToString());
         print("Sending attack with fill amount: " + fillLevel);
+
+        
+    }
+    private void sendAttack(int attackCost, AttackType attackType)
+    {
+        fillLevel -= attackCost;
+        fillToLevel(fillLevel);
+        
+        MultiplayerGameEvents.triggerPlayerSendAttack(attackType.ToString());
+        print("Sending attack with fill amount: " + fillLevel +" and attack type: " + attackType.ToString());
 
         
     }
@@ -97,6 +111,12 @@ public class MultiplayerPoints : MonoBehaviour
            
         }
 
+    }
+    public enum AttackType
+    {
+        Attack1,
+        Attack2,
+        Attack3
     }
     public void fillPointsBar(float current, float max)
     {

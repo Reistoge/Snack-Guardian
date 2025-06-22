@@ -22,6 +22,7 @@ public class NetworkManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             initializeWebSocket();
             connect();
+            
 
         }
         else
@@ -29,6 +30,18 @@ public class NetworkManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    // private void sendAttackFromPlayerToServer(string obj)
+    // {
+
+    //     // Check if the WebSocket is connected  
+    //     Debug.Log($"Sending attack from player: {obj}");
+
+
+    //     // sendPublicMessage(obj);
+
+    // }
+
     public void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
@@ -45,6 +58,7 @@ public class NetworkManager : MonoBehaviour
         {
             //Debug.Log("Connected to server");
             MultiplayerGameEvents.triggerConnectedToServer();
+            //MultiplayerGameEvents.onPlayerSendAttack += sendAttackFromPlayerToServer;
             getConnectedPlayers();
         });
 
@@ -52,6 +66,7 @@ public class NetworkManager : MonoBehaviour
         {
             //Debug.Log("Disconnected from server");
             MultiplayerGameEvents.triggerDisconnectedFromServer();
+            // MultiplayerGameEvents.onPlayerSendAttack -= sendAttackFromPlayerToServer;
         });
         webSocket.On.Event((eventName, data, type) =>
         {
@@ -156,8 +171,26 @@ public class NetworkManager : MonoBehaviour
                 }
                 
                 Debug.Log($"Received message from {publicMessageWrapper.data.id}: {publicMessageWrapper.data.msg}");
-                MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.id, publicMessageWrapper.data.msg);
+
+
+                // meensaje = ataque3
+                // MultiplayerGameEvents.triggerPlayerReceiveAttack(publicMessageWrapper.data.msg);
+
                 break;
+            // case "private-message":
+
+            //     var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
+            //     if (privateMessageWrapper == null || privateMessageWrapper.data == null)
+            //     {
+            //         Debug.LogWarning("Failed to parse private-message data");
+            //         return;
+            //     }
+            //     Debug.Log($"Private message from {privateMessageWrapper.data.id}: {privateMessageWrapper.data.message}");
+            //     // handleAttackMessage(privateMessageWrapper.data.message);
+            //     // Handle private message logic here
+            //     break;
+      
+         
             case "send-public-message":
                 var sendPublicMessageWrapper = JsonUtility.FromJson<ServerMessage<MessageData>>(jsonData);
                 if (sendPublicMessageWrapper == null || sendPublicMessageWrapper.data == null)

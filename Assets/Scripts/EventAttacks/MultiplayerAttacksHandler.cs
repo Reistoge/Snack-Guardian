@@ -26,6 +26,7 @@ public class MultiplayerAttacksHandler : MonoBehaviour
             case "1":
                 Debug.Log("Player 1 attack received");
                 // Handle player 1 attack logic here
+                
                 break;
             case "2":
                 Debug.Log("Player 2 attack received");
@@ -34,6 +35,7 @@ public class MultiplayerAttacksHandler : MonoBehaviour
             case "3":
                 Debug.Log("Player 3 attack received");
                 // Handle player 3 attack logic here
+                
                 break;
         }
 
