@@ -52,3 +52,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f2858c3f02f7a5444a5ea8124ff88043, type: 2}
   - {fileID: 11400000, guid: 011821e2edb31f6459acc8ced175aa9d, type: 2}
   - {fileID: 11400000, guid: b9c6eba89ee26224099a28f20d7ad6e9, type: 2}
+  snackGuardianMusic: {fileID: 11400000, guid: 210ebfde2416ddd429969bb93545b8a8, type: 2}
+  snackGuardianSFX: {fileID: 11400000, guid: 7fbca8660d9ed424b907cf849b323517, type: 2}

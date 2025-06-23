@@ -85,7 +85,7 @@ public class GameManager : GenericSingleton<GameManager>
         {
             Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
         }
-      
+        
     }
 
 

@@ -45,15 +45,15 @@ public class MultiplayerPoints : MonoBehaviour
         }
         if (fillLevel >= attack1Cost && fillLevel < attack2Cost)
         {
-            sendAttack(attack1Cost);
+            sendAttack(attack1Cost, "Attack1");
         }
         else if (fillLevel >= attack2Cost && fillLevel < attack3Cost)
         {
-            sendAttack(attack2Cost);
+            sendAttack(attack2Cost, "Attack2");
         }
         else if (fillLevel >= attack3Cost)
         {
-            sendAttack(attack3Cost);
+            sendAttack(attack3Cost, "Attack3");
         }
         
         
@@ -61,12 +61,36 @@ public class MultiplayerPoints : MonoBehaviour
 
 
     }
+    // public enum AttackType
+    // {
+    //   Attack1,
+    //   Attack2,
+    //   Attack3
+    //}
 
-    private void sendAttack(int attackCost)
+    private void sendAttack(int attackCost, string attackType)
     {
         fillLevel -= attackCost;
         fillToLevel(fillLevel);
         print("Sending attack with fill amount: " + fillLevel);
+        MultiplayerGameEvents.triggerPlayerSendAttack(attackType);
+        switch (attackType)
+        {
+            case "Attack1":
+                // Implement attack 1 logic here
+                Debug.Log("Attack 1 sent!");
+                 
+                
+                break;
+            case "Attack2":
+                // Implement attack 2 logic here
+                Debug.Log("Attack 2 sent!");
+                break;
+            case "Attack3":
+                // Implement attack 3 logic here
+                Debug.Log("Attack 3 sent!");
+                break;
+        }
 
         
     }

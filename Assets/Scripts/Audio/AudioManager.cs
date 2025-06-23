@@ -11,7 +11,6 @@ public class AudioManager : GenericSingleton<AudioManager>
 
     [SerializeField] AudioPlayer audioPlayerPrefab;
     [SerializeField] List<AudioPlayer> audioPlayers = new List<AudioPlayer>();
-
     [SerializeField] List<AudioConfig> audioConfigs = new List<AudioConfig>();
 
     public void OnEnable()
@@ -21,10 +20,14 @@ public class AudioManager : GenericSingleton<AudioManager>
 
     }
 
-    private void playGamePlayMusic()
+    public void playGamePlayMusic()
     {
-
+        if (snackGuardianMusic != null && snackGuardianMusic.GameplayMusic != null)
+        {
+            playSFX(snackGuardianMusic.GameplayMusic);
+        }
     }
+
     public void playMainMenuMusic()
     {
         if (snackGuardianMusic != null && snackGuardianMusic.MainMenuMusic != null)
@@ -33,6 +36,15 @@ public class AudioManager : GenericSingleton<AudioManager>
             playSFX(snackGuardianMusic.MainMenuMusic);
         }
     }
+
+    //public void playDamagedAudio()
+    //{
+        //if (snackGuardianSFX != null && snackGuardianSFX.damageAudio != null)
+        //{
+            //playSFX(snackGuardianSFX.damageAudio);
+        //}
+    //}
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.M))
@@ -48,6 +60,7 @@ public class AudioManager : GenericSingleton<AudioManager>
     }
     // music repository
     [SerializeField] SnackGuardianMusic snackGuardianMusic;
+    // [SerializeField] SnackGuardianSFX snackGuardianSFX;
 
     // function to basically play any sfx
 
@@ -64,7 +77,6 @@ public class AudioManager : GenericSingleton<AudioManager>
             {
                 audio.playAudio(audioConfig);
                 destroyInactiveAudioPlayers();
-
 
                 return;
             }
@@ -101,4 +113,5 @@ public class AudioManager : GenericSingleton<AudioManager>
     }
 
     public SnackGuardianMusic SnackGuardianMusic { get => snackGuardianMusic; set => snackGuardianMusic = value; }
+    // public SnackGuardianSFX SnackGuardianSFX { get => snackGuardianSFX; set => snackGuardianSFX = value; }
 }

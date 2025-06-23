@@ -5,14 +5,18 @@ using UnityEngine.UI;
 
 public class LobbyUIManager : MonoBehaviour
 {
+    public static LobbyUIManager Instance { get; private set; }
     [SerializeField] private TMP_InputField chatInput;
     [SerializeField] private TextMeshProUGUI chatDisplay; // Change to TextMeshProUGUI
-    [SerializeField] private TextMeshProUGUI playerList;
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button readyButton;
     [SerializeField] private Button sendMessageButton;
+    [SerializeField] private GameObject playerEntryPrefab;
+    [SerializeField] private Transform playerListContainer; // donde se instanciarán
 
     private bool isReady = false;
+    private string oponentId = "";
+    
     private List<string> connectedPlayers = new List<string>();
 
     // private void Start()
@@ -31,6 +35,19 @@ public class LobbyUIManager : MonoBehaviour
     //     // Initialize chat display
     //     chatDisplay.text = "Welcome to chat...";
     // }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     private void Start()
     {
         startGameButton.interactable = false;
@@ -49,7 +66,11 @@ public class LobbyUIManager : MonoBehaviour
 
     private void onReadyClick()
     {
-        // throw new NotImplementedException();
+        if (!string.IsNullOrEmpty(oponentId))
+        {
+            NetworkManager.Instance.sendPrivateMessage(oponentId, "ready-confirmed");
+            StartGameWith(oponentId);
+        }
     }
 
     private void handlePlayerDisconnected(string obj)
@@ -72,6 +93,8 @@ public class LobbyUIManager : MonoBehaviour
             chatInput.text = "";
         }
     }
+
+   
 
     private void handleChatMessage(string playerId, string message)
     {
@@ -113,12 +136,43 @@ public class LobbyUIManager : MonoBehaviour
     private void updatePlayerList()
     {
         // throw new NotImplementedException();
-        playerList.text = "Jugadores conectados\n";
+        foreach (Transform child in playerListContainer)
+        {
+            Destroy(child.gameObject);
+        }
+        
         foreach (var playerId in connectedPlayers)
         {
-            playerList.text += "id: " + playerId + "\n";
+            GameObject entryObj = Instantiate(playerEntryPrefab, playerListContainer, false);
+            ConnectedPlayerEntry entry = entryObj.GetComponent<ConnectedPlayerEntry>();
+            entry.Initialize(playerId);
+            Debug.Log("Cantidad de botones hijos: " + playerListContainer.childCount);
         }
+    }
 
+    public void ShowReadyPopup(string playerId)
+    {
+        // Show a popup to confirm readiness
+        Debug.Log($"Show ready popup for {playerId}");
+        // Implement your popup logic here
+        // For example, you can use a UI panel with buttons to confirm or decline
+        // For now, just log the action
+        chatDisplay.text += $"\n<color=yellow>{playerId} is ready to play!</color>";
+        Canvas.ForceUpdateCanvases();
+    }
+    
+    public void StartGameWith(string playerId)
+    {
+        Debug.Log($"Starting game with {playerId}");
+        oponentId = playerId;
+        isReady = true;
+        startGameButton.interactable = true;
+
+        // Notify the server to start the game
+        NetworkManager.Instance.sendPrivateMessage(playerId, "ready-confirmed");
+        // Optionally, you can also start the game locally
+        // For example, load the game scene or transition to the game state
+        GameManager.Instance.loadScene("GameScene"); // Uncomment if you want to load a scene
     }
 
     private void OnDestroy()
@@ -129,5 +183,11 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onPlayerConnected -= handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected -= handlePlayerDisconnected;
         MultiplayerGameEvents.onPlayersListCleared -= handlePlayersListCleared;
+    }
+
+    public void setOponentId(string id)
+    {
+        oponentId = id;
+        Debug.Log($"Oponent ID set to: {oponentId}");
     }
 }
