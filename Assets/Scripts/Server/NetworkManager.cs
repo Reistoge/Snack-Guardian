@@ -11,7 +11,7 @@ public class NetworkManager : MonoBehaviour
     [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/";
     private HTTP.WebSocket webSocket;
     [SerializeField] private string playerId;
-    private string oponentId = "";
+    [SerializeField] private string oponentId;
   
 
     private void Awake()
@@ -88,7 +88,6 @@ public class NetworkManager : MonoBehaviour
     }
     public void receiveAttackFromPlayer(string attackData)
     {
-        Debug.Log($"Received attack data from player: {attackData}");
         MultiplayerGameEvents.triggerPlayerReceiveAttack(attackData);
     }
 
@@ -187,16 +186,38 @@ public class NetworkManager : MonoBehaviour
                 }
                 break;
             case "private-message":
-                onPrivateMessageReceived(jsonData);
-                break;
-            case "send-private-message":
                 var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
                 if (privateMessageWrapper == null || privateMessageWrapper.data == null)
+                {
+                    Debug.LogWarning("Failed to parse private message data");
+                    return;
+                }
+                string from = privateMessageWrapper.data.id;
+                string content = privateMessageWrapper.data.msg;
+                Debug.Log($"Private message from {from}: {content} (llegan mensajes correctamente)");
+                if (content == "ready-to-play")
+                {
+                    LobbyUIManager.Instance.ShowReadyPopup(from);
+                }
+                else if (content == "ready-confirmed")
+                {
+                    oponentId = from;
+                    LobbyUIManager.Instance.StartGameWith(from);
+                }
+                else if (content == "Attack3")
+                {
+                    Debug.Log("📩 Recibido ataque tipo Attack3 desde: " + from);
+                    receiveAttackFromPlayer(content);
+                } 
+                break;
+            case "send-private-message":
+                var sendPrivateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
+                if (sendPrivateMessageWrapper == null || sendPrivateMessageWrapper.data == null)
                 {
                     Debug.LogWarning("Failed to parse private-message data");
                     return;
                 }
-                Debug.Log($"Private message sent to {privateMessageWrapper.data.id}: {privateMessageWrapper.data.message}");
+                Debug.Log($"Private message sent to {sendPrivateMessageWrapper.data.id}: {sendPrivateMessageWrapper.data.msg}");
                 break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
@@ -228,7 +249,7 @@ public class NetworkManager : MonoBehaviour
         var msgData = new ServerMessage<PrivateMessageData>
         {
             @event = "send-private-message",
-            data = new PrivateMessageData { id = targetId, message = message }
+            data = new PrivateMessageData { id = targetId, msg = message }
         };
 
         string json = JsonUtility.ToJson(msgData);
@@ -241,7 +262,7 @@ public class NetworkManager : MonoBehaviour
         var msgData = new ServerMessage<PrivateMessageData>
         {
             @event = "send-private-message",
-            data = new PrivateMessageData { id = this.oponentId, message = message }
+            data = new PrivateMessageData { id = oponentId, msg = message }
         };
 
         string json = JsonUtility.ToJson(msgData);
@@ -276,30 +297,10 @@ public class NetworkManager : MonoBehaviour
         webSocket.To.Data(json, HTTP.Text);
     }
 
-     public void onPrivateMessageReceived(string json)
-     {
-        var serverMessage = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(json);
-        if (serverMessage == null || serverMessage.data == null)
-        {
-            Debug.LogWarning("Failed to parse private message data");
-            return;
-        }
-        string from = serverMessage.data.id;
-        string content = serverMessage.data.message;
-
-        if (content == "ready-to-play")
-        {
-            LobbyUIManager.Instance.ShowReadyPopup(from);
-        }
-        else if (content == "ready-confirmed")
-        {
-            oponentId = from;
-            LobbyUIManager.Instance.StartGameWith(from);
-        }
-        else if (content == "Attack3")
-        {
-            receiveAttackFromPlayer(content);
-        } 
+public void setOponentId(string id)
+{
+    oponentId = id;
+    Debug.Log($"Oponent ID set to: {oponentId}");
 }
 
 [Serializable]
@@ -333,7 +334,7 @@ public class MessageData
 public class PrivateMessageData
 {
     public string id;
-    public string message;
+    public string msg;
 }
 
 [Serializable]

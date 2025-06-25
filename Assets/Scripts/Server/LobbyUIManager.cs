@@ -62,6 +62,12 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onPlayersListCleared += handlePlayersListCleared;
 
         chatDisplay.text = "Welcome to chat...";
+
+        if (NetworkManager.Instance.WebSocket.IsOpened)
+        {
+            Debug.Log("WebSocket ya está abierto al entrar al lobby. Forzando sincronización.");
+            handleConnectedToServer();
+        }
     }
 
     private void onReadyClick()

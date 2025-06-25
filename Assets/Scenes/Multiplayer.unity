@@ -1177,9 +1177,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.08196721
-    width: 0.43567055
-    height: 0.49180326
+    y: 0.012941176
+    width: 0.99999994
+    height: 0.97477937
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -1670,6 +1670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chatInput: {fileID: 377273527}
   chatDisplay: {fileID: 383216517}
+  playerList: {fileID: 1329119478}
   startGameButton: {fileID: 1062354567}
   readyButton: {fileID: 254977006}
   sendMessageButton: {fileID: 1663792911}

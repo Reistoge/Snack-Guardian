@@ -17,6 +17,7 @@ public class ConnectedPlayerEntry : MonoBehaviour
         inviteButton.onClick.AddListener(() => {
             Debug.Log($"Inviting {playerId}");
             LobbyUIManager.Instance.setOponentId(playerId);
+            NetworkManager.Instance.setOponentId(playerId);
             NetworkManager.Instance.sendPrivateMessage(playerId, "ready-to-play");
         });
     }

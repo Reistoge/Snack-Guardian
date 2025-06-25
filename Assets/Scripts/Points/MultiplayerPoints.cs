@@ -18,11 +18,14 @@ public class MultiplayerPoints : MonoBehaviour
     void OnEnable()
     {
         GameEvents.onSnackCaptured += fillWhenSnackCaptured;
+        MultiplayerGameEvents.onPlayerReceiveAttack += handleReceiveAttack;
     }
     void OnDisable()
     {
         GameEvents.onSnackCaptured -= fillWhenSnackCaptured;
+        MultiplayerGameEvents.onPlayerReceiveAttack -= handleReceiveAttack;
     }
+
     void Update()
     {
 
@@ -159,5 +162,29 @@ public class MultiplayerPoints : MonoBehaviour
         fillLevel = 0;
         fillPointsBar(0, maxPoints);
     }
- 
+
+    private void handleReceiveAttack(string attackType)
+    {
+        Debug.Log($"📥 Recibido ataque: {attackType}");
+        switch (attackType)
+        {
+            case "Attack1":
+                // Ejemplo: Reducir puntos o aplicar penalización
+                fillDown(); // baja un nivel
+                Debug.Log("Ataque 1 recibido");
+                break;
+            case "Attack2":
+                fillDown();
+                fillDown();
+                Debug.Log("Ataque 2 recibido");
+                break;
+            case "Attack3":
+                empty();
+                Debug.Log("Ataque 3 recibido");
+                break;
+            default:
+                Debug.LogWarning("Ataque desconocido recibido");
+                break;
+        }
+    }
 }
