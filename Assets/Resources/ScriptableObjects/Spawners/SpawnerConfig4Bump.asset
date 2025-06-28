@@ -13,8 +13,15 @@ MonoBehaviour:
   m_Name: SpawnerConfig4Bump
   m_EditorClassIdentifier: 
   snackConfigs:
+  - {fileID: 11400000, guid: 260a6a4db8cc5c44ba3edf68752cbbde, type: 2}
   - {fileID: 11400000, guid: 6a47f0090df4e5741870df14232500b5, type: 2}
-  maxSnacks: 10
+  - {fileID: 11400000, guid: a758741368bcab34f99178c172c42f0b, type: 2}
+  - {fileID: 11400000, guid: cb00e59364bfb4247a5c05ea4a7f1bbd, type: 2}
+  - {fileID: 11400000, guid: 84df0fd59b09a5b4abed829578a6518e, type: 2}
+  - {fileID: 11400000, guid: a73d1a1aa0a9d274180ed0072f9b17b6, type: 2}
+  - {fileID: 11400000, guid: e98e6910e49f3d643add53ff05dc4d16, type: 2}
+  - {fileID: 11400000, guid: 2c37a8407e66683408622cf8ad5a383c, type: 2}
+  maxSnacks: 5
   maxScale: 1
   leaveDurationSpeedFactor: 0.5
   spawnDelay: 3

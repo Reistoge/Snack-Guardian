@@ -18,4 +18,6 @@ MonoBehaviour:
   spawnerConfigs:
   - {fileID: 11400000, guid: 84397e5acd630ee43a6c0e6847c8144f, type: 2}
   - {fileID: 11400000, guid: f7e2e895a4dd604448f9478c24974960, type: 2}
+  rockConfig: {fileID: 11400000, guid: ada44408cd6c03649b11c6bfb6f33be9, type: 2}
+  chanceToReleaseRandomSnack: 0.1
   platformShouldBreakOnStartChance: 0.5

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986814f6a234a3648a2132280067a221, type: 3}
+  m_Name: cigarette-open
+  m_EditorClassIdentifier: 
+  sfxVolume: 0.7
+  priority: 128
+  spatialBlend: 0.5
+  stereoPan: 0.5
+  pitch: 0.5
+  loop: 0
+  clip: {fileID: 8300000, guid: db1b2c9462a198d4ba750c5a382b2714, type: 3}

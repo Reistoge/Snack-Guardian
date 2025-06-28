@@ -162,6 +162,7 @@ public class SnackAnimHandler : MonoBehaviour
 
         transform.localScale = endScale;
         playFlipAnimation();
+        spriteRenderer.sortingOrder = 200; // reset the sorting order to 0 when leaving the spiral tray
         snack.canBeCatched(true);
         yield return new WaitForSeconds(getClipDuration(FLIP_ANIMATION_STATE));
         readyToFall = true;

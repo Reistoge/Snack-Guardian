@@ -11,13 +11,14 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     [SerializeField] Fall fall;
     [SerializeField] SnackAnimHandler animatorHandler;
     [SerializeField] SnackInteract catchDetector;
+    [SerializeField] bool landed = false;
 
     ObjectEffect snackEffect;
     Coroutine leavingSpiralTrayRoutine;
     [SerializeField] float initScale = 0.5f;
     [SerializeField] float leaveDuration = 1f;
 
-
+    public bool Landed { get => landed; set => landed = value; }
 
     public float getInitScale()
     {
@@ -48,7 +49,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
     void Start()
     {
-
+        Landed = false;
         fall.stopFall();
         animatorHandler.playIdleAnimation();
         //catchDetector.desactivateCollider();
@@ -58,6 +59,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     {
         if (leavingSpiralTrayRoutine == null)
         {
+
             leavingSpiralTrayRoutine = StartCoroutine(startLeavingSpiralTrayCorutine());
         }
     }
@@ -66,6 +68,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
         if (leavingSpiralTrayRoutine != null)
         {
+
             StopCoroutine(leavingSpiralTrayRoutine);
             animatorHandler.stopLeavingSpiralTrayAnimation();
             leavingSpiralTrayRoutine = null;
@@ -85,10 +88,15 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
     public void destroySnack()
     {
+        detroyParticles();
         stopLeavingSpiralTrayCorutine();
         StartCoroutine(destroyObjectCorutine());
     }
 
+    private void detroyParticles()
+    {
+        Instantiate(snackConfig.destroyParticlesPrefab, transform.position, Quaternion.identity);
+    }
 
     IEnumerator startLeavingSpiralTrayCorutine()
     {
@@ -102,7 +110,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
     IEnumerator destroyObjectCorutine()
     {
-        
+
         animatorHandler.playDestroyAnimation();
         yield return new WaitUntil(() => animatorHandler.getReadyToDestroy());
         Destroy(gameObject);
@@ -159,13 +167,26 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     {
         //animatorHandler.playTouchGroundAnimation();
         // catchDetector.desactivateCollider();
+
+        if (snackConfig.isRock)
+        {
+            //prevent the player to be damaged when the rock is already destroyed.
+            canBeCatched(false);
+        }
+        if (snackConfig.destroyOnFall || snackConfig.isRock)
+        {
+            destroySnack();
+            return;
+        }
+        
         canBeCatched(false);
         int direction = Random.Range(0, 2) == 0 ? 1 : -1;
         float randomOffset = Random.Range(0, 0.15f);
         transform.position = new Vector3(transform.position.x + (randomOffset * direction), transform.position.y, 0);
+
+        //destroySnack();
         if (Random.Range(0, 2) == 1)
         {
-            //destroySnack();
             //destroy drop particles.
         }
         else
@@ -173,8 +194,10 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
             // do not destroy just stay in ground.
         }
+        GameEvents.triggerSnackLandedOnGround();
+        Landed = true;
 
-    } 
+    }
     public void canBeCatched(bool canBeCatched)
     {
         if (canBeCatched)
@@ -191,5 +214,10 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     public bool isReadyToFall()
     {
         return leavingSpiralTrayRoutine == null;
+    }
+
+    public SnackConfig getConfig()
+    {
+        return snackConfig;
     }
 }

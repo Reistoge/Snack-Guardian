@@ -20,10 +20,13 @@ MonoBehaviour:
   airDecceleration: 10
   wallJumpMoveAcceleration: 3
   wallJumpMoveDecceleration: 3
-  maxRunSpeed: 12
+  maxRunSpeed: 7
   groundLayer:
     serializedVersion: 2
     m_Bits: 448
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 4096
   groundDetectionRayLength: 0.02
   headDetectionRayLength: 0.02
   headWidth: 0.75
@@ -43,14 +46,14 @@ MonoBehaviour:
   jumpCoyoteTime: 0.1
   wallSlideSpeed: 3
   wallSlideDeccelerationSpeed: 30
-  wallJumpDirection: {x: -6, y: 2}
+  wallJumpDirection: {x: -3, y: 2.3}
   wallJumpPostBufferTime: 0.125
   wallJumpGravityOnReleaseMultiplier: 1
-  dashTime: 0.11
-  dashSpeed: 16.8
+  dashTime: 0.16
+  dashSpeed: 12
   timeBtwnDashesOnGround: 0.225
-  resetDashOnWallSlide: 1
-  numberOfDashes: 2
+  resetDashOnWallSlide: 0
+  numberOfDashes: 1
   dashDiagnallyBias: 0.4
   dashGravityOnReleaseMultiplier: 1
   dashTimeUpwardsCancel: 0.027

@@ -19,7 +19,7 @@ TagManager:
   - TriggerInteract
   - EnemyLayer
   - Snack
-  - 
+  - Wall
   - 
   - 
   - 
@@ -45,4 +45,10 @@ TagManager:
     locked: 0
   - name: Snacks
     uniqueID: 2790605685
+    locked: 0
+  - name: Player
+    uniqueID: 3405122637
+    locked: 0
+  - name: UI
+    uniqueID: 375231081
     locked: 0

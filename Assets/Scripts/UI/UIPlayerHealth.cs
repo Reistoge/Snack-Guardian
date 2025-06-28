@@ -8,12 +8,12 @@ public class UIPlayerHealth : MonoBehaviour
     // use a healthBar component to encapsulate the event of the healthBar UI of the player.
     private void OnEnable()
     {
-        GameEvents.OnHealthChanged += UpdateHealth;
+        GameEvents.onHealthChanged += UpdateHealth;
     }
 
     private void OnDisable()
     {
-        GameEvents.OnHealthChanged -= UpdateHealth;
+        GameEvents.onHealthChanged -= UpdateHealth;
     }
     private void UpdateHealth(float current, float max)
     {

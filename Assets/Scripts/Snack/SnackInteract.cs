@@ -38,14 +38,7 @@ public class SnackInteract : MonoBehaviour, IInteractor
 
         }
     }
-    void OnTriggerExit2D(Collider2D collision)
-    {
-
-    }
-    void OnTriggerStay2D(Collider2D collision)
-    {
-
-    }
+ 
     //template, dont change this,
     //this method pass the effect to the main player script.
     public void applyEffect(ObjectEffect effect)

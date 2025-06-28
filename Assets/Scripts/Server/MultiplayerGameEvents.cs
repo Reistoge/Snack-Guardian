@@ -1,6 +1,7 @@
 using System;
+using UnityEngine;
 
-public static class MultiplayerGameEvents 
+public static class MultiplayerGameEvents
 {
     // Network events
     public static event Action onConnectedToServer;
@@ -9,7 +10,13 @@ public static class MultiplayerGameEvents
     public static event Action<string> onPlayerConnected;
     public static event Action<string> onPlayerDisconnected;
     public static event Action<string, string> onChatMessageReceived;
+    public static event Action<string, bool> onPlayerReadyStateChanged;
+
+    public static event Action<string> onPlayerSendAttack;
+    public static event Action<string> onPlayerReceiveAttack;
+   
     public static event Action onGameStarted;
+    public static event Action onPlayersListCleared;
 
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
@@ -18,9 +25,11 @@ public static class MultiplayerGameEvents
     public static void triggerPlayerDisconnected(string id) => onPlayerDisconnected?.Invoke(id);
     public static void triggerChatMessageReceived(string id, string msg) => onChatMessageReceived?.Invoke(id, msg);
     public static void triggerGameStarted() => onGameStarted?.Invoke();
-
-    internal static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
+    public static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
     {
-      
+        onPlayerReadyStateChanged?.Invoke(playerId, isReady);
     }
+    public static void triggerPlayerSendAttack(string attackData) => onPlayerSendAttack?.Invoke(attackData);
+    public static void triggerPlayerReceiveAttack(string attackData) => onPlayerReceiveAttack?.Invoke(attackData);
+    public static void triggerPlayersListCleared() => onPlayersListCleared?.Invoke(); 
 }

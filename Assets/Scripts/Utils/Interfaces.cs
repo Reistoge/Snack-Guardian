@@ -31,5 +31,17 @@ public interface ITray
     public void setTrayId(string id);
     public string getTrayId();
     TrayConfig getTrayConfig();
-    
+    SnackSpawner getSnackSpawnerLoaded();
+    bool hasSnacksAvailable();
+    Snack addRockSnack();
+    int getEmptyCount();
 }
+
+public interface GameDebuff
+{
+    public GameDebuff applyDebuff();
+    public bool DebuffIsActive { get; set; }
+    public string getDebuffName();
+}
+ 
+ 

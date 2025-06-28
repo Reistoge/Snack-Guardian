@@ -6,30 +6,49 @@ public class GameManager : GenericSingleton<GameManager>
 {
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private PlayerMovementStats defaultMovementStats;
-
+    [SerializeField] GameDataSO gameData;
     public static Action OnGameSceneLoaded;
+    public static Action OnMainMenuLoaded;
     public static Action OnPlayerSpawned;
+    
+
+
 
     private GameObject currentPlayer;
+
+    public GameDataSO GameData { get => gameData; set => gameData = value; }
 
     void Awake()
     {
         base.Awake();
         SceneManager.sceneLoaded += onLevelFinishedLoading;
-        GameEvents.onPlayerDeath += () =>
-        {
-            Destroy(currentPlayer);
-            currentPlayer = null;
-            loadScene("MainMenu");
-        };
+        GameEvents.onGameOver+= tryUpdateHighScore;
+  
     }
+
+    private void tryUpdateHighScore()
+    {
+        if(PointsManager.Instance != null && PointsManager.Instance.Points > GameData.highScore)
+        {
+            GameData.highScore = PointsManager.Instance.Points;
+            Debug.Log("High score updated to: " + GameData.highScore);
+        }
+        else
+        {
+            Debug.Log("Current points: " + PointsManager.Instance.Points);
+        }
+       
+    }
+
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= onLevelFinishedLoading;
+        GameEvents.onGameOver -= tryUpdateHighScore;
     }
 
     private void onLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
+        AudioManager.Instance.stopAllAudio();
         switch (scene.name)
         {
             case "GameScene":
@@ -51,7 +70,22 @@ public class GameManager : GenericSingleton<GameManager>
         else if (Input.GetKeyDown(KeyCode.F1))
         {
             loadScene("GameScene");
+
         }
+        else if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            currentPlayer = GameObject.FindGameObjectWithTag("Player");
+            if (currentPlayer != null)
+            {
+                currentPlayer.TryGetComponent<Player>(out var playerComponent);
+                playerComponent.takeDamage(100000);
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.F2))
+        {
+            Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+        }
+        
     }
 
 
@@ -70,6 +104,7 @@ public class GameManager : GenericSingleton<GameManager>
 
             OnPlayerSpawned?.Invoke();
             GameEvents.triggerPlayerSpawned(currentPlayer);
+            
         }
     }
 

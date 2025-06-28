@@ -6,14 +6,14 @@ public class UIManager : MonoBehaviour
     
     private void OnEnable()
     {
-        GameEvents.OnHealthChanged += updateHealthUI;
-        GameEvents.onPlayerDeath += handlePlayerDeath;
+        GameEvents.onHealthChanged += updateHealthUI;
+        GameEvents.onGameOver += handlePlayerDeath;
     }
     
     private void OnDisable()
     {
-        GameEvents.OnHealthChanged -= updateHealthUI;
-        GameEvents.onPlayerDeath -= handlePlayerDeath;
+        GameEvents.onHealthChanged -= updateHealthUI;
+        GameEvents.onGameOver -= handlePlayerDeath;
     }
     
     private void updateHealthUI(float current, float max)
