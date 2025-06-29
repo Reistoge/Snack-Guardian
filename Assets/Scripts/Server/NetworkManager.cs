@@ -1,29 +1,59 @@
 using UnityEngine;
 using Netly;
 using System;
-using System.Net.WebSockets;
 
 public class NetworkManager : MonoBehaviour
 {
+    #region Singleton
     public static NetworkManager Instance { get; private set; }
+    #endregion
+
+    #region WebSocket Properties
     public HTTP.WebSocket WebSocket { get => webSocket; set => webSocket = value; }
+    public string PlayerId => playerId;
+    public string PlayerName => playerName;
+    public ConnectionData CurrentPlayerData => currentPlayerData;
 
-    [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/";
+    private const string GAME_KEY = "GJNTOU";
+    #endregion
+
+    #region Serialized Fields
+    [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/?gameId=H&name=Snack Guardian";
+    [SerializeField] private ConnectionData currentPlayerData;
+    #endregion
+
+    #region Private Fields
     private HTTP.WebSocket webSocket;
-    [SerializeField] private string playerId;
-  
+    private string playerId;
+    private string playerName;
+    #endregion
 
+    #region Unity Lifecycle
     private void Awake()
+    {
+        initializeSingleton();
+    }
+
+    private void Update()
+    {
+        handleDebugInput();
+    }
+
+    private void OnDestroy()
+    {
+        disconnect();
+    }
+    #endregion
+
+    #region Initialization
+    private void initializeSingleton()
     {
         if (Instance == null)
         {
             Instance = this;
-            //print("NetworkManager instance created");
             DontDestroyOnLoad(gameObject);
             initializeWebSocket();
             connect();
-            
-
         }
         else
         {
@@ -31,80 +61,263 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // private void sendAttackFromPlayerToServer(string obj)
-    // {
+    private void initializeWebSocket()
+    {
+        webSocket = new HTTP.WebSocket();
 
-    //     // Check if the WebSocket is connected  
-    //     Debug.Log($"Sending attack from player: {obj}");
+        SetupWebSocketEvents();
+    }
+
+    private void SetupWebSocketEvents()
+    {
+        webSocket.On.Open(onWebSocketOpen);
+        webSocket.On.Close(onWebSocketClose);
+        webSocket.On.Error(onWebSocketError);
+        webSocket.On.Event(onWebSocketEvent);
+        webSocket.On.Data(onWebSocketData);
+    }
+    #endregion
+
+    #region WebSocket Event Handlers
+    private void onWebSocketOpen()
+    {
+        MultiplayerGameEvents.triggerConnectedToServer();
+        getConnectedPlayers();
+    }
+
+    private void onWebSocketClose()
+    {
+        MultiplayerGameEvents.triggerDisconnectedFromServer();
+    }
+
+    private void onWebSocketError(Exception exception)
+    {
+        Debug.LogError($"WebSocket Error: {exception.Message}");
+        MultiplayerGameEvents.triggerConnectionError(exception.Message);
+    }
+
+    private void onWebSocketEvent(string eventName, byte[] data, HTTP.MessageType type)
+    {
+        Debug.Log($"WebSocket Event received: {eventName} with data: {System.Text.Encoding.UTF8.GetString(data)}");
+        handleServerData(eventName, data);
+    }
+
+    private void onWebSocketData(byte[] data, HTTP.MessageType messageType)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        Debug.Log($"Received raw JSON data: {json}");
+
+        var baseEvent = JsonUtility.FromJson<ServerMessageBase>(json);
+        if (baseEvent != null && !string.IsNullOrEmpty(baseEvent.@event))
+        {
+            handleServerData(baseEvent.@event, data);
+        }
+        else
+        {
+            Debug.LogWarning("No 'event' field found in message JSON");
+        }
+    }
+    #endregion
+
+    #region Server Event Handling
+    private void handleServerData(string eventName, byte[] data)
+    {
+        string jsonData = System.Text.Encoding.UTF8.GetString(data);
+        Debug.Log($"Handling event '{eventName}' with data: {jsonData}");
+
+        switch (eventName)
+        {
+            case "connected-to-server":
+                handleConnectedToServer(jsonData);
+                break;
+            case "login":
+                handleLoginResponse(jsonData);
+                break;
+            case "player-connected":
+                handlePlayerConnected(jsonData);
+                break;
+            case "player-disconnected":
+                handlePlayerDisconnected(jsonData);
+                break;
+            case "public-message":
+                handlePublicMessage(jsonData);
+                break;
+            case "send-public-message":
+                handleSendPublicMessage(jsonData);
+                break;
+            case "get-connected-players":
+                handleGetConnectedPlayers(jsonData);
+                break;
+            default:
+                Debug.LogWarning($"Unhandled event: {eventName}");
+                break;
+        }
+    }
+
+    private void handleConnectedToServer(string jsonData)
+    {
+        var connectionResponse = JsonUtility.FromJson<ConnectedToServerResponse>(jsonData);
+
+        if (connectionResponse?.data == null)
+        {
+            Debug.LogWarning("Failed to parse connected-to-server data");
+            return;
+        }
+
+        StorePlayerData(connectionResponse.data);
+        logConnectionInfo();
+        triggerConnectionEvents();
+        handleLoginStatus(connectionResponse.data.status);
 
 
-    //     // sendPublicMessage(obj);
+    }
 
-    // }
 
-    public void Update()
+
+    private void handleLoginStatus(string status)
+    {
+        if (status == "NO_LOGIN")
+        {
+            Debug.Log("Player needs to login. Sending login request...");
+            sendLoginRequest();
+        }
+        else
+        {
+            Debug.Log($"Player is already logged in with status: {status}");
+            MultiplayerGameEvents.triggerPlayerLoggedIn(playerId, playerName);
+        }
+    }
+ 
+    private void sendLoginRequest()
+    {
+        var loginMessage = new ServerMessage<LoginData>
+        {
+            @event = "login",
+            data = new LoginData { gameKey = GAME_KEY } // Use your actual game key
+        };
+
+        string json = JsonUtility.ToJson(loginMessage);
+        Debug.Log($"Sending login request: {json}");
+        webSocket.To.Data(json, HTTP.Text);
+    }
+    private void handleLoginResponse(string jsonData)
+    {
+        var loginResponse = JsonUtility.FromJson<LoginResponse>(jsonData);
+
+        if (loginResponse == null)
+        {
+            Debug.LogWarning("Failed to parse login response");
+            return;
+        }
+
+        Debug.Log($"Login Response - Status: {loginResponse.status}, Message: {loginResponse.msg}");
+
+        if (loginResponse.status == "OK" && loginResponse.data != null)
+        {
+            // Update player data with login response
+            StorePlayerData(loginResponse.data);
+            logConnectionInfo();
+
+            Debug.Log("Login successful! Player is now logged in.");
+            MultiplayerGameEvents.triggerPlayerLoggedIn(playerId, playerName);
+        }
+        else
+        {
+            Debug.LogError($"Login failed: {loginResponse.msg}");
+            MultiplayerGameEvents.triggerLoginFailed(loginResponse.msg);
+        }
+    }
+
+    private void handlePlayerConnected(string jsonData)
+    {
+        var playerWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
+        if (playerWrapper?.data != null)
+        {
+            Debug.Log($"Player connected: {playerWrapper.data.id}");
+            MultiplayerGameEvents.triggerPlayerConnected(playerWrapper.data.id);
+        }
+    }
+
+    private void handlePlayerDisconnected(string jsonData)
+    {
+        var playerDisconnectedWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
+        if (playerDisconnectedWrapper?.data != null)
+        {
+            Debug.Log($"Player disconnected: {playerDisconnectedWrapper.data.id}");
+            MultiplayerGameEvents.triggerPlayerDisconnected(playerDisconnectedWrapper.data.id);
+        }
+    }
+
+    private void handlePublicMessage(string jsonData)
+    {
+        var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<PublicMessageData>>(jsonData);
+        if (publicMessageWrapper?.data != null)
+        {
+            Debug.Log($"Received message from {publicMessageWrapper.data.playerId}: {publicMessageWrapper.data.playerMsg}");
+            MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.playerId, publicMessageWrapper.data.playerMsg);
+        }
+    }
+
+    private void handleSendPublicMessage(string jsonData)
+    {
+        var sendPublicMessageWrapper = JsonUtility.FromJson<ServerMessage<MessageData>>(jsonData);
+        if (sendPublicMessageWrapper?.data != null)
+        {
+            Debug.Log($"Public message sent: {sendPublicMessageWrapper.data.message}");
+        }
+    }
+
+    private void handleGetConnectedPlayers(string jsonData)
+    {
+        var playersConnectedWrapper = JsonUtility.FromJson<PlayersConnectedData>(jsonData);
+        if (playersConnectedWrapper?.data != null)
+        {
+            Debug.Log($"Connected players: {string.Join(", ", playersConnectedWrapper.data)}");
+            updateConnectedPlayersList(playersConnectedWrapper.data);
+        }
+    }
+    #endregion
+
+    #region Helper Methods
+    private void StorePlayerData(ConnectionData data)
+    {
+        currentPlayerData = data;
+        playerId = data.id;
+        playerName = data.name;
+    }
+
+    private void logConnectionInfo()
+    {
+        Debug.Log($"Connected with ID: {playerId}, Name: {playerName}");
+        Debug.Log($"Game: {currentPlayerData.game.name} by {currentPlayerData.game.team}");
+        Debug.Log($"Status: {currentPlayerData.status}");
+    }
+
+    private void triggerConnectionEvents()
+    {
+        MultiplayerGameEvents.triggerConnectedToServer();
+        MultiplayerGameEvents.triggerPlayerConnected(playerId);
+    }
+
+    private void updateConnectedPlayersList(string[] playerIds)
+    {
+        MultiplayerGameEvents.triggerPlayersListCleared();
+        foreach (string id in playerIds)
+        {
+            MultiplayerGameEvents.triggerPlayerConnected(id);
+        }
+    }
+
+    private void handleDebugInput()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
             getConnectedPlayers();
         }
     }
+    #endregion
 
-    private void initializeWebSocket()
-    {
-        webSocket = new HTTP.WebSocket();
-
-        webSocket.On.Open(() =>
-        {
-            //Debug.Log("Connected to server");
-            MultiplayerGameEvents.triggerConnectedToServer();
-            //MultiplayerGameEvents.onPlayerSendAttack += sendAttackFromPlayerToServer;
-            getConnectedPlayers();
-        });
-
-        webSocket.On.Close(() =>
-        {
-            //Debug.Log("Disconnected from server");
-            MultiplayerGameEvents.triggerDisconnectedFromServer();
-            // MultiplayerGameEvents.onPlayerSendAttack -= sendAttackFromPlayerToServer;
-        });
-        webSocket.On.Event((eventName, data, type) =>
-        {
-            Debug.Log($"WebSocket Event received: {eventName} with data: {System.Text.Encoding.UTF8.GetString(data)}");
-            handleServerData(eventName, data);
-        });
-        webSocket.On.Error((exception) =>
-        {
-            Debug.LogError($"WebSocket Error: {exception.Message}");
-            MultiplayerGameEvents.triggerConnectionError(exception.Message);
-        });
-
-        webSocket.On.Data((byte[] data, HTTP.MessageType messageType) =>
-        {
-            string json = System.Text.Encoding.UTF8.GetString(data);
-            Debug.Log($"Received raw JSON data: {json}");
-
-            // Extraemos solo el campo 'event'
-            var baseEvent = JsonUtility.FromJson<ServerMessageBase>(json);
-            if (baseEvent != null && !string.IsNullOrEmpty(baseEvent.@event))
-            {
-                handleServerData(baseEvent.@event, data);
-            }
-            else
-            {
-                Debug.LogWarning("No 'event' field found in message JSON");
-            }
-        });
-
-
-
-
-    }
-    public void receiveAttackFromPlayer(string attackData)
-    {
-        MultiplayerGameEvents.triggerPlayerReceiveAttack(attackData);
-    }
-
+    #region Public API
     public void connect()
     {
         if (!webSocket.IsOpened)
@@ -118,109 +331,6 @@ public class NetworkManager : MonoBehaviour
         if (webSocket.IsOpened)
         {
             webSocket.To.Close();
-        }
-    }
-
-    private void handleServerData(string eventName, byte[] data)
-    {
-        string jsonData = System.Text.Encoding.UTF8.GetString(data);
-        Debug.Log($"Handling event '{eventName}' with data: {jsonData}");
-
-        switch (eventName)
-        {
-            case "connected-to-server":
-                var connectionWrapper = JsonUtility.FromJson<ServerMessage<ConnectionData>>(jsonData);
-                if (connectionWrapper == null || connectionWrapper.data == null)
-                {
-                    Debug.LogWarning("Failed to parse connected-to-server data");
-                    return;
-                }
-                playerId = connectionWrapper.data.id;
-                // Debug.Log($"Connected with ID: {playerId}");
-                MultiplayerGameEvents.triggerPlayerConnected(playerId);
-                break;
-            case "player-connected":
-                var playerWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
-                if (playerWrapper == null || playerWrapper.data == null)
-                {
-                    Debug.LogWarning("Failed to parse player-connected data");
-                    return;
-                }
-                Debug.Log($"Player connected: {playerWrapper.data.id}");
-                MultiplayerGameEvents.triggerPlayerConnected(playerWrapper.data.id);
-
-                break;
-            case "player-disconnected":
-                var playerDisconnectedWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
-                if (playerDisconnectedWrapper == null || playerDisconnectedWrapper.data == null)
-                {
-                    Debug.LogWarning("Failed to parse player-disconnected data");
-                    return;
-                }
-                Debug.Log($"Player disconnected: {playerDisconnectedWrapper.data.id}");
-                MultiplayerGameEvents.triggerPlayerDisconnected(playerDisconnectedWrapper.data.id);
-                break;
-
-
-            case "public-message":
-                var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<ChatMessage>>(jsonData);
-                if (publicMessageWrapper == null || publicMessageWrapper.data == null)
-                {
-                    Debug.LogWarning("Failed to parse public-message data");
-                    return;
-                }
-                
-                Debug.Log($"Received message from {publicMessageWrapper.data.id}: {publicMessageWrapper.data.msg}");
-
-
-                // meensaje = ataque3
-                // MultiplayerGameEvents.triggerPlayerReceiveAttack(publicMessageWrapper.data.msg);
-
-                break;
-            // case "private-message":
-
-            //     var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
-            //     if (privateMessageWrapper == null || privateMessageWrapper.data == null)
-            //     {
-            //         Debug.LogWarning("Failed to parse private-message data");
-            //         return;
-            //     }
-            //     Debug.Log($"Private message from {privateMessageWrapper.data.id}: {privateMessageWrapper.data.message}");
-            //     // handleAttackMessage(privateMessageWrapper.data.message);
-            //     // Handle private message logic here
-            //     break;
-      
-         
-            case "send-public-message":
-                var sendPublicMessageWrapper = JsonUtility.FromJson<ServerMessage<MessageData>>(jsonData);
-                if (sendPublicMessageWrapper == null || sendPublicMessageWrapper.data == null)
-                {
-                    Debug.LogWarning("Failed to parse public-message data");
-                    return;
-                }
-                // Debug.Log($"Received message from {sendPublicMessageWrapper.data.id}: {sendPublicMessageWrapper.data.msg}");
-                Debug.Log($"Public message sent: {sendPublicMessageWrapper.data.message}");
-                break;
-            case "get-connected-players":
-                var playersConnectedWrapper = JsonUtility.FromJson<PlayersConnectedData>(jsonData);
-                print(playersConnectedWrapper);
-                if (playersConnectedWrapper?.data != null)
-                {
-                    Debug.Log($"Connected players: {string.Join(", ", playersConnectedWrapper.data)}");
-                    // Clear existing players first
-                    MultiplayerGameEvents.triggerPlayersListCleared();
-                    // Add each player
-                    foreach (string playerId in playersConnectedWrapper.data)
-                    {
-                        print(playerId);
-                        MultiplayerGameEvents.triggerPlayerConnected(playerId);
-                    }
-                }
-            
-                break;
-            default:
-                Debug.LogWarning($"Unhandled event: {eventName}");
-                break;
         }
     }
 
@@ -238,8 +348,9 @@ public class NetworkManager : MonoBehaviour
             @event = "send-public-message",
             data = msgData
         };
+
         string json = JsonUtility.ToJson(serverMessage);
-        Debug.Log($"Sending message: {json}"); // Debug line
+        Debug.Log($"Sending message: {json}");
         webSocket.To.Data(json, HTTP.Text);
     }
 
@@ -249,6 +360,7 @@ public class NetworkManager : MonoBehaviour
         string json = JsonUtility.ToJson(msgData);
         webSocket.To.Data(json, HTTP.Text);
     }
+
     public void getConnectedPlayers()
     {
         if (!webSocket.IsOpened)
@@ -262,28 +374,80 @@ public class NetworkManager : MonoBehaviour
             @event = "get-connected-players",
             data = null
         };
+
         string json = JsonUtility.ToJson(getMessage);
         webSocket.To.Data(json, HTTP.Text);
     }
-    private void OnDestroy()
-    {
-        disconnect();
-    }
+
     public void sendReadyState(bool isReady)
     {
         var readyData = new ReadyStateData { isReady = isReady };
         string json = JsonUtility.ToJson(readyData);
         webSocket.To.Data(json, HTTP.Text);
     }
- 
 
+    public void receiveAttackFromPlayer(string attackData)
+    {
+        MultiplayerGameEvents.triggerPlayerReceiveAttack(attackData);
+    }
+
+    public GameInfo GetGameInfo() => currentPlayerData?.game;
+    public string GetPlayerStatus() => currentPlayerData?.status;
+    public bool IsPlayerLoggedIn() => currentPlayerData?.status != "NO_LOGIN";
+    #endregion
+}
+[Serializable]
+public class ServerMessage<T>
+{
+    public string @event;
+    public T data;
 }
 
 [Serializable]
+public class ServerMessageBase
+{
+    public string @event;
+}
+
+[Serializable]
+public class LoginData
+{
+    public string gameKey;
+}
+
+[Serializable]
+public class LoginResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public ConnectionData data;
+}
+
+#region Data Models
+[Serializable]
 public class ConnectionData
 {
-    public string msg;
     public string id;
+    public string name;
+    public GameInfo game;
+    public string status;
+}
+
+[Serializable]
+public class GameInfo
+{
+    public string id;
+    public string name;
+    public string team;
+}
+
+[Serializable]
+public class ConnectedToServerResponse
+{
+    public string @event;
+    public string msg;
+    public ConnectionData data;
 }
 
 [Serializable]
@@ -318,26 +482,18 @@ public class ReadyStateData
 {
     public bool isReady;
 }
-// [Serializable]
-// public class PlayersConnectedData
-// {
-//     public string data;
-// }
+
 [Serializable]
 public class PlayersConnectedData
 {
     public string @event;
-    public string[] data; // Changed from string to string[] to match server response
+    public string[] data;
 }
 
 [Serializable]
-public class ServerMessage<T>
+public class PublicMessageData
 {
-    public string @event;
-    public T data;
+    public string playerId;
+    public string playerMsg;
 }
-
-public class ServerMessageBase
-{
-    public string @event;
-}
+#endregion
