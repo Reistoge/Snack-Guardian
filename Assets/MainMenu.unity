@@ -402,9 +402,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: 0.25698322
     width: 1
-    height: 1
+    height: 0.48550975
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -967,7 +967,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: -208, y: 138}
-  m_SizeDelta: {x: 192, y: 96}
+  m_SizeDelta: {x: 195.83334, y: 33.333336}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1169785563
 MonoBehaviour:
@@ -1112,7 +1112,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: -208, y: 98}
-  m_SizeDelta: {x: 300, y: 100}
+  m_SizeDelta: {x: 218.75, y: 33.333336}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1274335900
 MonoBehaviour:
@@ -1202,7 +1202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 227de087b7e41cd4e8eb03af38727f66, type: 3}
+  m_Sprite: {fileID: -966981028, guid: 227de087b7e41cd4e8eb03af38727f66, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
