@@ -113,10 +113,10 @@ public class LobbyUIManager : MonoBehaviour
     private void updatePlayerList()
     {
         // throw new NotImplementedException();
-        playerList.text = "Jugadores conectados:\n";
+        playerList.text = "Jugadores conectados\n";
         foreach (var playerId in connectedPlayers)
         {
-            playerList.text += playerId + "\n";
+            playerList.text += "id: " + playerId + "\n";
         }
 
     }

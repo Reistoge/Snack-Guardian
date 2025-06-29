@@ -30,7 +30,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.31
+    m_Value: 0.25
   xMultiplier:
     m_OverrideState: 1
     m_Value: 1
@@ -61,10 +61,10 @@ MonoBehaviour:
     m_Value: 5
   intensity:
     m_OverrideState: 1
-    m_Value: 0.7
+    m_Value: 0.5
   response:
     m_OverrideState: 1
-    m_Value: 0.8
+    m_Value: 0.381
   texture:
     m_OverrideState: 0
     m_Value: {fileID: 0}

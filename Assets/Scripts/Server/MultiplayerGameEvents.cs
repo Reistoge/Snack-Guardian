@@ -17,6 +17,8 @@ public static class MultiplayerGameEvents
    
     public static event Action onGameStarted;
     public static event Action onPlayersListCleared;
+    public static event Action<string, string> onPlayerLoggedIn;
+    public static event Action<string> onLoginFailed;
 
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
@@ -32,4 +34,6 @@ public static class MultiplayerGameEvents
     public static void triggerPlayerSendAttack(string attackData) => onPlayerSendAttack?.Invoke(attackData);
     public static void triggerPlayerReceiveAttack(string attackData) => onPlayerReceiveAttack?.Invoke(attackData);
     public static void triggerPlayersListCleared() => onPlayersListCleared?.Invoke(); 
+    public static void triggerPlayerLoggedIn(string playerId, string playerName) => onPlayerLoggedIn?.Invoke(playerId, playerName);
+    public static void triggerLoginFailed(string errorMessage) => onLoginFailed?.Invoke(errorMessage);
 }
