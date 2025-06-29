@@ -250,11 +250,11 @@ public class NetworkManager : MonoBehaviour
 
     private void handlePublicMessage(string jsonData)
     {
-        var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<PublicMessageData>>(jsonData);
+        var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<ChatMessage>>(jsonData);
         if (publicMessageWrapper?.data != null)
         {
-            Debug.Log($"Received message from {publicMessageWrapper.data.playerId}: {publicMessageWrapper.data.playerMsg}");
-            MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.playerId, publicMessageWrapper.data.playerMsg);
+            Debug.Log($"Received message from {publicMessageWrapper.data.id}: {publicMessageWrapper.data.msg}");
+            // Add your message handling logic here
         }
     }
 
@@ -488,12 +488,5 @@ public class PlayersConnectedData
 {
     public string @event;
     public string[] data;
-}
-
-[Serializable]
-public class PublicMessageData
-{
-    public string playerId;
-    public string playerMsg;
 }
 #endregion
