@@ -1252,10 +1252,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0.058252428
-    width: 0.34953576
-    height: 0.34951457
+    x: 0.061458338
+    y: 0
+    width: 0.8768519
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -1962,8 +1962,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58b8636af44b7494088482fdb7b8203e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverUrl: ws://ucn-game-server.martux.cl:4010/
-  playerId: 
+  serverUrl: ws://ucn-game-server.martux.cl:4010/?gameId=H&name=Snack Guardian
+  currentPlayerData:
+    id: 
+    name: 
+    game:
+      id: 
+      name: 
+      team: 
+    status: 
 --- !u!4 &1457407293
 Transform:
   m_ObjectHideFlags: 0
