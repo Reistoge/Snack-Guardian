@@ -142,11 +142,26 @@ public class NetworkManager : MonoBehaviour
             case "public-message":
                 handlePublicMessage(jsonData);
                 break;
+            case "private-message":
+                handlePrivateMessage(jsonData);
+                break;
             case "send-public-message":
                 handleSendPublicMessage(jsonData);
                 break;
+            case "send-private-message":
+                handleSendPrivateMessage(jsonData);
+                break;
             case "get-connected-players":
                 handleGetConnectedPlayers(jsonData);
+                break;
+            case "player-name-changed":
+                handlePlayerNameChanged(jsonData);
+                break;
+            case "change-name":
+                handleChangeNameResponse(jsonData);
+                break;
+            case "player-data":
+                handlePlayerDataResponse(jsonData);
                 break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
@@ -230,7 +245,7 @@ public class NetworkManager : MonoBehaviour
 
     private void handlePlayerConnected(string jsonData)
     {
-        var playerWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
+        var playerWrapper = JsonUtility.FromJson<PlayerConnectedResponse>(jsonData);
         if (playerWrapper?.data != null)
         {
             Debug.Log($"Player connected: {playerWrapper.data.id}");
@@ -240,7 +255,7 @@ public class NetworkManager : MonoBehaviour
 
     private void handlePlayerDisconnected(string jsonData)
     {
-        var playerDisconnectedWrapper = JsonUtility.FromJson<ServerMessage<PlayerData>>(jsonData);
+        var playerDisconnectedWrapper = JsonUtility.FromJson<PlayerDisconnectedResponse>(jsonData);
         if (playerDisconnectedWrapper?.data != null)
         {
             Debug.Log($"Player disconnected: {playerDisconnectedWrapper.data.id}");
@@ -250,11 +265,11 @@ public class NetworkManager : MonoBehaviour
 
     private void handlePublicMessage(string jsonData)
     {
-        var publicMessageWrapper = JsonUtility.FromJson<ServerMessage<ChatMessage>>(jsonData);
+        var publicMessageWrapper = JsonUtility.FromJson<PublicMessageResponse>(jsonData);
         if (publicMessageWrapper?.data != null)
         {
-            Debug.Log($"Received message from {publicMessageWrapper.data.id}: {publicMessageWrapper.data.msg}");
-            // Add your message handling logic here
+            Debug.Log($"Received message from {publicMessageWrapper.data.playerId}: {publicMessageWrapper.data.playerMsg}");
+            MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.playerId, publicMessageWrapper.data.playerMsg);
         }
     }
 
@@ -267,13 +282,83 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    private void handlePrivateMessage(string jsonData)
+    {
+        var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
+        if (privateMessageWrapper?.data != null)
+        {
+            Debug.Log($"Received private message from {privateMessageWrapper.data.id}: {privateMessageWrapper.data.message}");
+            // Trigger private message event if you want to handle private messages differently
+            // For now, we'll treat it like a chat message but you can create a separate event
+            MultiplayerGameEvents.triggerChatMessageReceived($"[Private] {privateMessageWrapper.data.id}", privateMessageWrapper.data.message);
+        }
+    }
+
+    private void handleSendPrivateMessage(string jsonData)
+    {
+        var sendPrivateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
+        if (sendPrivateMessageWrapper?.data != null)
+        {
+            Debug.Log($"Private message sent to {sendPrivateMessageWrapper.data.id}: {sendPrivateMessageWrapper.data.message}");
+        }
+    }
+
     private void handleGetConnectedPlayers(string jsonData)
     {
-        var playersConnectedWrapper = JsonUtility.FromJson<PlayersConnectedData>(jsonData);
+        var playersConnectedWrapper = JsonUtility.FromJson<GetConnectedPlayersResponse>(jsonData);
         if (playersConnectedWrapper?.data != null)
         {
             Debug.Log($"Connected players: {string.Join(", ", playersConnectedWrapper.data)}");
             updateConnectedPlayersList(playersConnectedWrapper.data);
+        }
+    }
+
+    private void handlePlayerNameChanged(string jsonData)
+    {
+        var playerNameWrapper = JsonUtility.FromJson<PlayerNameChangedResponse>(jsonData);
+        if (playerNameWrapper?.data != null)
+        {
+            Debug.Log($"Player {playerNameWrapper.data.playerId} changed name to {playerNameWrapper.data.playerName}");
+            // You can add a specific event for name changes if needed
+        }
+    }
+
+    private void handleChangeNameResponse(string jsonData)
+    {
+        var changeNameResponse = JsonUtility.FromJson<ChangeNameResponse>(jsonData);
+        if (changeNameResponse != null)
+        {
+            Debug.Log($"Change name response - Status: {changeNameResponse.status}, Message: {changeNameResponse.msg}");
+            
+            if (changeNameResponse.status == "OK" && changeNameResponse.data != null)
+            {
+                playerName = changeNameResponse.data.name;
+                Debug.Log($"Player name successfully changed to: {playerName}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to change name: {changeNameResponse.msg}");
+            }
+        }
+    }
+
+    private void handlePlayerDataResponse(string jsonData)
+    {
+        var playerDataResponse = JsonUtility.FromJson<PlayerDataResponse>(jsonData);
+        if (playerDataResponse != null)
+        {
+            Debug.Log($"Player data response - Status: {playerDataResponse.status}, Message: {playerDataResponse.msg}");
+            
+            if (playerDataResponse.status == "OK" && playerDataResponse.data != null)
+            {
+                StorePlayerData(playerDataResponse.data);
+                logConnectionInfo();
+                Debug.Log("Player data successfully retrieved and updated");
+            }
+            else
+            {
+                Debug.LogError($"Failed to get player data: {playerDataResponse.msg}");
+            }
         }
     }
     #endregion
@@ -356,8 +441,21 @@ public class NetworkManager : MonoBehaviour
 
     public void sendPrivateMessage(string targetId, string message)
     {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send private message - not connected");
+            return;
+        }
+
         var msgData = new PrivateMessageData { id = targetId, message = message };
-        string json = JsonUtility.ToJson(msgData);
+        var serverMessage = new ServerMessage<PrivateMessageData>
+        {
+            @event = "send-private-message",
+            data = msgData
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"Sending private message: {json}");
         webSocket.To.Data(json, HTTP.Text);
     }
 
@@ -381,14 +479,66 @@ public class NetworkManager : MonoBehaviour
 
     public void sendReadyState(bool isReady)
     {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send ready state - not connected");
+            return;
+        }
+
         var readyData = new ReadyStateData { isReady = isReady };
-        string json = JsonUtility.ToJson(readyData);
+        var serverMessage = new ServerMessage<ReadyStateData>
+        {
+            @event = "send-ready-state",
+            data = readyData
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"Sending ready state: {json}");
         webSocket.To.Data(json, HTTP.Text);
     }
 
     public void receiveAttackFromPlayer(string attackData)
     {
         MultiplayerGameEvents.triggerPlayerReceiveAttack(attackData);
+    }
+
+    public void changePlayerName(string newName)
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot change name - not connected");
+            return;
+        }
+
+        var nameData = new ChangeNameData { name = newName };
+        var serverMessage = new ServerMessage<ChangeNameData>
+        {
+            @event = "change-name",
+            data = nameData
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"Changing player name: {json}");
+        webSocket.To.Data(json, HTTP.Text);
+    }
+
+    public void getPlayerData()
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot get player data - not connected");
+            return;
+        }
+
+        var serverMessage = new ServerMessage<object>
+        {
+            @event = "player-data",
+            data = null
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"Requesting player data: {json}");
+        webSocket.To.Data(json, HTTP.Text);
     }
 
     public GameInfo GetGameInfo() => currentPlayerData?.game;
@@ -450,20 +600,9 @@ public class ConnectedToServerResponse
     public ConnectionData data;
 }
 
-[Serializable]
-public class PlayerData
-{
-    public string msg;
-    public string id;
-}
+ 
 
-[Serializable]
-public class ChatMessage
-{
-    public string id;
-    public string msg;
-}
-
+ 
 [Serializable]
 public class MessageData
 {
@@ -483,10 +622,84 @@ public class ReadyStateData
     public bool isReady;
 }
 
+ 
+
 [Serializable]
-public class PlayersConnectedData
+public class PlayerConnectedResponse
 {
     public string @event;
+    public string msg;
+    public ConnectionData data;
+}
+
+[Serializable]
+public class PlayerDisconnectedResponse
+{
+    public string @event;
+    public string msg;
+    public ConnectionData data;
+}
+
+[Serializable]
+public class GetConnectedPlayersResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
     public string[] data;
+}
+
+[Serializable]
+public class PlayerNameChangedResponse
+{
+    public string @event;
+    public string msg;
+    public PlayerNameChangedData data;
+}
+
+[Serializable]
+public class PlayerNameChangedData
+{
+    public string playerId;
+    public string playerName;
+}
+
+[Serializable]
+public class ChangeNameData
+{
+    public string name;
+}
+
+[Serializable]
+public class ChangeNameResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public ChangeNameData data;
+}
+
+[Serializable]
+public class PublicMessageResponse
+{
+    public string @event;
+    public string msg;
+    public PublicMessageData data;
+}
+
+[Serializable]
+public class PublicMessageData
+{
+    public string playerId;
+    public string playerMsg;
+}
+
+[Serializable]
+public class PlayerDataResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public ConnectionData data;
 }
 #endregion
