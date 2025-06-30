@@ -151,7 +151,7 @@ public class NetworkManager : MonoBehaviour
             case "send-private-message":
                 handleSendPrivateMessage(jsonData);
                 break;
-            case "get-connected-players":
+            case "online-players":
                 handleGetConnectedPlayers(jsonData);
                 break;
             case "player-name-changed":
@@ -279,6 +279,7 @@ public class NetworkManager : MonoBehaviour
         if (sendPublicMessageWrapper?.data != null)
         {
             Debug.Log($"Public message sent: {sendPublicMessageWrapper.data.message}");
+            MultiplayerGameEvents.triggerChatMessageReceived("You", sendPublicMessageWrapper.data.message);
         }
     }
 
@@ -469,7 +470,7 @@ public class NetworkManager : MonoBehaviour
 
         var getMessage = new ServerMessage<object>
         {
-            @event = "get-connected-players",
+            @event = "online-players",
             data = null
         };
 

@@ -18,6 +18,9 @@ public class DamagedState : PlayerBaseState
         player.stopMovement();
         player.Movement.applyImpact(isDamaged: true);
         player.playDamagedAnimation();
+         
+       
+         
         
         // Set timer like BumpState does through initiateBumpTimer
         impactTimer = player.Movement.moveStats.damageEffect.impactDuration;

@@ -16,6 +16,7 @@ public class DashState : PlayerBaseState
 
         player.PlayerAnimation.playEnterDash();
         player.setIsInvincible(true); // check if works with a spike.
+     
         
         // player.initiateDash();
     }

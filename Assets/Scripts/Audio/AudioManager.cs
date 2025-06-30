@@ -17,12 +17,23 @@ public class AudioManager : GenericSingleton<AudioManager>
     public void OnEnable()
     {
         GameManager.OnGameSceneLoaded += playGamePlayMusic;
+        GameEvents.onGameOver += playGameOverMusic;
         
+
+    }
+    
+
+    private void playGameOverMusic()
+    {
+
+
+        playSFX(snackGuardianMusic.GameOverMusic);
 
     }
 
     private void playGamePlayMusic()
     {
+        playSFX(snackGuardianMusic.GameplayMusic);
 
     }
     public void playMainMenuMusic()
@@ -44,6 +55,7 @@ public class AudioManager : GenericSingleton<AudioManager>
     public void OnDisable()
     {
         GameManager.OnGameSceneLoaded -= playGamePlayMusic;
+        GameEvents.onGameOver -= playGameOverMusic;
 
     }
     // music repository
@@ -99,6 +111,7 @@ public class AudioManager : GenericSingleton<AudioManager>
 
         }
     }
+    
 
     public SnackGuardianMusic SnackGuardianMusic { get => snackGuardianMusic; set => snackGuardianMusic = value; }
 }

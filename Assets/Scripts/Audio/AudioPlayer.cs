@@ -40,6 +40,11 @@ public class AudioPlayer : MonoBehaviour
         audioSource.priority = audioConfig.priority;
         audioSource.spatialBlend = audioConfig.spatialBlend;
         audioSource.panStereo = audioConfig.stereoPan;
+        if (audioConfig.randomPitch > 0)
+        {
+            audioSource.pitch = UnityEngine.Random.Range(audioConfig.pitch - audioConfig.randomPitch, audioConfig.pitch + audioConfig.randomPitch);
+        }
+    
         audioSource.pitch = audioConfig.pitch;
         audioSource.loop = audioConfig.loop;
     }
