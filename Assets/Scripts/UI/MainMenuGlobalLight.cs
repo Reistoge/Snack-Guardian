@@ -8,6 +8,7 @@ public class MainMenuGlobalLight : MonoBehaviour
 {
     [SerializeField] Animator animator;
     readonly int GLOBAL_LIGHT_ON_HASH = Animator.StringToHash("onEnter");
+    [SerializeField] GameObject snackGuardianLogoLight;
 
     void OnEnable()
     {
@@ -18,6 +19,11 @@ public class MainMenuGlobalLight : MonoBehaviour
     private void activateGlobalLight()
     {
         animator.Play(GLOBAL_LIGHT_ON_HASH, -1, 0f);
+        if (snackGuardianLogoLight != null)
+        {
+            snackGuardianLogoLight.SetActive(true);
+        }
+
     }
 
     void OnDisable()

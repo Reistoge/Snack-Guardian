@@ -77,6 +77,13 @@ public class VendingOrderUI : MonoBehaviour
             {
                 itemUI.Setup(trayId, snackSprite);
             }
+            if (i == 0)
+            {
+                foreach (Transform t in itemUI.transform)
+                {
+                    t.gameObject.SetActive(true); // Ensure the first item is visible
+                }
+            }
 
             // Optional: Add a small delay between items for visual effect
             yield return new WaitForSeconds(0.1f);
