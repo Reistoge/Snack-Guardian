@@ -22,6 +22,9 @@ public static class MultiplayerGameEvents
     public static event Action<string> onLoginFailed;
     public static Action<string> onMatchRequestSent;
 
+    public static event Action<string> onMatchRejectionSent;
+    public static event Action<string, string> onMatchRejectionReceived; // (playerId, message)
+
     // cambio de nombre
     public static Action<string, string> onPlayerNameChanged;
 
@@ -32,6 +35,11 @@ public static class MultiplayerGameEvents
     public static event Action<string> onMatchReject;
     public static event Action<string, string> onMatchAccepted;
     public static event Action<string> onMatchRejected;
+
+    public static event Action onMatchAcceptanceSent;
+    public static event Action<string, string> onMatchAcceptanceError; // (message, playerStatus)
+    public static event Action<string> onMatchAcceptanceSuccess; // (message)
+
     // Evento cuando el servidor rechaza la solicitud
     //recibir match
 
@@ -88,5 +96,30 @@ public static class MultiplayerGameEvents
         onMatchRejected?.Invoke(playerId);
     }
 
+    public static void triggerMatchRejectionSent(string playerId)
+    {
+        onMatchRejectionSent?.Invoke(playerId);
+    }
+
+    public static void triggerMatchRejectionReceived(string playerId, string message)
+    {
+        onMatchRejectionReceived?.Invoke(playerId, message);
+    }
+
+    // Agregar estos métodos trigger:
+    public static void triggerMatchAcceptanceSent()
+    {
+        onMatchAcceptanceSent?.Invoke();
+    }
+
+    public static void triggerMatchAcceptanceError(string message, string playerStatus)
+    {
+        onMatchAcceptanceError?.Invoke(message, playerStatus);
+    }
+
+    public static void triggerMatchAcceptanceSuccess(string message)
+    {
+        onMatchAcceptanceSuccess?.Invoke(message);
+    }
 
 }

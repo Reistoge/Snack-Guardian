@@ -79,11 +79,16 @@ public class LobbyUIManager : MonoBehaviour
         //MultiplayerGameEvents.onMatchAccepted += HandleMatchAccepted;
         //
 
+        MultiplayerGameEvents.onMatchRejectionReceived += HandleMatchRejectionReceived;
+
+
         MultiplayerGameEvents.onMatchAccept += HandleMatchAccept;
         MultiplayerGameEvents.onMatchReject += HandleMatchReject;
         MultiplayerGameEvents.onMatchAccepted += HandleMatchAccepted;
 
-
+        MultiplayerGameEvents.onMatchAcceptanceSent += HandleMatchAcceptanceSent;
+        MultiplayerGameEvents.onMatchAcceptanceError += HandleMatchAcceptanceError;
+        MultiplayerGameEvents.onMatchAcceptanceSuccess += HandleMatchAcceptanceSuccess;
 
         // Configura los botones y los listeners
         acceptButton.onClick.AddListener(OnAcceptClick);
@@ -287,27 +292,25 @@ public class LobbyUIManager : MonoBehaviour
     private void OnAcceptClick()
     {
         // Notificar que el jugador ha aceptado la solicitud de la partida
-        MultiplayerGameEvents.triggerMatchAccept(matchId);  // Usamos el evento que hemos definido previamente en MultiplayerGameEvents
+        NetworkManager.Instance.sendAcceptMatchRequest();
 
         // Cerrar la ventana de la solicitud de partida
         matchRequestPanel.SetActive(false);
 
-        // Mostrar mensaje en la UI (si lo deseas)
-        chatDisplay.text += $"\n<color=green>Has aceptado la solicitud para el Match {matchId}</color>";
+        // Mostrar mensaje local en la UI (el mensaje del servidor llegará después)
+        chatDisplay.text += $"\n<color=cyan>Procesando aceptación de partida...</color>";
     }
 
     private void OnRejectClick()
     {
-
-
         // Llamar a la función del NetworkManager para enviar el mensaje de rechazo
-        NetworkManager.Instance.sendRejectMatchRequest(matchId);  // Esto envía el mensaje al servidor
+        NetworkManager.Instance.sendRejectMatchRequest(matchId);
 
-        // Cerrar la ventana de la solicitud de partida (la ventana que muestra la solicitud)
+        // Cerrar la ventana de la solicitud de partida
         matchRequestPanel.SetActive(false);
 
-        // Mostrar un mensaje en la UI para indicar que la solicitud ha sido rechazada
-        chatDisplay.text += $"\n<color=red>La solicitud de partida {matchId} ha sido rechazada.</color>";
+        // Mostrar un mensaje local en la UI
+        chatDisplay.text += $"\n<color=red>Has rechazado la solicitud de partida {matchId}.</color>";
     }
 
 
@@ -315,6 +318,36 @@ public class LobbyUIManager : MonoBehaviour
     {
         // Mostrar el mensaje en la UI del jugador que hizo la solicitud
         chatDisplay.text += $"\n<color=red>El jugador '{playerId}' ha rechazado tu solicitud de partida.</color>";
+    }
+
+    private void HandleMatchRejectionReceived(string playerId, string message)
+    {
+        Debug.Log($"Match rejection received: {message}");
+        chatDisplay.text += $"\n<color=orange>{message}</color>";
+    }
+
+    private void HandleMatchAcceptanceSent()
+    {
+        Debug.Log("Match acceptance sent to server");
+        chatDisplay.text += $"\n<color=cyan>Enviando aceptación de partida...</color>";
+    }
+
+    private void HandleMatchAcceptanceError(string message, string playerStatus)
+    {
+        Debug.Log($"Match acceptance error: {message}, Player status: {playerStatus}");
+        chatDisplay.text += $"\n<color=red>Error: {message}</color>";
+
+        // Opcional: Actualizar UI basado en el nuevo estado del jugador
+        if (playerStatus == "AVAILABLE")
+        {
+            chatDisplay.text += $"\n<color=yellow>Tu estado ha sido actualizado a: Disponible</color>";
+        }
+    }
+
+    private void HandleMatchAcceptanceSuccess(string message)
+    {
+        Debug.Log($"Match acceptance success: {message}");
+        chatDisplay.text += $"\n<color=green>¡Partida aceptada exitosamente! {message}</color>";
     }
 
     private void OnDestroy()
@@ -330,6 +363,11 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onMatchRequestReceived -= HandleMatchRequestReceived;
         MultiplayerGameEvents.onMatchRejected -= HandleMatchRejected;
         MultiplayerGameEvents.onMatchReject -= HandleMatchReject;
+
+        MultiplayerGameEvents.onMatchAcceptanceSent -= HandleMatchAcceptanceSent;
+        MultiplayerGameEvents.onMatchAcceptanceError -= HandleMatchAcceptanceError;
+        MultiplayerGameEvents.onMatchAcceptanceSuccess -= HandleMatchAcceptanceSuccess;
+
         //MultiplayerGameEvents.onMatchRejected -= HandleMatchRejected;
     }
 
