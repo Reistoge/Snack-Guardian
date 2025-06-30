@@ -121,15 +121,30 @@ public class LobbyUIManager : MonoBehaviour
         }
     }
 
+    // Update the handleChatMessage method to show better player identification:
     private void handleChatMessage(string playerId, string message)
     {
-        Debug.Log($"Handling chat message: {playerId}: {message}"); // Debug line
+        Debug.Log($"Handling chat message: {playerId}: {message}");
 
-        // Ensure UI updates happen on main thread
-        if (!this) return;
+        if (!this || !chatDisplay) return;
 
-        chatDisplay.text += $"\n{playerId}: {message}";
-        Canvas.ForceUpdateCanvases(); // Force UI refresh
+        // Check if it's your own message by comparing with your player name or ID
+        string displayName;
+        if (playerId == NetworkManager.Instance.PlayerName || playerId == NetworkManager.Instance.PlayerId)
+        {
+            displayName = "<color=#4CAF50>You</color>";
+        }
+        else
+        {
+            displayName = $"<color=#2196F3>{playerId}</color>";
+        }
+
+        string formattedMessage = $"\n{displayName}: {message}";
+        chatDisplay.text += formattedMessage;
+
+        // Force UI update and scroll
+        Canvas.ForceUpdateCanvases();
+  
     }
 
 

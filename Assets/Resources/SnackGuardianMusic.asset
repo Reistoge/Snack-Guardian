@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 824d2bf4795895541a9bd849bcdb8616, type: 3}
   m_Name: SnackGuardianMusic
   m_EditorClassIdentifier: 
-  GameplayMusic: {fileID: 0}
+  GameplayMusic: {fileID: 11400000, guid: 9d7788205dafa6242bb1eb408b93304b, type: 2}
   MainMenuMusic: {fileID: 11400000, guid: 1f675056251893543bdbdd4051b18b4e, type: 2}
-  GameOverMusic: {fileID: 0}
+  GameOverMusic: {fileID: 11400000, guid: 83e793b7a994600458132e0cbd2b778b, type: 2}
   VictoryMusic: {fileID: 0}

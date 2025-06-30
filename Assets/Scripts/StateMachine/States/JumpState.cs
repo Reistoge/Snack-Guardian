@@ -14,6 +14,9 @@ public class JumpState : PlayerBaseState
         base.Enter();
         player.PlayerAnimation.playEnterJump();
         
+         
+        
+        
         // player.initiateJump(1);
     }
     public override void Exit(){

@@ -15,6 +15,9 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     [SerializeField] PlayerAnimHandler anim;
     [SerializeField] HealthSystem healthSystem;
     [SerializeField] ObjectEffect playerEffect;
+    [SerializeField] PlayerAudio playerAudio;
+
+    
 
 
 
@@ -152,11 +155,45 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     }
     public void playDamagedAnimation()
     {
+        
         anim.playDamagedAnimation();
     }
+    public void playDamagedAudio()
+    {
+        
+        AudioManager.Instance.playSFX(playerAudio.DamageAudio);
+    }
+   
+ 
+    public void playDashAudio()
+    {
+        AudioManager.Instance.playSFX(playerAudio.DashAudio);
+    }
+    public void playFirstJumpAudio()
+    {
+        AudioManager.Instance.playSFX(playerAudio.FirstJumpAudio);
+    }
+    public void playSecondJumpAudio()
+    {
+        AudioManager.Instance.playSFX(playerAudio.SecondJumpAudio);
+    }
+    public void playTouchWallAudio()
+    {
+        AudioManager.Instance.playSFX(playerAudio.TouchWallAudio);
+    }
+    public void playAudio(AudioConfig audioConfig)
+    {
+        // here we play the audio config
+        AudioManager.Instance.playSFX(audioConfig);
+    }
+
+ 
+   
+
 
     public void stopMovement()
     {
+
         movement.stopMovement();
     }
  

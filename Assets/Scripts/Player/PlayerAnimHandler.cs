@@ -94,6 +94,10 @@ public class PlayerAnimHandler : MonoBehaviour
     {
         sprite.material = defaultMaterial;
     }
+    public void playAudio(AudioConfig audioConfig)
+    {
+        AudioManager.Instance.playSFX(audioConfig);
+    }
 
     // Example: Get the length of the "Damaged" animation clip
     public float getDamagedAnimationDuration()

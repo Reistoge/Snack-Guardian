@@ -205,7 +205,7 @@ Animator:
   m_GameObject: {fileID: 1521542640411153765}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 51815693489c8a3429d23e69496c20a3, type: 2}
+  m_Controller: {fileID: 9100000, guid: e6a30a7f1c35e334b8a81de5cd7938d4, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -291,7 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15284aba1740d5a4e8d170a1657dee3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snackConfig: {fileID: 11400000, guid: cb00e59364bfb4247a5c05ea4a7f1bbd, type: 2}
+  snackConfig: {fileID: 11400000, guid: a758741368bcab34f99178c172c42f0b, type: 2}
   fall: {fileID: 7930278489831744563}
   animatorHandler: {fileID: 3315465292840821790}
   catchDetector: {fileID: 4053112428503254058}

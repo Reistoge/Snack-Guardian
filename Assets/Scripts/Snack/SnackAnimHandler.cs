@@ -97,7 +97,7 @@ public class SnackAnimHandler : MonoBehaviour
         }
     }
 
- 
+
     // public void playTouchGroundAnimation()
     // {
     //     int randomSign = Random.value < 0.5f ? 1 : -1;
@@ -183,8 +183,12 @@ public class SnackAnimHandler : MonoBehaviour
         foreach (var clip in anim.runtimeAnimatorController.animationClips)
         {
             if (clip.name == clipName) // Replace with your damaged animation's name
-                return clip.length; 
+                return clip.length;
         }
         return 0f; // Or throw an exception if not found
+    }
+    public void playAudio(AudioConfig audioConfig)
+    {
+        AudioManager.Instance.playSFX(audioConfig);
     }
 }
