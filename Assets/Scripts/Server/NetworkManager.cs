@@ -1,6 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Netly;
 using System;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -107,10 +109,10 @@ public class NetworkManager : MonoBehaviour
         string json = System.Text.Encoding.UTF8.GetString(data);
         Debug.Log($"Received raw JSON data: {json}");
 
-        var baseEvent = JsonUtility.FromJson<ServerMessageBase>(json);
-        if (baseEvent != null && !string.IsNullOrEmpty(baseEvent.@event))
+        string eventName = extractEventName(json);
+        if (!string.IsNullOrEmpty(eventName))
         {
-            handleServerData(baseEvent.@event, data);
+            handleServerData(eventName, data);
         }
         else
         {
@@ -163,10 +165,32 @@ public class NetworkManager : MonoBehaviour
             case "player-data":
                 handlePlayerDataResponse(jsonData);
                 break;
+            case "send-match-request":
+                handleSendMatchRequest(jsonData);
+                break;
+            case "online-players":
+                handleOnlinePlayers2(jsonData);
+                break;
+            case "match-request-received":
+                HandleMatchRequestReceived(data);
+                break;
+            case "match-accepted":
+                HandleMatchAccepted(data);
+                break;
+            case "match-rejected":
+                HandleMatchRejected(data);
+                break;
+            case "accept-match":
+                HandleAcceptMatchResponse(data);
+                break;
+            case "reject-match":
+                SendMatchRejectedNotification(data);
+                break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
                 break;
         }
+
     }
 
     private void handleConnectedToServer(string jsonData)
@@ -187,8 +211,6 @@ public class NetworkManager : MonoBehaviour
 
     }
 
-
-
     private void handleLoginStatus(string status)
     {
         if (status == "NO_LOGIN")
@@ -202,7 +224,7 @@ public class NetworkManager : MonoBehaviour
             MultiplayerGameEvents.triggerPlayerLoggedIn(playerId, playerName);
         }
     }
- 
+
     private void sendLoginRequest()
     {
         var loginMessage = new ServerMessage<LoginData>
@@ -232,6 +254,9 @@ public class NetworkManager : MonoBehaviour
             // Update player data with login response
             StorePlayerData(loginResponse.data);
             logConnectionInfo();
+
+            string desiredName = "olaolaola"; // Puedes usar un campo configurable aquí si deseas
+            changePlayerName(desiredName);
 
             Debug.Log("Login successful! Player is now logged in.");
             MultiplayerGameEvents.triggerPlayerLoggedIn(playerId, playerName);
@@ -268,8 +293,11 @@ public class NetworkManager : MonoBehaviour
         var publicMessageWrapper = JsonUtility.FromJson<PublicMessageResponse>(jsonData);
         if (publicMessageWrapper?.data != null)
         {
-            Debug.Log($"Received message from {publicMessageWrapper.data.playerId}: {publicMessageWrapper.data.playerMsg}");
-            MultiplayerGameEvents.triggerChatMessageReceived(publicMessageWrapper.data.playerId, publicMessageWrapper.data.playerMsg);
+            string name = publicMessageWrapper.data.playerName;
+            string message = publicMessageWrapper.data.playerMsg;
+
+            Debug.Log($"Received message from {name}: {message}");
+            MultiplayerGameEvents.triggerChatMessageReceived(name, message); // ← Se envía el nombre, no el ID
         }
     }
 
@@ -329,7 +357,7 @@ public class NetworkManager : MonoBehaviour
         if (changeNameResponse != null)
         {
             Debug.Log($"Change name response - Status: {changeNameResponse.status}, Message: {changeNameResponse.msg}");
-            
+
             if (changeNameResponse.status == "OK" && changeNameResponse.data != null)
             {
                 playerName = changeNameResponse.data.name;
@@ -348,7 +376,7 @@ public class NetworkManager : MonoBehaviour
         if (playerDataResponse != null)
         {
             Debug.Log($"Player data response - Status: {playerDataResponse.status}, Message: {playerDataResponse.msg}");
-            
+
             if (playerDataResponse.status == "OK" && playerDataResponse.data != null)
             {
                 StorePlayerData(playerDataResponse.data);
@@ -361,6 +389,64 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
+
+    private void handleSendMatchRequest(string jsonData)
+    {
+        var response = JsonUtility.FromJson<SendMatchRequestResponse>(jsonData);
+        if (response != null && response.status == "OK" && response.data != null)
+        {
+            Debug.Log($"Match request sent! Match ID: {response.data.matchId}");
+            MultiplayerGameEvents.triggerMatchRequestSent(response.data.matchId);
+        }
+        else
+        {
+            Debug.LogError("Failed to send match request or invalid response.");
+        }
+    }
+
+    private void handleOnlinePlayers(string jsonData)
+    {
+        var response = JsonUtility.FromJson<OnlinePlayersResponse>(jsonData);
+        if (response != null && response.status == "OK" && response.data != null)
+        {
+            Debug.Log($"Received list of {response.data.Count} online players:");
+            MultiplayerGameEvents.triggerOnlinePlayersReceived(response.data);
+        }
+        else
+        {
+            Debug.LogWarning("Failed to parse online players list");
+        }
+    }
+
+    private void handleOnlinePlayers2(string jsonData)
+    {
+        var response = JsonUtility.FromJson<OnlinePlayersResponse>(jsonData);
+        if (response != null && response.status == "OK" && response.data != null)
+        {
+            Debug.Log($"[NetworkManager] Online players received: {response.data.Count}");
+
+            MultiplayerGameEvents.triggerOnlinePlayersReceived(response.data);
+        }
+        else
+        {
+            Debug.LogWarning("Failed to parse online players list");
+        }
+    }
+
+    private string extractEventName(string json)
+    {
+        try
+        {
+            int start = json.IndexOf("\"event\":\"") + 9;
+            int end = json.IndexOf("\"", start);
+            return json.Substring(start, end - start);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     #endregion
 
     #region Helper Methods
@@ -399,6 +485,134 @@ public class NetworkManager : MonoBehaviour
         {
             getConnectedPlayers();
         }
+    }
+
+    private void HandleMatchRequestReceived(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        MatchRequestReceivedEvent matchRequest = JsonUtility.FromJson<MatchRequestReceivedEvent>(json);
+
+        // Aquí manejas el mensaje y el matchId
+        Debug.Log(matchRequest.msg);
+
+        // Llamamos a un evento en MultiplayerGameEvents para actualizar la UI o mostrar un mensaje
+        MultiplayerGameEvents.triggerMatchRequestReceived(matchRequest.data.playerId, matchRequest.data.matchId);
+    }
+
+    private void HandleMatchAccepted(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        MatchAcceptedEvent matchAcceptedEvent = JsonUtility.FromJson<MatchAcceptedEvent>(json);
+
+        // Procesar el evento
+        Debug.Log($"Match accepted by {matchAcceptedEvent.data.playerId} for match {matchAcceptedEvent.data.matchId}, Status: {matchAcceptedEvent.data.matchStatus}");
+
+        // Actualizar la UI con el estado del match
+        MultiplayerGameEvents.triggerMatchAccepted(matchAcceptedEvent.data.matchId, matchAcceptedEvent.data.matchStatus);
+    }
+
+
+
+    private void HandleMatchRejected(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        MatchRejectedEvent matchRejectedEvent = JsonUtility.FromJson<MatchRejectedEvent>(json);
+
+        // Mostrar el mensaje en la UI del jugador que hizo la solicitud
+        Debug.Log($"Received match-rejected event: {matchRejectedEvent.msg}");
+
+        // Llamamos a un evento que notificará a la interfaz del usuario que la solicitud fue rechazada
+        MultiplayerGameEvents.triggerMatchRejected(matchRejectedEvent.data.playerId);
+    }
+    private void SendMatchRejectedNotification(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        MatchRejectedEvent matchRejectedEvent = JsonUtility.FromJson<MatchRejectedEvent>(json);
+
+        // Aquí manejamos el evento y creamos la notificación para el jugador
+        Debug.Log($"La solicitud de partida ha sido rechazada por {matchRejectedEvent.data.playerId}");
+
+        // Enviar una notificación o evento al jugador que hizo la solicitud
+        MultiplayerGameEvents.triggerMatchReject(matchRejectedEvent.data.playerId);
+    }
+    public void HandleRejectMatchResponse(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        RejectMatchResponse response = JsonUtility.FromJson<RejectMatchResponse>(json);
+
+        if (response.status == "OK")
+        {
+            // Si la respuesta es correcta, procesamos el rechazo
+            Debug.Log($"La solicitud de partida de {response.data.playerId} ha sido rechazada.");
+
+            // Disparar el evento para notificar a la UI
+            MultiplayerGameEvents.triggerMatchRejected(response.data.playerId);
+        }
+        else
+        {
+            Debug.LogError($"Error al procesar el rechazo de la partida: {response.msg}");
+        }
+    }
+
+
+    private void HandleAcceptMatchResponse(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        AcceptMatchResponse response = JsonUtility.FromJson<AcceptMatchResponse>(json);
+
+        if (response.status == "ERROR")
+        {
+            Debug.LogError($"Error accepting match: {response.msg}");
+            // Aquí puedes actualizar la UI o mostrar un mensaje de error
+            //MultiplayerGameEvents.triggerMatchRejected(response.data.playerId);  // Notificar rechazo si la partida no existe
+        }
+        else
+        {
+            Debug.Log($"Match {response.data.matchId} accepted, status: {response.data.matchStatus}");
+            // Aquí puedes manejar la lógica cuando el partido es aceptado
+            MultiplayerGameEvents.triggerMatchAccepted(response.data.matchId, response.data.matchStatus);
+        }
+    }
+
+    public void sendAcceptMatchRequest(string matchId)
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send accept match request - not connected");
+            return;
+        }
+
+        // Crear el mensaje de aceptación
+        var acceptMatchRequest = new
+        {
+            @event = "accept-match",
+            data = new { matchId = matchId }
+        };
+
+        string json = JsonUtility.ToJson(acceptMatchRequest);
+        Debug.Log($"Sending accept match request for match {matchId}: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);  // Enviar el mensaje al servidor
+    }
+
+    public void sendRejectMatchRequest(string matchId)
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send reject match request - not connected");
+            return;
+        }
+
+        // Crear el mensaje de rechazo
+        var rejectMatchRequest = new
+        {
+            @event = "reject-match"
+        };
+
+        string json = JsonUtility.ToJson(rejectMatchRequest);
+        Debug.Log($"Sending reject match request for match {matchId}: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);  // Enviar el mensaje de rechazo al servidor
     }
     #endregion
 
@@ -541,6 +755,49 @@ public class NetworkManager : MonoBehaviour
         webSocket.To.Data(json, HTTP.Text);
     }
 
+    /// AQUI VAN LAS ACCIONES RESPECTO A LOBBY-EVENTS
+
+    public void sendMatchRequest(string targetPlayerId)
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send match request - not connected");
+            return;
+        }
+
+        var matchRequest = new MatchRequestData { playerId = targetPlayerId };
+        var serverMessage = new ServerMessage<MatchRequestData>
+        {
+            @event = "send-match-request",
+            data = matchRequest
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"Sending match request to player {targetPlayerId}: {json}");
+        webSocket.To.Data(json, HTTP.Text);
+    }
+
+    public void requestOnlinePlayers()
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot request online players - not connected");
+            return;
+        }
+
+        var serverMessage = new ServerMessage<object>
+        {
+            @event = "online-players",
+            data = null
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"Requesting online players: {json}");
+        webSocket.To.Data(json, HTTP.Text);
+    }
+
+
+
     public GameInfo GetGameInfo() => currentPlayerData?.game;
     public string GetPlayerStatus() => currentPlayerData?.status;
     public bool IsPlayerLoggedIn() => currentPlayerData?.status != "NO_LOGIN";
@@ -595,14 +852,17 @@ public class GameInfo
 [Serializable]
 public class ConnectedToServerResponse
 {
-    public string @event;
-    public string msg;
+    public string id;
+    public string name;
+    public GameInfo game;
+    public string status;
     public ConnectionData data;
+
 }
 
- 
 
- 
+
+
 [Serializable]
 public class MessageData
 {
@@ -691,6 +951,7 @@ public class PublicMessageResponse
 public class PublicMessageData
 {
     public string playerId;
+    public string playerName;
     public string playerMsg;
 }
 
@@ -701,5 +962,107 @@ public class PlayerDataResponse
     public string status;
     public string msg;
     public ConnectionData data;
+}
+
+//playerDatas
+[Serializable]
+public class OnlinePlayersResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public List<ConnectionData> data;
+}
+
+//para los MATCH
+
+[Serializable]
+public class MatchRequestData
+{
+    public string playerId; // jugador al que se envía la solicitud
+    public string matchId;
+}
+
+[Serializable]
+public class SendMatchRequestResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public MatchIdData data;
+}
+
+public class MatchRequestReceivedEvent
+{
+    public string eventType;
+    public string msg;
+    public MatchRequestData data;
+}
+
+[Serializable]
+public class MatchIdData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class MatchAcceptedData
+{
+    public string playerId;
+    public string matchId;
+    public string matchStatus; // "WAITING_PLAYERS", "IN_PROGRESS", etc.
+}
+
+[Serializable]
+public class MatchAcceptedEvent
+{
+    public string @event;
+    public string msg;
+    public MatchAcceptedData data;
+}
+
+[Serializable]
+public class MatchRejectedData
+{
+    public string playerId;  // Jugador que ha rechazado la solicitud
+}
+
+[Serializable]
+public class MatchRejectedEvent
+{
+    public string @event;
+    public string msg;
+    public MatchRejectedData data;
+}
+
+[Serializable]
+public class AcceptMatchData
+{
+    public string matchId;
+    public string matchStatus;  // "WAITING_PLAYERS", etc.
+}
+
+[Serializable]
+public class AcceptMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public AcceptMatchData data;
+}
+
+[Serializable]
+public class RejectMatchData
+{
+    public string playerId;  // ID del jugador que rechazó la solicitud
+}
+
+[Serializable]
+public class RejectMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public RejectMatchData data;
 }
 #endregion
