@@ -50,7 +50,7 @@ public class GameSceneCamera : MonoBehaviour
         // Follow player if in follow mode
         if (isFollowingPlayer && playerTransform != null)
         {
-            // FollowPlayer();
+             FollowPlayer();
         }
     }
 

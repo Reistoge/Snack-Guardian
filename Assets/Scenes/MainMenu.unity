@@ -240,6 +240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 134456483}
+  snackGuardianLogoLight: {fileID: 783922913}
 --- !u!1 &255807219
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,7 +253,7 @@ GameObject:
   - component: {fileID: 255807220}
   - component: {fileID: 255807222}
   m_Layer: 0
-  m_Name: Bg
+  m_Name: MainBackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -322,7 +323,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 783922914}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &255807222
@@ -403,7 +405,7 @@ Camera:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 0.99973613
+    width: 0.99884087
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
@@ -801,6 +803,94 @@ MonoBehaviour:
   zippoLight: {fileID: 11400000, guid: 67985c085e757814786e2a433863490c, type: 2}
   zippoOpen: {fileID: 11400000, guid: a594abe722b89c340a3adabf41f1192a, type: 2}
   animator: {fileID: 759904695}
+--- !u!1 &783922913
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 783922914}
+  - component: {fileID: 783922915}
+  m_Layer: 0
+  m_Name: Light 2D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &783922914
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783922913}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.29, y: 1.4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 255807221}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &783922915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783922913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ComponentVersion: 1
+  m_LightType: 1
+  m_BlendStyleIndex: 0
+  m_FalloffIntensity: 0.461
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1.33
+  m_LightVolumeIntensity: 1
+  m_LightVolumeIntensityEnabled: 0
+  m_ApplyToSortingLayers: 00000000754355a64d0cf6ca69925d16
+  m_LightCookieSprite: {fileID: 0}
+  m_DeprecatedPointLightCookieSprite: {fileID: 0}
+  m_LightOrder: 0
+  m_AlphaBlendOnOverlap: 0
+  m_OverlapOperation: 0
+  m_NormalMapDistance: 3
+  m_NormalMapQuality: 2
+  m_UseNormalMap: 0
+  m_ShadowIntensityEnabled: 0
+  m_ShadowIntensity: 0.75
+  m_ShadowVolumeIntensityEnabled: 0
+  m_ShadowVolumeIntensity: 0.75
+  m_LocalBounds:
+    m_Center: {x: -0.15435004, y: 0.19625002, z: 0}
+    m_Extent: {x: 3.73805, y: 1.5975499, z: 0}
+  m_PointLightInnerAngle: 360
+  m_PointLightOuterAngle: 360
+  m_PointLightInnerRadius: 0
+  m_PointLightOuterRadius: 1
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 0.5
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath:
+  - {x: -3.3859468, y: -0.90035313, z: 0}
+  - {x: 3.0522823, y: -0.886047, z: 0}
+  - {x: 3.085136, y: -0.06286669, z: 0}
+  - {x: 2.3617501, y: 0.03287375, z: 0}
+  - {x: 1.8947209, y: 0.6475998, z: 0}
+  - {x: 2.0286121, y: 1.2786125, z: 0}
+  - {x: -2.4284692, y: 1.2929183, z: 0}
+  - {x: -2.4695854, y: 0.676211, z: 0}
+  - {x: -2.817079, y: 0.0042603016, z: 0}
+  - {x: -3.3921633, y: 0.011244178, z: 0}
 --- !u!1 &989819706
 GameObject:
   m_ObjectHideFlags: 0
@@ -915,6 +1005,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 6329384649287051715, guid: c2a25338b213b724db4ce74a654c8ab4, type: 3}
   defaultMovementStats: {fileID: 11400000, guid: 9fe520151b0e35e4e87bab610d31e094, type: 2}
   gameData: {fileID: 11400000, guid: 37b0ba44399c5e842ae620a074369874, type: 2}
+  transitionAnimPrefab: {fileID: 899392032671700080, guid: 387698c3d113c734c833e44acc9d5493, type: 3}
 --- !u!4 &1004561425
 Transform:
   m_ObjectHideFlags: 0

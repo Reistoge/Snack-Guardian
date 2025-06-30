@@ -33,6 +33,7 @@ public class AudioManager : GenericSingleton<AudioManager>
 
     private void playGamePlayMusic()
     {
+        
         playSFX(snackGuardianMusic.GameplayMusic);
 
     }
@@ -75,6 +76,7 @@ public class AudioManager : GenericSingleton<AudioManager>
             if (audio.IsPlaying == false)
             {
                 audio.playAudio(audioConfig);
+                
                 destroyInactiveAudioPlayers();
 
 
