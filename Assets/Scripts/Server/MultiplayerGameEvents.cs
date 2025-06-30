@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class MultiplayerGameEvents
@@ -14,11 +15,34 @@ public static class MultiplayerGameEvents
 
     public static event Action<string> onPlayerSendAttack;
     public static event Action<string> onPlayerReceiveAttack;
-   
+   public static event Action<string, string> onMatchRequestReceived;
     public static event Action onGameStarted;
     public static event Action onPlayersListCleared;
     public static event Action<string, string> onPlayerLoggedIn;
     public static event Action<string> onLoginFailed;
+    public static Action<string> onMatchRequestSent;
+
+    public static event Action<string> onMatchRejectionSent;
+    public static event Action<string, string> onMatchRejectionReceived; // (playerId, message)
+
+    // cambio de nombre
+    public static Action<string, string> onPlayerNameChanged;
+
+    ///enviar match
+    public static Action<List<ConnectionData>> onOnlinePlayersReceived;
+
+    public static event Action<string> onMatchAccept;
+    public static event Action<string> onMatchReject;
+    public static event Action<string, string> onMatchAccepted;
+    public static event Action<string> onMatchRejected;
+
+    public static event Action onMatchAcceptanceSent;
+    public static event Action<string, string> onMatchAcceptanceError; // (message, playerStatus)
+    public static event Action<string> onMatchAcceptanceSuccess; // (message)
+
+    // Evento cuando el servidor rechaza la solicitud
+    //recibir match
+
 
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
@@ -31,9 +55,71 @@ public static class MultiplayerGameEvents
     {
         onPlayerReadyStateChanged?.Invoke(playerId, isReady);
     }
+    public static void triggerMatchRequestSent(string matchId)
+    {
+        onMatchRequestSent?.Invoke(matchId);
+    }
+
     public static void triggerPlayerSendAttack(string attackData) => onPlayerSendAttack?.Invoke(attackData);
     public static void triggerPlayerReceiveAttack(string attackData) => onPlayerReceiveAttack?.Invoke(attackData);
     public static void triggerPlayersListCleared() => onPlayersListCleared?.Invoke(); 
     public static void triggerPlayerLoggedIn(string playerId, string playerName) => onPlayerLoggedIn?.Invoke(playerId, playerName);
     public static void triggerLoginFailed(string errorMessage) => onLoginFailed?.Invoke(errorMessage);
+
+    public static void triggerOnlinePlayersReceived(List<ConnectionData> players)
+    {
+        onOnlinePlayersReceived?.Invoke(players);
+    }
+    public static void triggerMatchRequestReceived(string playerId, string matchId)
+    {
+        onMatchRequestReceived?.Invoke(playerId, matchId);
+    }
+
+    // Funciones para disparar los eventos
+    public static void triggerMatchAccept(string matchId)
+    {
+        onMatchAccept?.Invoke(matchId);
+    }
+
+    public static void triggerMatchReject(string playerId)
+    {
+        onMatchReject?.Invoke(playerId);
+    }
+
+    public static void triggerMatchAccepted(string matchId, string matchStatus)
+    {
+        onMatchAccepted?.Invoke(matchId, matchStatus);
+    }
+
+    public static void triggerMatchRejected(string playerId)
+    {
+        onMatchRejected?.Invoke(playerId);
+    }
+
+    public static void triggerMatchRejectionSent(string playerId)
+    {
+        onMatchRejectionSent?.Invoke(playerId);
+    }
+
+    public static void triggerMatchRejectionReceived(string playerId, string message)
+    {
+        onMatchRejectionReceived?.Invoke(playerId, message);
+    }
+
+    // Agregar estos métodos trigger:
+    public static void triggerMatchAcceptanceSent()
+    {
+        onMatchAcceptanceSent?.Invoke();
+    }
+
+    public static void triggerMatchAcceptanceError(string message, string playerStatus)
+    {
+        onMatchAcceptanceError?.Invoke(message, playerStatus);
+    }
+
+    public static void triggerMatchAcceptanceSuccess(string message)
+    {
+        onMatchAcceptanceSuccess?.Invoke(message);
+    }
+
 }
