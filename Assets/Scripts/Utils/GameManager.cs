@@ -107,8 +107,6 @@ public class GameManager : GenericSingleton<GameManager>
 
     }
 
-
-
     private void spawnPlayer()
     {
         if (currentPlayer == null)
@@ -137,7 +135,7 @@ public class GameManager : GenericSingleton<GameManager>
     public void loadScene(string sceneName)
     {
 
-        Debug.Log($"[GameManager] Intentando cargar escena: '{sceneName}'"); // ¡Añade esta línea!
+        Debug.Log($"[GameManager] Intentando cargar escena: '{sceneName}'"); // ï¿½Aï¿½ade esta lï¿½nea!
         //SceneManager.LoadScene(sceneName);
         StartCoroutine(playTransition(()=> SceneManager.LoadScene(sceneName)));
     }
