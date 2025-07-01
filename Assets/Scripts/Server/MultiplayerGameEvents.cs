@@ -46,6 +46,9 @@ public static class MultiplayerGameEvents
     public static event Action<string, string> onConnectMatchSuccess; // (matchId, message)
     public static event Action<string> onConnectMatchError; // (errorMessage)
 
+    public static event Action onPingMatchSent;
+    public static event Action<string, string> onPingMatchSuccess; // (matchId, message)
+    public static event Action<string> onPingMatchError; // (message)
 
     public static event Action<string, string> onPlayersReady;
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
@@ -144,5 +147,20 @@ public static class MultiplayerGameEvents
     public static void triggerPlayersReady(string matchId, string message)
     {
         onPlayersReady?.Invoke(matchId, message);
-    }   
+    }
+
+    public static void triggerPingMatchSent()
+    {
+        onPingMatchSent?.Invoke();
+    }
+
+    public static void triggerPingMatchSuccess(string matchId, string message)
+    {
+        onPingMatchSuccess?.Invoke(matchId, message);
+    }
+
+    public static void triggerPingMatchError(string message)
+    {
+        onPingMatchError?.Invoke(message);
+    }
 }

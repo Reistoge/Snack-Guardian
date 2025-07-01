@@ -193,6 +193,9 @@ public class NetworkManager : MonoBehaviour
             case "players-ready":
                     HandlePlayersReady(data);
                 break;
+            case "ping-match":
+                HandlePingMatchResponse(data);
+                break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
                 break;
@@ -405,7 +408,7 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.Log($"Match request sent! Match ID: {response.data.matchId}");
             MultiplayerGameEvents.triggerMatchRequestSent(response.data.matchId);
-        }
+        }   
         else
         {
             Debug.LogError("Failed to send match request or invalid response.");
@@ -718,6 +721,35 @@ public class NetworkManager : MonoBehaviour
         Debug.Log($"Sending reject match request: {json}");
 
         webSocket.To.Data(json, HTTP.Text);
+    }
+    public void sendPingMatchRequest(string matchId = null) // matchId es opcional si el servidor no lo requiere en la solicitud
+    {
+        var pingMatchRequest = new PingMatchRequest();
+
+        var json = JsonUtility.ToJson(pingMatchRequest);
+        Debug.Log($"[NetworkManager] Sending ping-match request: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);
+
+        MultiplayerGameEvents.triggerPingMatchSent(); // Activa el evento para la UI u otros sistemas
+    }
+
+    // Crea este nuevo método para manejar la respuesta del servidor al ping-match
+    private void HandlePingMatchResponse(byte[] data)
+    {
+        string jsonString = Encoding.UTF8.GetString(data);
+        PingMatchResponse pingMatchResponse = JsonUtility.FromJson<PingMatchResponse>(jsonString);
+
+        if (pingMatchResponse.status == "OK")
+        {
+            Debug.Log($"[NetworkManager] Ping Match successful: {pingMatchResponse.msg}, Match ID: {pingMatchResponse.data.matchId}");
+            MultiplayerGameEvents.triggerPingMatchSuccess(pingMatchResponse.data.matchId, pingMatchResponse.msg);
+        }
+        else
+        {
+            Debug.LogError($"[NetworkManager] Ping Match failed: {pingMatchResponse.msg}");
+            MultiplayerGameEvents.triggerPingMatchError(pingMatchResponse.msg);
+        }
     }
 
     public class RejectMatchRequest
@@ -1216,5 +1248,26 @@ public class PlayersReadyEvent
     public string @event;
     public string msg;
     public PlayersReadyData data;
+}
+
+[Serializable]
+public class PingMatchRequest
+{
+    public string @event = "ping-match";
+}
+
+[Serializable]
+public class PingMatchResponseData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class PingMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public PingMatchResponseData data;
 }
 #endregion

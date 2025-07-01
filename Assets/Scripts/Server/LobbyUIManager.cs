@@ -29,6 +29,7 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private GameObject playersReadyPanel; // ¡Arrastra tu panel desde el Inspector de Unity!
     [SerializeField] private TextMeshProUGUI playersReadyInfoText; // Para mostrar el mensaje "Both players are ready..."
 
+
     private string matchId;
     private string playerId;
 
@@ -97,9 +98,9 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onConnectMatchSuccess += HandleConnectMatchSuccess;
         MultiplayerGameEvents.onConnectMatchError += HandleConnectMatchError;
 
-        //        MultiplayerGameEvents.onPingMatchSent += HandlePingMatchSent;
-        //MultiplayerGameEvents.onPingMatchSuccess += HandlePingMatchSuccess;
-        //MultiplayerGameEvents.onPingMatchError += HandlePingMatchError;
+        MultiplayerGameEvents.onPingMatchSent += HandlePingMatchSent;
+        MultiplayerGameEvents.onPingMatchSuccess += HandlePingMatchSuccess;
+        MultiplayerGameEvents.onPingMatchError += HandlePingMatchError;
 
         MultiplayerGameEvents.onPlayersReady += HandlePlayersReady;
 
@@ -111,8 +112,7 @@ public class LobbyUIManager : MonoBehaviour
         rejectButton.onClick.AddListener(OnRejectClick);
 
 
-        pingButton.onClick.AddListener(OnPingButtonClicked);
-        pingButton.gameObject.SetActive(false);  // Lo mantenemos oculto inicialmente
+        pingButton.onClick.AddListener(OnPingButtonClicked); // Lo mantenemos oculto inicialmente
 
         // Inicialmente desactivar la ventana
         matchRequestPanel.SetActive(false);
@@ -401,17 +401,18 @@ public class LobbyUIManager : MonoBehaviour
 
     private void HandlePingMatchSent()
     {
-        // Habilitar el botón de iniciar partida en la UI
-        startGameButton.interactable = true;
-        chatDisplay.text += $"\n<color=green>¡La partida está lista para comenzar! Match ID: {matchId}</color>";
+        chatDisplay.text += "\n<color=yellow>Enviando ping de sincronización...</color>";
     }
 
     private void HandlePingMatchSuccess(string matchId, string message)
     {
-        Debug.Log($"Ping match success: {message}, Match ID: {matchId}");
-        chatDisplay.text += $"\n<color=green>¡Ping enviado exitosamente!</color>";
-        chatDisplay.text += $"\n<color=green>Match ID: {matchId}</color>";
-        chatDisplay.text += $"\n<color=yellow>{message}</color>";
+        chatDisplay.text += $"\n<color=green>Sincronización de partida exitosa! Match ID: {matchId}. Mensaje: {message}</color>";
+        // Una vez que el ping es exitoso, podrías iniciar la cuenta atrás o la carga de la escena del juego
+        // También podrías ocultar el panel de "players-ready" si aún está visible
+        if (playersReadyPanel != null && playersReadyPanel.activeSelf)
+        {
+            playersReadyPanel.SetActive(false);
+        }
     }
 
     public void EnablePingButton(string matchId)
@@ -423,16 +424,12 @@ public class LobbyUIManager : MonoBehaviour
 
     private void OnPingButtonClicked()
     {
-        // Llamas al método para enviar el ping cuando el jugador presiona el botón
-      //  NetworkManager.Instance.sendPingMatch();
+        // Asegúrate de tener el matchId disponible aquí. Podrías guardarlo cuando recibes 'match-accepted'
+        // o 'players-ready'. Por ejemplo:
 
-        // Deshabilitar el botón después de enviar el ping para evitar múltiples clics
-        //pingButton.gameObject.SetActive(false);
-
-        // Mostrar un mensaje indicando que el ping fue enviado
-        //Debug.Log("Ping enviado para sincronizar la partida.");
-        //MultiplayerGameEvents.triggerChatMessageReceived("Servidor", "Ping enviado para sincronizar los jugadores.");
+        NetworkManager.Instance.sendPingMatchRequest();
     }
+
 
     private void HandlePingMatchError(string errorMessage)
     {
@@ -459,7 +456,7 @@ public class LobbyUIManager : MonoBehaviour
             playersReadyPanel.SetActive(true);
             if (playersReadyInfoText != null)
             {
-                playersReadyInfoText.text = $"Jugadores listos!, clickea cuando quieras}";
+                playersReadyInfoText.text = $"Jugadores listos!, clickea cuando quieras";
             }
         }
         else
@@ -501,6 +498,16 @@ public class LobbyUIManager : MonoBehaviour
 
         MultiplayerGameEvents.onMatchRejectionReceived -= HandleMatchRejectionReceived;
         //MultiplayerGameEvents.onMatchRejected -= HandleMatchRejected;
+
+        MultiplayerGameEvents.onPingMatchSent -= HandlePingMatchSent;
+        MultiplayerGameEvents.onPingMatchSuccess -= HandlePingMatchSuccess;
+        MultiplayerGameEvents.onPingMatchError -= HandlePingMatchError;
+
+        // Remueve el listener del botón de ping
+        if (pingButton != null)
+        {
+            pingButton.onClick.RemoveListener(OnPingButtonClicked);
+        }
     }
 
 
