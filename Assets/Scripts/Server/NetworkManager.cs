@@ -3,6 +3,7 @@ using Netly;
 using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using System.Text;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -185,6 +186,15 @@ public class NetworkManager : MonoBehaviour
                 break;
             case "reject-match":
                 SendMatchRejectNotification(data);
+                break;
+            case "connect-match":
+                HandleConnectMatchResponse(data);
+                break;
+            case "players-ready":
+                    HandlePlayersReady(data);
+                break;
+            case "ping-match":
+                HandlePingMatchResponse(data);
                 break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
@@ -398,7 +408,7 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.Log($"Match request sent! Match ID: {response.data.matchId}");
             MultiplayerGameEvents.triggerMatchRequestSent(response.data.matchId);
-        }
+        }   
         else
         {
             Debug.LogError("Failed to send match request or invalid response.");
@@ -606,6 +616,69 @@ public class NetworkManager : MonoBehaviour
             Debug.LogWarning($"Unknown accept-match response status: {response.status}");
         }
     }
+    private void HandleConnectMatchResponse(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        Debug.Log($"Raw connect-match response: {json}");
+
+        ConnectMatchResponse response = JsonUtility.FromJson<ConnectMatchResponse>(json);
+
+        if (response == null)
+        {
+            Debug.LogError("Failed to parse connect-match response");
+            return;
+        }
+
+        Debug.Log($"Connect-match response - Status: {response.status}, Message: {response.msg}");
+
+        if (response.status == "OK" && response.data != null)
+        {
+            Debug.Log($"Successfully connected to match: {response.data.matchId}");
+            MultiplayerGameEvents.triggerConnectMatchSuccess(response.data.matchId, response.msg);
+        }
+        else
+        {
+            Debug.LogError($"Error connecting to match: {response.msg}");
+            MultiplayerGameEvents.triggerConnectMatchError(response.msg);
+        }
+    }
+
+    public void sendConnectMatchRequest()
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send connect match request - not connected");
+            return;
+        }
+
+        var connectMatchRequest = new ConnectMatchRequest();
+
+        string json = JsonUtility.ToJson(connectMatchRequest);
+        Debug.Log($"Sending connect match request: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);
+
+        // Disparar evento local
+        MultiplayerGameEvents.triggerConnectMatchSent();
+    }
+
+    // Implementación de HandlePlayersReady usando System.Text.Encoding y JsonUtility
+    private void HandlePlayersReady(byte[] data)
+    {
+        // 1. Convertir el byte[] a string usando UTF8 encoding
+        string jsonString = Encoding.UTF8.GetString(data);
+
+        // 2. Deserializar el string JSON a tu objeto PlayersReadyEvent
+        PlayersReadyEvent playersReadyEvent = JsonUtility.FromJson<PlayersReadyEvent>(jsonString);
+
+        Debug.Log($"[NetworkManager] Players Ready Event Received: {playersReadyEvent.msg}, Match ID: {playersReadyEvent.data.matchId}");
+
+        // Activa el evento en MultiplayerGameEvents para que LobbyUIManager lo pueda escuchar
+        MultiplayerGameEvents.triggerPlayersReady(playersReadyEvent.data.matchId, playersReadyEvent.msg);
+
+        // Si debes enviar "ping-match" automáticamente, descomenta la siguiente línea:
+        // sendPingMatchRequest(playersReadyEvent.data.matchId);
+    }
 
     public void sendAcceptMatchRequest()
     {
@@ -648,6 +721,35 @@ public class NetworkManager : MonoBehaviour
         Debug.Log($"Sending reject match request: {json}");
 
         webSocket.To.Data(json, HTTP.Text);
+    }
+    public void sendPingMatchRequest(string matchId = null) // matchId es opcional si el servidor no lo requiere en la solicitud
+    {
+        var pingMatchRequest = new PingMatchRequest();
+
+        var json = JsonUtility.ToJson(pingMatchRequest);
+        Debug.Log($"[NetworkManager] Sending ping-match request: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);
+
+        MultiplayerGameEvents.triggerPingMatchSent(); // Activa el evento para la UI u otros sistemas
+    }
+
+    // Crea este nuevo método para manejar la respuesta del servidor al ping-match
+    private void HandlePingMatchResponse(byte[] data)
+    {
+        string jsonString = Encoding.UTF8.GetString(data);
+        PingMatchResponse pingMatchResponse = JsonUtility.FromJson<PingMatchResponse>(jsonString);
+
+        if (pingMatchResponse.status == "OK")
+        {
+            Debug.Log($"[NetworkManager] Ping Match successful: {pingMatchResponse.msg}, Match ID: {pingMatchResponse.data.matchId}");
+            MultiplayerGameEvents.triggerPingMatchSuccess(pingMatchResponse.data.matchId, pingMatchResponse.msg);
+        }
+        else
+        {
+            Debug.LogError($"[NetworkManager] Ping Match failed: {pingMatchResponse.msg}");
+            MultiplayerGameEvents.triggerPingMatchError(pingMatchResponse.msg);
+        }
     }
 
     public class RejectMatchRequest
@@ -1113,4 +1215,59 @@ public class AcceptMatchRequest
     public string @event = "accept-match";
 }
 
+[Serializable]
+public class ConnectMatchRequest
+{
+    public string @event = "connect-match";
+}
+
+[Serializable]
+public class ConnectMatchResponseData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class ConnectMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public ConnectMatchResponseData data;
+}
+
+[Serializable]
+public class PlayersReadyData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class PlayersReadyEvent
+{
+    public string @event;
+    public string msg;
+    public PlayersReadyData data;
+}
+
+[Serializable]
+public class PingMatchRequest
+{
+    public string @event = "ping-match";
+}
+
+[Serializable]
+public class PingMatchResponseData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class PingMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public PingMatchResponseData data;
+}
 #endregion
