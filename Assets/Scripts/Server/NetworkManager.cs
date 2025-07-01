@@ -3,6 +3,7 @@ using Netly;
 using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using System.Text;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -185,6 +186,12 @@ public class NetworkManager : MonoBehaviour
                 break;
             case "reject-match":
                 SendMatchRejectNotification(data);
+                break;
+            case "connect-match":
+                HandleConnectMatchResponse(data);
+                break;
+            case "players-ready":
+                    HandlePlayersReady(data);
                 break;
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
@@ -605,6 +612,69 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.LogWarning($"Unknown accept-match response status: {response.status}");
         }
+    }
+    private void HandleConnectMatchResponse(byte[] data)
+    {
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        Debug.Log($"Raw connect-match response: {json}");
+
+        ConnectMatchResponse response = JsonUtility.FromJson<ConnectMatchResponse>(json);
+
+        if (response == null)
+        {
+            Debug.LogError("Failed to parse connect-match response");
+            return;
+        }
+
+        Debug.Log($"Connect-match response - Status: {response.status}, Message: {response.msg}");
+
+        if (response.status == "OK" && response.data != null)
+        {
+            Debug.Log($"Successfully connected to match: {response.data.matchId}");
+            MultiplayerGameEvents.triggerConnectMatchSuccess(response.data.matchId, response.msg);
+        }
+        else
+        {
+            Debug.LogError($"Error connecting to match: {response.msg}");
+            MultiplayerGameEvents.triggerConnectMatchError(response.msg);
+        }
+    }
+
+    public void sendConnectMatchRequest()
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send connect match request - not connected");
+            return;
+        }
+
+        var connectMatchRequest = new ConnectMatchRequest();
+
+        string json = JsonUtility.ToJson(connectMatchRequest);
+        Debug.Log($"Sending connect match request: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);
+
+        // Disparar evento local
+        MultiplayerGameEvents.triggerConnectMatchSent();
+    }
+
+    // Implementación de HandlePlayersReady usando System.Text.Encoding y JsonUtility
+    private void HandlePlayersReady(byte[] data)
+    {
+        // 1. Convertir el byte[] a string usando UTF8 encoding
+        string jsonString = Encoding.UTF8.GetString(data);
+
+        // 2. Deserializar el string JSON a tu objeto PlayersReadyEvent
+        PlayersReadyEvent playersReadyEvent = JsonUtility.FromJson<PlayersReadyEvent>(jsonString);
+
+        Debug.Log($"[NetworkManager] Players Ready Event Received: {playersReadyEvent.msg}, Match ID: {playersReadyEvent.data.matchId}");
+
+        // Activa el evento en MultiplayerGameEvents para que LobbyUIManager lo pueda escuchar
+        MultiplayerGameEvents.triggerPlayersReady(playersReadyEvent.data.matchId, playersReadyEvent.msg);
+
+        // Si debes enviar "ping-match" automáticamente, descomenta la siguiente línea:
+        // sendPingMatchRequest(playersReadyEvent.data.matchId);
     }
 
     public void sendAcceptMatchRequest()
@@ -1113,4 +1183,38 @@ public class AcceptMatchRequest
     public string @event = "accept-match";
 }
 
+[Serializable]
+public class ConnectMatchRequest
+{
+    public string @event = "connect-match";
+}
+
+[Serializable]
+public class ConnectMatchResponseData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class ConnectMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public ConnectMatchResponseData data;
+}
+
+[Serializable]
+public class PlayersReadyData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class PlayersReadyEvent
+{
+    public string @event;
+    public string msg;
+    public PlayersReadyData data;
+}
 #endregion

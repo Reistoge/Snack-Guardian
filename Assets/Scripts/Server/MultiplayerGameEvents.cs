@@ -42,8 +42,12 @@ public static class MultiplayerGameEvents
 
     // Evento cuando el servidor rechaza la solicitud
     //recibir match
+    public static event Action onConnectMatchSent;
+    public static event Action<string, string> onConnectMatchSuccess; // (matchId, message)
+    public static event Action<string> onConnectMatchError; // (errorMessage)
 
 
+    public static event Action<string, string> onPlayersReady;
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
     public static void triggerConnectionError(string error) => onConnectionError?.Invoke(error);
@@ -122,4 +126,23 @@ public static class MultiplayerGameEvents
         onMatchAcceptanceSuccess?.Invoke(message);
     }
 
+    public static void triggerConnectMatchSent()
+    {
+        onConnectMatchSent?.Invoke();
+    }
+
+    public static void triggerConnectMatchSuccess(string matchId, string message)
+    {
+        onConnectMatchSuccess?.Invoke(matchId, message);
+    }
+
+    public static void triggerConnectMatchError(string errorMessage)
+    {
+        onConnectMatchError?.Invoke(errorMessage);
+    }
+
+    public static void triggerPlayersReady(string matchId, string message)
+    {
+        onPlayersReady?.Invoke(matchId, message);
+    }   
 }
