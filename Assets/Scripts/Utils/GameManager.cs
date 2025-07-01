@@ -13,6 +13,8 @@ public class GameManager : GenericSingleton<GameManager>
     public static Action OnMainMenuLoaded;
     public static Action OnPlayerSpawned;
 
+    
+    
 
 
 
@@ -28,6 +30,20 @@ public class GameManager : GenericSingleton<GameManager>
         GameEvents.onGameOver += tryUpdateHighScore;
 
     }
+    public string getPlayerName()
+    {
+        if (GameData != null)
+        {
+            return GameData.playerName;
+        }
+        else
+        {
+            Debug.LogWarning("GameData is not set in GameManager.");
+            return "DefaultPlayer";
+        }
+    }
+    
+
 
     private void tryUpdateHighScore()
     {

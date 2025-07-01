@@ -265,7 +265,7 @@ public class NetworkManager : MonoBehaviour
             StorePlayerData(loginResponse.data);
             logConnectionInfo();
 
-            string desiredName = "olaolaola"; // Puedes usar un campo configurable aquí si deseas
+            string desiredName = GameManager.Instance.getPlayerName(); // Puedes usar un campo configurable aquí si deseas
             changePlayerName(desiredName);
 
             Debug.Log("Login successful! Player is now logged in.");

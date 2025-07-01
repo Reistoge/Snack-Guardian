@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class GameDataSO : ScriptableObject
 {
     public float highScore = 0f;
+    public string playerName = "Snack-guardian-Player";
      
 
    

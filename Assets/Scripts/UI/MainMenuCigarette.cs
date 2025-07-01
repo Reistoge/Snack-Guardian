@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using Random = UnityEngine.Random;
 
@@ -12,6 +13,7 @@ public class MainMenuCigarette : MonoBehaviour
     [SerializeField] AudioConfig zippoLight;
     [SerializeField] AudioConfig zippoOpen;
     [SerializeField] Animator animator;
+    [SerializeField] UnityEvent onCigaretteEvent;
 
     const string ZIPPO_LIGHT = "ZippoLight";
     const string ZIPPO_On = "ZippoOn";
@@ -43,6 +45,7 @@ public class MainMenuCigarette : MonoBehaviour
         animator.Play(ZIPPO_ON_HASH, -1, 0f);
         AudioManager.Instance.playMainMenuMusic();
         onCigarette?.Invoke();
+        onCigaretteEvent?.Invoke();
     }
 
 
