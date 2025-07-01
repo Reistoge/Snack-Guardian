@@ -137,7 +137,8 @@ public class GameManager : GenericSingleton<GameManager>
     public void loadScene(string sceneName)
     {
 
-        // SceneManager.LoadScene(sceneName);
+        Debug.Log($"[GameManager] Intentando cargar escena: '{sceneName}'"); // ¡Añade esta línea!
+        //SceneManager.LoadScene(sceneName);
         StartCoroutine(playTransition(()=> SceneManager.LoadScene(sceneName)));
     }
     IEnumerator playTransition(Action action)

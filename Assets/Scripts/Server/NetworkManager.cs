@@ -196,6 +196,16 @@ public class NetworkManager : MonoBehaviour
             case "ping-match":
                 HandlePingMatchResponse(data);
                 break;
+            case "match-start":
+                HandleMatchStart(data);
+                break;
+            case "finish-game":
+                HandleFinishGameResponse(data);
+                break;
+            case "quit-match":
+                HandleQuitMatchResponse(data);
+                break;
+
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
                 break;
@@ -643,6 +653,104 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    private void HandleMatchStart(byte[] data)
+    {
+        string jsonString = System.Text.Encoding.UTF8.GetString(data);
+        MatchStartEvent matchStartEvent = JsonUtility.FromJson<MatchStartEvent>(jsonString);
+
+        Debug.Log($"[NetworkManager] Match Start Event Received: {matchStartEvent.msg}, Match ID: {matchStartEvent.data.matchId}");
+
+        // Activa el evento en MultiplayerGameEvents para que otros sistemas puedan escucharlo
+        MultiplayerGameEvents.triggerMatchStart(matchStartEvent.data.matchId, matchStartEvent.msg);
+    }
+
+    // Crea este nuevo método para enviar el evento finish-game (si el jugador lo inicia)
+    public void sendFinishGameRequest(string matchId = null)
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("[NetworkManager] No se pudo enviar finish-game: WebSocket no está conectado.");
+            MultiplayerGameEvents.triggerFinishGameError("WebSocket no conectado.");
+            return;
+        }
+
+        var finishGameRequest = new FinishGameRequest();
+        // Si necesitas enviar el matchId en la solicitud, descomenta:
+        // if (matchId != null) finishGameRequest.matchId = matchId;
+
+        string json = JsonUtility.ToJson(finishGameRequest);
+        Debug.Log($"[NetworkManager] Sending finish-game request: {json}");
+
+        // Usando webSocket.To.Data() según tu implementación actual
+        webSocket.To.Data(json, HTTP.Text);
+
+        MultiplayerGameEvents.triggerFinishGameSent();
+    }
+
+    // Crea este nuevo método para enviar el evento finish-game (si el jugador lo inicia)
+    private void HandleFinishGameResponse(byte[] data)
+    {
+        string jsonString = System.Text.Encoding.UTF8.GetString(data);
+        FinishGameResponse finishGameResponse = JsonUtility.FromJson<FinishGameResponse>(jsonString);
+
+        if (finishGameResponse.status == "OK")
+        {
+            Debug.Log($"[NetworkManager] Game Finished: {finishGameResponse.msg}, Match ID: {finishGameResponse.data.matchId}");
+            // Dispara un evento de éxito con los datos relevantes
+            MultiplayerGameEvents.triggerFinishGameSuccess(
+                finishGameResponse.data.matchId,
+                finishGameResponse.msg
+            // Puedes añadir más parámetros como el ganador si FinishGameResponseData los tiene
+            // finishGameResponse.data.winnerPlayerId,
+            // finishGameResponse.data.winnerPlayerName
+            );
+        }
+        else
+        {
+            Debug.LogError($"[NetworkManager] Game Finish failed or error: {finishGameResponse.msg}");
+            MultiplayerGameEvents.triggerFinishGameError(finishGameResponse.msg);
+        }
+    }
+
+    // Crea este nuevo método para enviar el evento quit-match
+    public void sendQuitMatchRequest(string matchId = null) // matchId es opcional en la solicitud
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("[NetworkManager] No se pudo enviar quit-match: WebSocket no está conectado.");
+            MultiplayerGameEvents.triggerQuitMatchError("WebSocket no conectado.");
+            return;
+        }
+
+        var quitMatchRequest = new QuitMatchRequest();
+        // Si el servidor necesita el matchId en la solicitud, descomenta la línea de abajo:
+        // if (matchId != null) quitMatchRequest.matchId = matchId;
+
+        var json = JsonUtility.ToJson(quitMatchRequest);
+        Debug.Log($"[NetworkManager] Sending quit-match request: {json}");
+
+        // Usando webSocket.To.Data() según tu implementación actual
+        webSocket.To.Data(json, HTTP.Text);
+
+        MultiplayerGameEvents.triggerQuitMatchSent();
+    }
+
+    private void HandleQuitMatchResponse(byte[] data)
+    {
+        string jsonString = System.Text.Encoding.UTF8.GetString(data);
+        QuitMatchResponse quitMatchResponse = JsonUtility.FromJson<QuitMatchResponse>(jsonString);
+
+        if (quitMatchResponse.status == "OK")
+        {
+            Debug.Log($"[NetworkManager] Quit Match successful: {quitMatchResponse.msg}, Player Status: {quitMatchResponse.data.playerStatus}");
+            MultiplayerGameEvents.triggerQuitMatchSuccess(quitMatchResponse.data.playerStatus, quitMatchResponse.msg);
+        }
+        else
+        {
+            Debug.LogError($"[NetworkManager] Quit Match failed: {quitMatchResponse.msg}");
+            MultiplayerGameEvents.triggerQuitMatchError(quitMatchResponse.msg);
+        }
+    }
     public void sendConnectMatchRequest()
     {
         if (!webSocket.IsOpened)
@@ -1270,4 +1378,70 @@ public class PingMatchResponse
     public string msg;
     public PingMatchResponseData data;
 }
+
+[Serializable]
+public class MatchStartData
+{
+    public string matchId;
+}
+
+[Serializable]
+public class MatchStartEvent
+{
+    public string @event;
+    public string msg;
+    public MatchStartData data;
+}
+
+[Serializable]
+public class FinishGameRequest
+{
+    public string @event = "finish-game";
+    // Si necesitas enviar el matchId o algún otro dato, añádelo aquí:
+    // public string matchId;
+}
+
+[Serializable]
+public class FinishGameResponseData
+{
+    public string matchId;
+    // Puedes añadir más datos si el servidor los envía, como el ganador
+    // public string winnerPlayerId;
+    // public string winnerPlayerName;
+}
+
+[Serializable]
+public class FinishGameResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public FinishGameResponseData data;
+}
+
+[Serializable]
+public class QuitMatchRequest
+{
+    public string @event = "quit-match";
+    // Si necesitas enviar el matchId en la solicitud, añádelo aquí (opcional):
+    // public string matchId;
+}
+
+[Serializable]
+public class QuitMatchResponseData
+{
+    public string playerStatus; // Ej: "AVAILABLE", "IN_MATCH", etc.
+    // Puedes añadir el matchId si el servidor lo devuelve en la data
+    // public string matchId;
+}
+
+[Serializable]
+public class QuitMatchResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public QuitMatchResponseData data;
+}
+
 #endregion

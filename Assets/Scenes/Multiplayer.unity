@@ -1023,7 +1023,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0002584893, y: 0}
+  m_AnchoredPosition: {x: 0.0005075635, y: 0}
   m_SizeDelta: {x: -309.72, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &237854173
@@ -2038,10 +2038,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.13598673
     y: 0
-    width: 0.99973613
-    height: 1
+    width: 0.7282108
+    height: 0.99999994
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -2726,7 +2726,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 6329384649287051715, guid: c2a25338b213b724db4ce74a654c8ab4, type: 3}
   defaultMovementStats: {fileID: 11400000, guid: 9fe520151b0e35e4e87bab610d31e094, type: 2}
   gameData: {fileID: 11400000, guid: 37b0ba44399c5e842ae620a074369874, type: 2}
-  transitionAnimPrefab: {fileID: 0}
+  transitionAnimPrefab: {fileID: 899392032671700080, guid: 387698c3d113c734c833e44acc9d5493, type: 3}
 --- !u!4 &1004561425
 Transform:
   m_ObjectHideFlags: 0
@@ -4186,7 +4186,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 527553206}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9997023
+  m_Size: 0.9999657
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
