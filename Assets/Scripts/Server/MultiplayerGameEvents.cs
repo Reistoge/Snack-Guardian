@@ -50,7 +50,17 @@ public static class MultiplayerGameEvents
     public static event Action<string, string> onPingMatchSuccess; // (matchId, message)
     public static event Action<string> onPingMatchError; // (message)
 
+    public static event Action<string, string> onMatchStart;
     public static event Action<string, string> onPlayersReady;
+
+    public static event Action onFinishGameSent;
+    public static event Action<string, string> onFinishGameSuccess; // (matchId, message)
+    public static event Action<string> onFinishGameError; // (message)
+
+    public static event Action onQuitMatchSent;
+    public static event Action<string, string> onQuitMatchSuccess; // (playerStatus, message)
+    public static event Action<string> onQuitMatchError; // (message)
+
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
     public static void triggerConnectionError(string error) => onConnectionError?.Invoke(error);
@@ -162,5 +172,40 @@ public static class MultiplayerGameEvents
     public static void triggerPingMatchError(string message)
     {
         onPingMatchError?.Invoke(message);
+    }
+
+    public static void triggerMatchStart(string matchId, string message)
+    {
+        onMatchStart?.Invoke(matchId, message);
+    }
+
+    public static void triggerFinishGameSent()
+    {
+        onFinishGameSent?.Invoke();
+    }
+
+    public static void triggerFinishGameSuccess(string matchId, string message)
+    {
+        onFinishGameSuccess?.Invoke(matchId, message);
+    }
+
+    public static void triggerFinishGameError(string message)
+    {
+        onFinishGameError?.Invoke(message);
+    }
+
+    public static void triggerQuitMatchSent()
+    {
+        onQuitMatchSent?.Invoke();
+    }
+
+    public static void triggerQuitMatchSuccess(string playerStatus, string message)
+    {
+        onQuitMatchSuccess?.Invoke(playerStatus, message);
+    }
+
+    public static void triggerQuitMatchError(string message)
+    {
+        onQuitMatchError?.Invoke(message);
     }
 }

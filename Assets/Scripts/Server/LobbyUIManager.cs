@@ -103,9 +103,16 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onPingMatchError += HandlePingMatchError;
 
         MultiplayerGameEvents.onPlayersReady += HandlePlayersReady;
+        MultiplayerGameEvents.onMatchStart += HandleMatchStartEvent;
 
+        MultiplayerGameEvents.onFinishGameSent += HandleFinishGameSent;
+        MultiplayerGameEvents.onFinishGameSuccess += HandleFinishGameSuccess;
+        MultiplayerGameEvents.onFinishGameError += HandleFinishGameError;
         //MultiplayerGameEvents.onPlayersReadyResponse += HandlePlayersReadyResponse;
 
+        MultiplayerGameEvents.onQuitMatchSent += HandleQuitMatchSent;
+        MultiplayerGameEvents.onQuitMatchSuccess += HandleQuitMatchSuccess;
+        MultiplayerGameEvents.onQuitMatchError += HandleQuitMatchError;
 
         // Configura los botones y los listeners
         acceptButton.onClick.AddListener(OnAcceptClick);
@@ -470,6 +477,94 @@ public class LobbyUIManager : MonoBehaviour
         // Si lo envías automáticamente, asegúrate de que el NetworkManager ya lo hace al recibir 'players-ready'.
         // Si quieres un botón en la UI, configura su listener para llamar a NetworkManager.Instance.sendPingMatchRequest(matchId);
     }
+
+    private void HandleMatchStartEvent(string matchId, string message)
+    {
+        Debug.Log($"[LobbyUIManager] ¡Partida lista para iniciar! Cargando escena de juego. Match ID: {matchId}");
+        chatDisplay.text += $"\n<color=cyan>¡LA PARTIDA VA A COMENZAR! ID: {matchId}. {message}</color>";
+
+        // Llama a GameManager para cambiar la escena
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.loadScene("GameScene"); // Llama a tu método para cargar la escena
+        }
+        else
+        {
+            Debug.LogError("[LobbyUIManager] GameManager.Instance no está disponible. No se puede cargar la escena.");
+        }
+
+        // Opcional: Oculta cualquier UI del lobby/pre-partida
+        if (playersReadyPanel != null && playersReadyPanel.activeSelf)
+        {
+            playersReadyPanel.SetActive(false);
+        }
+        // Puedes también desactivar todo el LobbyUIManager si no lo necesitas en la nueva escena
+        // gameObject.SetActive(false);
+    }
+
+    private void HandleFinishGameSent()
+    {
+        chatDisplay.text += "\n<color=yellow>Enviando solicitud de fin de partida...</color>";
+    }
+
+    private void HandleFinishGameSuccess(string matchId, string message)
+    {
+        Debug.Log($"[LobbyUIManager] ¡Partida Finalizada! ID: {matchId}, Mensaje: {message}");
+        chatDisplay.text += $"\n<color=purple>¡PARTIDA TERMINADA! ID: {matchId}. {message}</color>";
+
+        // Aquí puedes:
+        // 1. Mostrar una pantalla de "Game Over" o "Resultados".
+        // 2. Mostrar el ganador (si los datos del evento lo incluyen).
+        // 3. Ofrecer opciones para volver al lobby, jugar de nuevo, etc.
+        // 4. Volver al lobby automáticamente:
+        // if (GameManager.Instance != null)
+
+        //     GameManager.Instance.loadScene("LobbySceneName"); // Reemplaza con el nombre de tu escena de lobby
+
+    }
+
+    private void HandleFinishGameError(string message)
+    {
+        Debug.LogError($"[LobbyUIManager] Error al finalizar la partida: {message}");
+        chatDisplay.text += $"\n<color=red>Error al finalizar la partida: {message}</color>";
+    }
+
+    // Manejador cuando se envía la solicitud de quit-match
+    private void HandleQuitMatchSent()
+    {
+        chatDisplay.text += "\n<color=yellow>Enviando solicitud para salir de la partida...</color>";
+        // Opcional: Desactivar botón de "salir de partida" para evitar spam
+    }
+
+    // Manejador cuando el servidor confirma que has salido de la partida
+    private void HandleQuitMatchSuccess(string playerStatus, string message)
+    {
+        Debug.Log($"[LobbyUIManager] Has salido de la partida. Estado: {playerStatus}. Mensaje: {message}");
+        chatDisplay.text += $"\n<color=blue>Has salido de la partida: {message}</color>";
+
+        // Aquí es donde típicamente regresarías al lobby o a la pantalla principal
+        if (GameManager.Instance != null)
+        {
+            // Asume que "LobbyScene" es el nombre de tu escena de lobby
+            GameManager.Instance.loadScene("Multiplayer");
+        }
+        else
+        {
+            Debug.LogError("[LobbyUIManager] GameManager.Instance no disponible para cargar la escena del lobby.");
+        }
+
+        // Opcional: Actualizar el estado del jugador si tu UI muestra eso
+        // Por ejemplo, si tienes un indicador de "disponible" vs "en partida"
+        // currentPlayerData.Status = playerStatus; // Si currentPlayerData es accesible
+    }
+
+    // Manejador si hay un error al intentar salir de la partida
+    private void HandleQuitMatchError(string message)
+    {
+        Debug.LogError($"[LobbyUIManager] Error al salir de la partida: {message}");
+        chatDisplay.text += $"\n<color=red>Error al salir de la partida: {message}</color>";
+    }
+
     private void OnDestroy()
     {
         // Unsubscribe from all events
@@ -502,6 +597,15 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onPingMatchSent -= HandlePingMatchSent;
         MultiplayerGameEvents.onPingMatchSuccess -= HandlePingMatchSuccess;
         MultiplayerGameEvents.onPingMatchError -= HandlePingMatchError;
+        MultiplayerGameEvents.onMatchStart -= HandleMatchStartEvent;
+
+        MultiplayerGameEvents.onFinishGameSent -= HandleFinishGameSent;
+        MultiplayerGameEvents.onFinishGameSuccess -= HandleFinishGameSuccess;
+        MultiplayerGameEvents.onFinishGameError -= HandleFinishGameError;
+
+        MultiplayerGameEvents.onQuitMatchSent -= HandleQuitMatchSent;
+        MultiplayerGameEvents.onQuitMatchSuccess -= HandleQuitMatchSuccess;
+        MultiplayerGameEvents.onQuitMatchError -= HandleQuitMatchError;
 
         // Remueve el listener del botón de ping
         if (pingButton != null)
