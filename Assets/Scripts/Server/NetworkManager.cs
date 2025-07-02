@@ -333,13 +333,13 @@ public class NetworkManager : MonoBehaviour
 
     private void handlePrivateMessage(string jsonData)
     {
-        var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
+        var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageReceibedData>>(jsonData);
         if (privateMessageWrapper?.data != null)
         {
-            Debug.Log($"Received private message from {privateMessageWrapper.data.playerId}: {privateMessageWrapper.data.message}");
+            Debug.Log($"Received private message from {privateMessageWrapper.data.playerId}: {privateMessageWrapper.data.playerMsg}");
             // Trigger private message event if you want to handle private messages differently
             // For now, we'll treat it like a chat message but you can create a separate event
-            MultiplayerGameEvents.triggerChatMessageReceived($"[Private] {privateMessageWrapper.data.playerId}", privateMessageWrapper.data.message);
+            MultiplayerGameEvents.triggerChatMessageReceived($"[Private] {privateMessageWrapper.data.playerId}", privateMessageWrapper.data.playerMsg);
         }
     }
 
@@ -1128,6 +1128,14 @@ public class PrivateMessageData
     public string message;
 }
 
+[Serializable]
+
+public class PrivateMessageReceibedData
+{
+    public string playerId;
+    public string playerName;
+    public string playerMsg;
+}
 [Serializable]
 public class ReadyStateData
 {
