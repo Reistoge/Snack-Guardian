@@ -16,6 +16,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     [SerializeField] HealthSystem healthSystem;
     [SerializeField] ObjectEffect playerEffect;
     [SerializeField] PlayerAudio playerAudio;
+    
 
     
 
@@ -32,6 +33,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     public PlayerMovement Movement { get => movement; set => movement = value; }
     public PlayerAnimHandler PlayerAnimation { get => anim; set => anim = value; }
     public PlayerStateMachine StateMachine { get => stateMachine; set => stateMachine = value; }
+    
 
     private void Awake()
     {

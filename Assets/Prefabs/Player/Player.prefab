@@ -166,6 +166,7 @@ MonoBehaviour:
   EnemyLayerInteract:
     serializedVersion: 2
     m_Bits: 0
+  bumpEffect: {fileID: 11400000, guid: ca61e70ed56fcaa47a5d58f0b196eaae, type: 2}
 --- !u!1 &5977789585796176467
 GameObject:
   m_ObjectHideFlags: 0
