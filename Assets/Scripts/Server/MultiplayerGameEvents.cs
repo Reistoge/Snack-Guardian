@@ -61,6 +61,8 @@ public static class MultiplayerGameEvents
     public static event Action<string, string> onQuitMatchSuccess; // (playerStatus, message)
     public static event Action<string> onQuitMatchError; // (message)
 
+    public static event Action<string, string> onShowPrivateMessagePanel;
+
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
     public static void triggerConnectionError(string error) => onConnectionError?.Invoke(error);
@@ -208,4 +210,10 @@ public static class MultiplayerGameEvents
     {
         onQuitMatchError?.Invoke(message);
     }
+
+    public static void triggerShowPrivateMessagePanel(string playerId, string playerName)
+    {
+        onShowPrivateMessagePanel?.Invoke(playerId, playerName);
+    }
+
 }

@@ -21,7 +21,7 @@ public class NetworkManager : MonoBehaviour
     #endregion
 
     #region Serialized Fields
-    [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/?gameId=H&name=Snack Guardian";
+    [SerializeField] private string serverUrl = "ws://ucn-game-server.martux.cl:4010/?gameId=H&name=SnackGuardian-Cris";
     [SerializeField] private ConnectionData currentPlayerData;
     #endregion
 
@@ -336,10 +336,10 @@ public class NetworkManager : MonoBehaviour
         var privateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
         if (privateMessageWrapper?.data != null)
         {
-            Debug.Log($"Received private message from {privateMessageWrapper.data.id}: {privateMessageWrapper.data.message}");
+            Debug.Log($"Received private message from {privateMessageWrapper.data.playerId}: {privateMessageWrapper.data.message}");
             // Trigger private message event if you want to handle private messages differently
             // For now, we'll treat it like a chat message but you can create a separate event
-            MultiplayerGameEvents.triggerChatMessageReceived($"[Private] {privateMessageWrapper.data.id}", privateMessageWrapper.data.message);
+            MultiplayerGameEvents.triggerChatMessageReceived($"[Private] {privateMessageWrapper.data.playerId}", privateMessageWrapper.data.message);
         }
     }
 
@@ -348,7 +348,7 @@ public class NetworkManager : MonoBehaviour
         var sendPrivateMessageWrapper = JsonUtility.FromJson<ServerMessage<PrivateMessageData>>(jsonData);
         if (sendPrivateMessageWrapper?.data != null)
         {
-            Debug.Log($"Private message sent to {sendPrivateMessageWrapper.data.id}: {sendPrivateMessageWrapper.data.message}");
+            Debug.Log($"Private message sent to {sendPrivateMessageWrapper.data.playerId}: {sendPrivateMessageWrapper.data.message}");
         }
     }
 
@@ -911,7 +911,7 @@ public class NetworkManager : MonoBehaviour
             return;
         }
 
-        var msgData = new PrivateMessageData { id = targetId, message = message };
+        var msgData = new PrivateMessageData { playerId = targetId, message = message };
         var serverMessage = new ServerMessage<PrivateMessageData>
         {
             @event = "send-private-message",
@@ -1124,7 +1124,7 @@ public class MessageData
 [Serializable]
 public class PrivateMessageData
 {
-    public string id;
+    public string playerId;
     public string message;
 }
 
