@@ -68,17 +68,12 @@ public class GameManager : GenericSingleton<GameManager>
     private void onLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
         AudioManager.Instance.stopAllAudio();
-        switch (scene.name)
+        if (scene.name.Contains("GameScene"))
         {
-            case "GameScene":
-                OnGameSceneLoaded?.Invoke();
-                spawnPlayer();
-                break;
-
-            case "MainMenu":
-                // Handle main menu initialization
-                break;
+            OnGameSceneLoaded?.Invoke();
+            spawnPlayer();
         }
+ 
     }
     void Update()
     {
