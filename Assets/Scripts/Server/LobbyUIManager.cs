@@ -82,6 +82,7 @@ public class LobbyUIManager : MonoBehaviour
         // Subscribe to all events
         MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
+        MultiplayerGameEvents.onChatPrivateMessageReceived += handlePrivateChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
         MultiplayerGameEvents.onPlayersListCleared += handlePlayersListCleared;
@@ -141,7 +142,7 @@ public class LobbyUIManager : MonoBehaviour
         closePrivateMessagePanelButton.onClick.AddListener(ClosePrivateMessagePanel);
 
         // Asegurarse de que el panel está cerrado al inicio
-        PrivateMessagePanel.SetActive(false);
+
 
         // Configura los botones y los listeners
         acceptButton.onClick.AddListener(OnAcceptClick);
@@ -208,7 +209,30 @@ public class LobbyUIManager : MonoBehaviour
   
     }
 
+    private void handlePrivateChatMessage(string playerId, string message)
+    {
+        Debug.Log($"Handling chat message: {playerId}: {message}");
 
+        if (!this || !privateChatDisplay) return;
+
+        // Check if it's your own message by comparing with your player name or ID
+        string displayName;
+        if (playerId == NetworkManager.Instance.PlayerName || playerId == NetworkManager.Instance.PlayerId)
+        {
+            displayName = $"{GREEN_COLOR}{NetworkManager.Instance.PlayerName}You</color>";
+        }
+        else
+        {
+            displayName = $"{BLUE_COLOR}{playerId}</color>";
+        }
+
+        string formattedMessage = $"\n{displayName}: {message}";
+        privateChatDisplay.text += formattedMessage;
+
+        // Force UI update and scroll
+        Canvas.ForceUpdateCanvases();
+
+    }
     private void handlePlayersListCleared()
     {
         connectedPlayers.Clear();
@@ -673,6 +697,7 @@ public class LobbyUIManager : MonoBehaviour
         // Unsubscribe from all events
         MultiplayerGameEvents.onConnectedToServer -= handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived -= handleChatMessage;
+        MultiplayerGameEvents.onChatPrivateMessageReceived -= handlePrivateChatMessage;
         MultiplayerGameEvents.onPlayerConnected -= handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected -= handlePlayerDisconnected;
         MultiplayerGameEvents.onPlayersListCleared -= handlePlayersListCleared;

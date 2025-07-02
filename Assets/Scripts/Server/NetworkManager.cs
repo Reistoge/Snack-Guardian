@@ -339,7 +339,7 @@ public class NetworkManager : MonoBehaviour
             Debug.Log($"Received private message from {privateMessageWrapper.data.playerId}: {privateMessageWrapper.data.playerMsg}");
             // Trigger private message event if you want to handle private messages differently
             // For now, we'll treat it like a chat message but you can create a separate event
-            MultiplayerGameEvents.triggerChatMessageReceived($"[Private] {privateMessageWrapper.data.playerId}", privateMessageWrapper.data.playerMsg);
+            MultiplayerGameEvents.triggerPrivateChatMessageReceived($"[Private] {privateMessageWrapper.data.playerId}", privateMessageWrapper.data.playerMsg);
         }
     }
 
