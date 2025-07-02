@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI.Table;
+using Unity.VisualScripting;
 
 public class LobbyUIManager : MonoBehaviour
 {
@@ -15,13 +16,6 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Transform dynamicPlayerListContainer;
     [SerializeField] private Button refreshPlayersButton;
 
-    [SerializeField] private Button PrivateMessages;
-    [SerializeField] private GameObject PrivateMessagePanel;
-    [SerializeField] private TextMeshProUGUI privateMessageRecipientText; // El texto "Enviando a..."
-    [SerializeField] private TMP_InputField privateMessageInput; // El campo para escribir
-    [SerializeField] private Button sendPrivateMessageButton; // El botón "Enviar"
-    [SerializeField] private Button closePrivateMessagePanelButton; // El botón "Cerrar"
-
     ///la ventana del matchup
     ///
     [SerializeField] private GameObject onlinePlayersWindow;
@@ -32,11 +26,20 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Button acceptButton;
     [SerializeField] private Button rejectButton;
     [SerializeField] private TextMeshProUGUI matchInfoText;  // Para mostrar el mensaje de la solicitud
-    [SerializeField] private Button pingButton;  // Botón para enviar el ping
-    [SerializeField] private GameObject playersReadyPanel; // ¡Arrastra tu panel desde el Inspector de Unity!
+    [SerializeField] private Button pingButton;  // Botï¿½n para enviar el ping
+    [SerializeField] private GameObject playersReadyPanel; // ï¿½Arrastra tu panel desde el Inspector de Unity!
     [SerializeField] private TextMeshProUGUI playersReadyInfoText; // Para mostrar el mensaje "Both players are ready..."
-    private string privateMessageRecipientId;
+    [SerializeField] private TextMeshProUGUI playerIdText;
 
+    const string CYAN_COLOR = "<color=#00FFFF>";
+    const string GREEN_COLOR = "<color=#008000>";
+    const string RED_COLOR = "<color=#FF0000>";
+    const string YELLOW_COLOR = "<color=#FFFF00>";
+    const string BLUE_COLOR = "<color=#0000FF>";
+    const string PURPLE_COLOR = "<color=#800080>";
+    const string ORANGE_COLOR = "<color=#FFA500>";
+    const string GRAY_COLOR = "<color=#808080>";
+    
     private string matchId;
     private string playerId;
 
@@ -64,6 +67,7 @@ public class LobbyUIManager : MonoBehaviour
         startGameButton.interactable = false;
         readyButton.onClick.AddListener(onReadyClick);
         sendMessageButton.onClick.AddListener(sendChatMessage);
+        
 
         refreshPlayersButton.onClick.AddListener(requestOnlinePlayers);
 
@@ -125,15 +129,6 @@ public class LobbyUIManager : MonoBehaviour
         acceptButton.onClick.AddListener(OnAcceptClick);
         rejectButton.onClick.AddListener(OnRejectClick);
 
-        MultiplayerGameEvents.onShowPrivateMessagePanel += HandleShowPrivateMessagePanel;
-
-        sendPrivateMessageButton.onClick.AddListener(SendPrivateMessage);
-        closePrivateMessagePanelButton.onClick.AddListener(ClosePrivateMessagePanel);
-
-        PrivateMessages.onClick.AddListener(() => onlinePlayersWindow.SetActive(true));
-
-        PrivateMessagePanel.SetActive(false);
-
 
         pingButton.onClick.AddListener(OnPingButtonClicked); // Lo mantenemos oculto inicialmente
 
@@ -141,9 +136,6 @@ public class LobbyUIManager : MonoBehaviour
         matchRequestPanel.SetActive(false);
 
         chatDisplay.text = "Welcome to chat...";
-
-
-
     }
 
     private void onReadyClick()
@@ -158,7 +150,7 @@ public class LobbyUIManager : MonoBehaviour
         {
             connectedPlayers.Remove(obj);
             updatePlayerList();
-            chatDisplay.text += $"\n<color=red>Player {obj} left</color>";
+            chatDisplay.text += $"\n{RED_COLOR}Player {obj} left</color>";
         }
     }
 
@@ -183,11 +175,11 @@ public class LobbyUIManager : MonoBehaviour
         string displayName;
         if (playerId == NetworkManager.Instance.PlayerName || playerId == NetworkManager.Instance.PlayerId)
         {
-            displayName = "<color=#4CAF50>You</color>";
+            displayName = $"{GREEN_COLOR}{NetworkManager.Instance.PlayerName}You</color>";
         }
         else
         {
-            displayName = $"<color=#2196F3>{playerId}</color>";
+            displayName = $"{BLUE_COLOR}{playerId}</color>";
         }
 
         string formattedMessage = $"\n{displayName}: {message}";
@@ -195,7 +187,7 @@ public class LobbyUIManager : MonoBehaviour
 
         // Force UI update and scroll
         Canvas.ForceUpdateCanvases();
-
+  
     }
 
 
@@ -211,6 +203,7 @@ public class LobbyUIManager : MonoBehaviour
         connectedPlayers.Clear();
         updatePlayerList();
         NetworkManager.Instance.getConnectedPlayers(); // Request player list after connection
+        playerIdText.text = $"Player ID: {NetworkManager.Instance.PlayerId}";
     }
 
     private void handlePlayerConnected(string playerId)
@@ -220,7 +213,7 @@ public class LobbyUIManager : MonoBehaviour
         {
             connectedPlayers.Add(playerId);
             updatePlayerList();
-            chatDisplay.text += $"\n<color=green>Player {playerId} joined</color>";
+            chatDisplay.text += $"\n{GREEN_COLOR}Player {playerId} joined</color>";
         }
     }
 
@@ -237,7 +230,7 @@ public class LobbyUIManager : MonoBehaviour
 
     private void handleMatchRequestSent(string matchId)
     {
-        chatDisplay.text += $"\n<color=cyan>Solicitud de partida enviada. ID: {matchId}</color>";
+        chatDisplay.text += $"\n{CYAN_COLOR}Solicitud de partida enviada. ID: {matchId}</color>";
     }
 
     private void displayInteractivePlayerList(List<ConnectionData> players)
@@ -249,58 +242,72 @@ public class LobbyUIManager : MonoBehaviour
 
         foreach (var player in players)
         {
-            //   if (player.id == NetworkManager.Instance.PlayerId)
-            //     continue;
+         //   if (player.id == NetworkManager.Instance.PlayerId)
+           //     continue;
 
             GameObject buttonObj = Instantiate(playerRowPrefab, dynamicPlayerListContainer);
             buttonObj.SetActive(true);
 
-            // Asigna textos específicos por nombre
+            // Asigna textos especï¿½ficos por nombre
             foreach (var t in buttonObj.GetComponentsInChildren<TextMeshProUGUI>())
             {
-                if (t.name == "NameText") t.text = player.name;
+                if (t.name == "NameText")
+                {
+                    t.text = player.name;
+                      
+
+                    t.GetComponent<Button>().onClick.RemoveAllListeners();
+                    t.GetComponent<Button>().onClick.RemoveAllListeners();
+                    t.GetComponent<Button>().onClick.AddListener(() =>
+                        {
+                        chatDisplay.text += $"\n{CYAN_COLOR} tienes el name de {player.name} en el ClipBoard </color>";
+                        GUIUtility.systemCopyBuffer = player.name; // Copia el ID al portapapeles
+                    });
+                
+                 }
+                else if (t.name == "IdText")
+                {
+                    t.text = player.id;
+
+                    t.GetComponent<Button>().onClick.RemoveAllListeners();
+                    t.GetComponent<Button>().onClick.RemoveAllListeners();
+                    t.GetComponent<Button>().onClick.AddListener(() =>
+                        {
+                            chatDisplay.text += $"\n{CYAN_COLOR} tienes el id de {player.name} en el ClipBoard </color>";
+                            GUIUtility.systemCopyBuffer = player.id; // Copia el ID al portapapeles
+                        });
+                }
                 else if (t.name == "StatusText") t.text = player.status;
                 else if (t.name == "GameText") t.text = $"{player.game.name} - {player.game.team}";
             }
 
-            // Configura el botón correctamente
+            // Configura el boton correctamente
             var matchButton = buttonObj.transform.Find("MatchButton").GetComponent<Button>();
             matchButton.onClick.RemoveAllListeners();
             matchButton.onClick.AddListener(() =>
             {
                 NetworkManager.Instance.sendMatchRequest(player.id);
-                chatDisplay.text += $"\n<color=cyan>Solicitud enviada a {player.name}</color>";
+                chatDisplay.text += $"\n{CYAN_COLOR}Solicitud enviada a {player.name}</color>";
             });
+
+             
             matchButton.interactable = (player.status == "AVAILABLE");
 
-            var messageButton = buttonObj.transform.Find("PMButton")?.GetComponent<Button>();
-            if (messageButton != null)
-            {
-                messageButton.onClick.RemoveAllListeners();
-                messageButton.onClick.AddListener(() =>
-                {
-                    // Dispara el evento para mostrar el panel
-                    MultiplayerGameEvents.triggerShowPrivateMessagePanel(player.id, player.name);
-                });
-
-                Debug.Log($"Agregado: {player.name} - {player.status}");
-            }
-
+            Debug.Log($"Agregado: {player.name} - {player.status}");
         }
-
     }
 
     private void requestOnlinePlayers()
     {
         NetworkManager.Instance.requestOnlinePlayers();
-        chatDisplay.text += "\n<color=gray>Solicitando jugadores online...</color>";
+        chatDisplay.text += $"\n{GRAY_COLOR}Solicitando jugadores online...</color>";
     }
 
     private void handleOnlinePlayersReceived(List<ConnectionData> players)
     {
 
 
-        playerList.text = "Jugadores en línea:\n";
+        playerList.text = "Jugadores en linea:\n";
 
         foreach (var p in players)
         {
@@ -314,7 +321,7 @@ public class LobbyUIManager : MonoBehaviour
         this.playerId = playerId;
 
         // Mostrar el mensaje en la UI
-        matchInfoText.text = $"Solicitud de partida recibida de {playerId}. ¿Aceptar?";
+        matchInfoText.text = $"Invitacion de \n{playerId}";
 
         // Activar la ventana
         matchRequestPanel.SetActive(true);
@@ -324,7 +331,7 @@ public class LobbyUIManager : MonoBehaviour
     {
         // El jugador ha aceptado la solicitud, actualizamos la UI
         Debug.Log($"Jugador ha aceptado la solicitud para el Match {matchId}");
-        chatDisplay.text += $"\n<color=green>Has aceptado la solicitud para el Match {matchId}</color>";
+        chatDisplay.text += $"\n{GREEN_COLOR} Has aceptado la solicitud para el Match {matchId}</color>";
     }
 
     private void HandleMatchReject(string matchId)
@@ -333,7 +340,7 @@ public class LobbyUIManager : MonoBehaviour
 
         // Eliminar la ventana de solicitud
         Debug.Log($"La solicitud de partida {matchId} ha sido rechazada.");
-        chatDisplay.text += $"\n<color=red>La solicitud de partida {matchId} ha sido rechazada.</color>";
+        chatDisplay.text += $"\n{RED_COLOR} La solicitud de partida {matchId} ha sido rechazada.</color>";
         //RemoveMatchRequestWindow(matchId);
     }
 
@@ -341,15 +348,15 @@ public class LobbyUIManager : MonoBehaviour
     {
         // El servidor ha aceptado la solicitud, actualizamos la UI
 
-        Debug.Log($"[LobbyUIManager] ¡Partida aceptada por el oponente! ID de partida: {matchId}, Estado: {matchStatus}");
-        chatDisplay.text += $"\n<color=green>¡Tu solicitud de partida ha sido ACEPTADA! ID de partida: {matchId}. Estado: {matchStatus}</color>";
+        Debug.Log($"[LobbyUIManager] Partida aceptada por el oponente! ID de partida: {matchId}, Estado: {matchStatus}");
+        chatDisplay.text += $"\n{GREEN_COLOR} Tu solicitud de partida ha sido ACEPTADA! ID de partida: {matchId}. Estado: {matchStatus}</color>";
         this.matchId = matchId; // Guarda el ID de la partida
         NetworkManager.Instance.sendConnectMatchRequest();
     }
 
     public static void triggerMatchAccepted(string matchId, string matchStatus)
     {
-        //onMatchAccepted?.Invoke(matchId, matchStatus);
+    //onMatchAccepted?.Invoke(matchId, matchStatus);
     }
 
     private void OnAcceptClick()
@@ -360,29 +367,29 @@ public class LobbyUIManager : MonoBehaviour
         // Cerrar la ventana de la solicitud de partida
         matchRequestPanel.SetActive(false);
 
-        // Mostrar mensaje local en la UI (el mensaje del servidor llegará después)
-        chatDisplay.text += $"\n<color=cyan>Procesando aceptación de partida...</color>";
+        // Mostrar mensaje local en la UI (el mensaje del servidor llegarï¿½ despuï¿½s)
+        chatDisplay.text += $"\n{CYAN_COLOR} Procesando aceptacion de partida...</color>";
 
         StartCoroutine(ConnectToMatchAfterDelay());
     }
 
     private System.Collections.IEnumerator ConnectToMatchAfterDelay()
     {
-        // Esperar un poco para que se procese la aceptación
+        // Esperar un poco para que se procese la aceptaciï¿½n
         yield return new WaitForSeconds(1f);
         NetworkManager.Instance.sendConnectMatchRequest();
     }
 
     private void OnRejectClick()
     {
-        // Llamar a la función del NetworkManager para enviar el mensaje de rechazo
+        // Llamar a la funciï¿½n del NetworkManager para enviar el mensaje de rechazo
         NetworkManager.Instance.sendRejectMatchRequest(matchId);
 
         // Cerrar la ventana de la solicitud de partida
         matchRequestPanel.SetActive(false);
 
         // Mostrar un mensaje local en la UI
-        chatDisplay.text += $"\n<color=red>Has rechazado la solicitud de partida {matchId}.</color>";
+        chatDisplay.text += $"\n{RED_COLOR} Has rechazado la solicitud de partida {matchId}.</color>";
     }
 
 
@@ -390,64 +397,64 @@ public class LobbyUIManager : MonoBehaviour
     private void HandleMatchRejected(string playerId)
     {
         // Mostrar el mensaje en la UI del jugador que hizo la solicitud
-        chatDisplay.text += $"\n<color=red>El jugador '{playerId}' ha rechazado tu solicitud de partida.</color>";
+        chatDisplay.text += $"\n{RED_COLOR} El jugador '{playerId}' ha rechazado tu solicitud de partida.</color>";
     }
 
     private void HandleMatchRejectionReceived(string playerId, string message)
     {
         Debug.Log($"Match rejection received: {message}");
-        chatDisplay.text += $"\n<color=orange>{message}</color>";
+        chatDisplay.text += $"\n{ORANGE_COLOR} {message}</color>";
     }
 
     private void HandleMatchAcceptanceSent()
     {
         Debug.Log("Match acceptance sent to server");
-        chatDisplay.text += $"\n<color=cyan>Enviando aceptación de partida...</color>";
+        chatDisplay.text += $"\n{CYAN_COLOR}Enviando aceptaciÃ³n de partida...</color>";
     }
 
     private void HandleMatchAcceptanceError(string message, string playerStatus)
     {
         Debug.Log($"Match acceptance error: {message}, Player status: {playerStatus}");
-        chatDisplay.text += $"\n<color=red>Error: {message}</color>";
+        chatDisplay.text += $"\n{RED_COLOR}Error: {message}</color>";
 
     }
 
     private void HandleMatchAcceptanceSuccess(string message)
     {
         Debug.Log($"Match acceptance success: {message}");
-        chatDisplay.text += $"\n<color=green>¡Partida aceptada exitosamente! {message}</color>";
+        chatDisplay.text += $"\n{GREEN_COLOR}Â¡Partida aceptada exitosamente! {message}</color>";
     }
 
     private void HandleConnectMatchSent()
     {
         Debug.Log("Connect match request sent to server");
-        chatDisplay.text += $"\n<color=cyan>Conectando a la partida...</color>";
+        chatDisplay.text += $"\n{CYAN_COLOR}Conectando a la partida...</color>";
     }
 
     private void HandleConnectMatchSuccess(string matchId, string message)
     {
         Debug.Log($"Connect match success: {message}, Match ID: {matchId}");
-        chatDisplay.text += $"\n<color=green>¡Conectado a la partida exitosamente!</color>";
-        chatDisplay.text += $"\n<color=green>Match ID: {matchId}</color>";
-        chatDisplay.text += $"\n<color=yellow>{message}</color>";
+        chatDisplay.text += $"\n{GREEN_COLOR}Â¡Conectado a la partida exitosamente!</color>";
+        chatDisplay.text += $"\n{GREEN_COLOR}Match ID: {matchId}</color>";
+        chatDisplay.text += $"\n{YELLOW_COLOR}{message}</color>";
     }
 
     private void HandleConnectMatchError(string errorMessage)
     {
         Debug.Log($"Connect match error: {errorMessage}");
-        chatDisplay.text += $"\n<color=red>Error al conectar a la partida: {errorMessage}</color>";
+        chatDisplay.text += $"\n{RED_COLOR}Error al conectar a la partida: {errorMessage}</color>";
     }
 
     private void HandlePingMatchSent()
     {
-        chatDisplay.text += "\n<color=yellow>Enviando ping de sincronización...</color>";
+        chatDisplay.text += $"\n{YELLOW_COLOR}Enviando ping de sincronizaciÃ³n...</color>";
     }
 
     private void HandlePingMatchSuccess(string matchId, string message)
     {
-        chatDisplay.text += $"\n<color=green>Sincronización de partida exitosa! Match ID: {matchId}. Mensaje: {message}</color>";
-        // Una vez que el ping es exitoso, podrías iniciar la cuenta atrás o la carga de la escena del juego
-        // También podrías ocultar el panel de "players-ready" si aún está visible
+        chatDisplay.text += $"\n{GREEN_COLOR}SincronizaciÃ³n de partida exitosa! Match ID: {matchId}. Mensaje: {message}</color>";
+        // Una vez que el ping es exitoso, podrï¿½as iniciar la cuenta atrï¿½s o la carga de la escena del juego
+        // Tambiï¿½n podrï¿½as ocultar el panel de "players-ready" si aï¿½n estï¿½ visible
         if (playersReadyPanel != null && playersReadyPanel.activeSelf)
         {
             playersReadyPanel.SetActive(false);
@@ -456,14 +463,14 @@ public class LobbyUIManager : MonoBehaviour
 
     public void EnablePingButton(string matchId)
     {
-        // Aquí habilitas el botón y cambias su texto si es necesario
+        // Aquï¿½ habilitas el botï¿½n y cambias su texto si es necesario
         pingButton.gameObject.SetActive(true);
         pingButton.GetComponentInChildren<TextMeshProUGUI>().text = "Enviar Ping";  // Cambia el texto si es necesario
     }
 
     private void OnPingButtonClicked()
     {
-        // Asegúrate de tener el matchId disponible aquí. Podrías guardarlo cuando recibes 'match-accepted'
+        // Asegï¿½rate de tener el matchId disponible aquï¿½. Podrï¿½as guardarlo cuando recibes 'match-accepted'
         // o 'players-ready'. Por ejemplo:
 
         NetworkManager.Instance.sendPingMatchRequest();
@@ -473,16 +480,16 @@ public class LobbyUIManager : MonoBehaviour
     private void HandlePingMatchError(string errorMessage)
     {
         Debug.Log($"Ping match error: {errorMessage}");
-        chatDisplay.text += $"\n<color=red>Error al enviar ping: {errorMessage}</color>";
+        chatDisplay.text += $"\n{RED_COLOR}Error al enviar ping: {errorMessage}</color>";
     }
 
     private void HandlePlayersReadyResponse(string matchId)
     {
-        // Habilitar el botón PingMatch
+        // Habilitar el botï¿½n PingMatch
         EnablePingButton(matchId);
 
-        // Mostrar un mensaje en el chat que ambos jugadores están listos
-        chatDisplay.text += "\n<color=green>Ambos jugadores están listos para comenzar la partida.</color>";
+        // Mostrar un mensaje en el chat que ambos jugadores estï¿½n listos
+        chatDisplay.text += $"\n{GREEN_COLOR}Ambos jugadores estÃ¡n listos para comenzar la partida.</color>";
     }
 
     private void HandlePlayersReady(string matchId, string message)
@@ -495,34 +502,34 @@ public class LobbyUIManager : MonoBehaviour
             playersReadyPanel.SetActive(true);
             if (playersReadyInfoText != null)
             {
-                playersReadyInfoText.text = $"Jugadores listos!, clickea cuando quieras";
+                playersReadyInfoText.text = $"Jugadores listos!";
             }
         }
         else
         {
-            Debug.LogWarning("[LobbyUIManager] playersReadyPanel no está asignado en el Inspector.");
-            chatDisplay.text += $"\n<color=orange>¡Jugadores Listos para empezar! ID: {matchId}. Mensaje: {message}</color>";
+            Debug.LogWarning("[LobbyUIManager] playersReadyPanel no esta asignado en el Inspector.");
+            chatDisplay.text += $"\n{ORANGE_COLOR}Â¡Jugadores Listos para empezar! ID: {matchId}. Mensaje: {message}</color>";
         }
 
-        // Aquí podrías añadir un botón en tu UI para que el jugador haga click y se envíe el "ping-match"
-        // o enviarlo automáticamente si ese es el comportamiento deseado.
-        // Si lo envías automáticamente, asegúrate de que el NetworkManager ya lo hace al recibir 'players-ready'.
-        // Si quieres un botón en la UI, configura su listener para llamar a NetworkManager.Instance.sendPingMatchRequest(matchId);
+        // Aquï¿½ podrï¿½as aï¿½adir un botï¿½n en tu UI para que el jugador haga click y se envï¿½e el "ping-match"
+        // o enviarlo automï¿½ticamente si ese es el comportamiento deseado.
+        // Si lo envï¿½as automï¿½ticamente, asegï¿½rate de que el NetworkManager ya lo hace al recibir 'players-ready'.
+        // Si quieres un botï¿½n en la UI, configura su listener para llamar a NetworkManager.Instance.sendPingMatchRequest(matchId);
     }
 
     private void HandleMatchStartEvent(string matchId, string message)
     {
-        Debug.Log($"[LobbyUIManager] ¡Partida lista para iniciar! Cargando escena de juego. Match ID: {matchId}");
-        chatDisplay.text += $"\n<color=cyan>¡LA PARTIDA VA A COMENZAR! ID: {matchId}. {message}</color>";
+        Debug.Log($"[LobbyUIManager] Partida lista para iniciar! Cargando escena de juego. Match ID: {matchId}");
+        chatDisplay.text += $"\n{CYAN_COLOR} LA PARTIDA VA A COMENZAR! ID: {matchId}. {message}</color>";
 
         // Llama a GameManager para cambiar la escena
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.loadScene("GameScene"); // Llama a tu método para cargar la escena
+            GameManager.Instance.loadScene("GameScene"); // Llama a tu mï¿½todo para cargar la escena
         }
         else
         {
-            Debug.LogError("[LobbyUIManager] GameManager.Instance no está disponible. No se puede cargar la escena.");
+            Debug.LogError("[LobbyUIManager] GameManager.Instance no estï¿½ disponible. No se puede cargar la escena.");
         }
 
         // Opcional: Oculta cualquier UI del lobby/pre-partida
@@ -530,25 +537,25 @@ public class LobbyUIManager : MonoBehaviour
         {
             playersReadyPanel.SetActive(false);
         }
-        // Puedes también desactivar todo el LobbyUIManager si no lo necesitas en la nueva escena
+        // Puedes tambiï¿½n desactivar todo el LobbyUIManager si no lo necesitas en la nueva escena
         // gameObject.SetActive(false);
     }
 
     private void HandleFinishGameSent()
     {
-        chatDisplay.text += "\n<color=yellow>Enviando solicitud de fin de partida...</color>";
+        chatDisplay.text += $"\n{YELLOW_COLOR}Enviando solicitud de fin de partida...</color>";
     }
 
     private void HandleFinishGameSuccess(string matchId, string message)
     {
-        Debug.Log($"[LobbyUIManager] ¡Partida Finalizada! ID: {matchId}, Mensaje: {message}");
-        chatDisplay.text += $"\n<color=purple>¡PARTIDA TERMINADA! ID: {matchId}. {message}</color>";
+        Debug.Log($"[LobbyUIManager] ï¿½Partida Finalizada! ID: {matchId}, Mensaje: {message}");
+        chatDisplay.text += $"\n{PURPLE_COLOR}Â¡PARTIDA TERMINADA! ID: {matchId}. {message}</color>";
 
-        // Aquí puedes:
+        // Aquï¿½ puedes:
         // 1. Mostrar una pantalla de "Game Over" o "Resultados".
         // 2. Mostrar el ganador (si los datos del evento lo incluyen).
         // 3. Ofrecer opciones para volver al lobby, jugar de nuevo, etc.
-        // 4. Volver al lobby automáticamente:
+        // 4. Volver al lobby automï¿½ticamente:
         // if (GameManager.Instance != null)
 
         //     GameManager.Instance.loadScene("LobbySceneName"); // Reemplaza con el nombre de tu escena de lobby
@@ -558,23 +565,23 @@ public class LobbyUIManager : MonoBehaviour
     private void HandleFinishGameError(string message)
     {
         Debug.LogError($"[LobbyUIManager] Error al finalizar la partida: {message}");
-        chatDisplay.text += $"\n<color=red>Error al finalizar la partida: {message}</color>";
+        chatDisplay.text += $"\n{RED_COLOR} Error al finalizar la partida: {message}</color>";
     }
 
-    // Manejador cuando se envía la solicitud de quit-match
+    // Manejador cuando se envï¿½a la solicitud de quit-match
     private void HandleQuitMatchSent()
     {
-        chatDisplay.text += "\n<color=yellow>Enviando solicitud para salir de la partida...</color>";
-        // Opcional: Desactivar botón de "salir de partida" para evitar spam
+        chatDisplay.text += $"\n{YELLOW_COLOR}Enviando solicitud para salir de la partida...</color>";
+        // Opcional: Desactivar botï¿½n de "salir de partida" para evitar spam
     }
 
     // Manejador cuando el servidor confirma que has salido de la partida
     private void HandleQuitMatchSuccess(string playerStatus, string message)
     {
         Debug.Log($"[LobbyUIManager] Has salido de la partida. Estado: {playerStatus}. Mensaje: {message}");
-        chatDisplay.text += $"\n<color=blue>Has salido de la partida: {message}</color>";
+        chatDisplay.text += $"\n{BLUE_COLOR}Has salido de la partida: {message}</color>";
 
-        // Aquí es donde típicamente regresarías al lobby o a la pantalla principal
+        // Aquï¿½ es donde tï¿½picamente regresarï¿½as al lobby o a la pantalla principal
         if (GameManager.Instance != null)
         {
             // Asume que "LobbyScene" es el nombre de tu escena de lobby
@@ -594,43 +601,7 @@ public class LobbyUIManager : MonoBehaviour
     private void HandleQuitMatchError(string message)
     {
         Debug.LogError($"[LobbyUIManager] Error al salir de la partida: {message}");
-        chatDisplay.text += $"\n<color=red>Error al salir de la partida: {message}</color>";
-    }
-
-    private void HandleShowPrivateMessagePanel(string recipientId, string recipientName)
-    {
-        // Guarda los datos del destinatario
-        privateMessageRecipientId = recipientId;
-
-        // Actualiza la UI del panel
-        privateMessageRecipientText.text = $"Mensaje para: <color=yellow>{recipientName}</color>";
-        privateMessageInput.text = ""; // Limpia el texto anterior
-
-        // Muestra el panel
-        PrivateMessagePanel.SetActive(true);
-        privateMessageInput.Select(); // Pone el foco en el campo de texto
-        privateMessageInput.ActivateInputField();
-    }
-
-    private void SendPrivateMessage()
-    {
-        string message = privateMessageInput.text;
-
-        // Valida que el mensaje y el destinatario no estén vacíos
-        if (!string.IsNullOrEmpty(message) && !string.IsNullOrEmpty(privateMessageRecipientId))
-        {
-            // Usa el NetworkManager para enviar el mensaje
-            NetworkManager.Instance.sendPrivateMessage(privateMessageRecipientId, message);
-
-            // Opcional: Muestra tu propio mensaje en el chat localmente
-            privateMessageRecipientText.text += $"\n<color=#4CAF50>Tú (a {privateMessageRecipientId})</color>: {message}";
-
-        }
-    }
-
-    private void ClosePrivateMessagePanel()
-    {
-        PrivateMessagePanel.SetActive(false);
+        chatDisplay.text += $"\n{RED_COLOR}Error al salir de la partida: {message}</color>";
     }
 
     private void OnDestroy()
@@ -675,8 +646,13 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onQuitMatchSuccess -= HandleQuitMatchSuccess;
         MultiplayerGameEvents.onQuitMatchError -= HandleQuitMatchError;
 
-        MultiplayerGameEvents.onShowPrivateMessagePanel -= HandleShowPrivateMessagePanel;
+        // Remueve el listener del botï¿½n de ping
+        if (pingButton != null)
+        {
+            pingButton.onClick.RemoveListener(OnPingButtonClicked);
+        }
     }
+
 
 
 }
