@@ -20,7 +20,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a73d1a1aa0a9d274180ed0072f9b17b6, type: 2}
   - {fileID: 11400000, guid: e98e6910e49f3d643add53ff05dc4d16, type: 2}
   - {fileID: 11400000, guid: 2c37a8407e66683408622cf8ad5a383c, type: 2}
-  - {fileID: 11400000, guid: 6a47f0090df4e5741870df14232500b5, type: 2}
   maxSnacks: 5
   maxScale: 1
   leaveDurationSpeedFactor: 0.5

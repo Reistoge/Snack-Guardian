@@ -9,12 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c821689a7deb8946905e5f78c12d312, type: 3}
-  m_Name: SpawnerConfig5Bump
+  m_Script: {fileID: 11500000, guid: f8a2031f525378c428418e0f330338cc, type: 3}
+  m_Name: starsParticles
   m_EditorClassIdentifier: 
-  snackConfigs: []
-  maxSnacks: 6
-  maxScale: 1
-  leaveDurationSpeedFactor: 0.5
-  spawnDelay: 3
-  spawnChance: 0.5
+  type: 2
+  amount: 0
+  effectColor: {r: 1, g: 1, b: 1, a: 1}
+  effectParticles: {fileID: 6144018296819444211, guid: dea4ed75a539abd46891e239827901c3, type: 3}

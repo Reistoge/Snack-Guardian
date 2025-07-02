@@ -7,8 +7,17 @@ public class PlayerInteract : MonoBehaviour, IInteractor
 {
     [SerializeField] Player player;
     [SerializeField] LayerMask EnemyLayerInteract;
-
     
+    private ParticleSystem playerBumpParticles;
+    [SerializeField] ObjectEffect bumpEffect;
+
+    void Start()
+    {
+
+        playerBumpParticles = Instantiate(bumpEffect.effectParticles).GetComponent<ParticleSystem>();
+        
+         
+    }
     public void interactionWithSnack(ObjectEffect effect)
     {
 
@@ -16,6 +25,10 @@ public class PlayerInteract : MonoBehaviour, IInteractor
         if (!player.isDashing() && effect.type == EffectType.Nothing)
         {
             player.bump();
+
+            playerBumpParticles.transform.position = player.transform.position;
+            playerBumpParticles.Play();
+             
             GameEvents.triggerSnackCaptured(false);
             StartCoroutine(stopTime(0.1f));
 
