@@ -40,6 +40,7 @@ public static class MultiplayerGameEvents
     public static event Action<string, string> onMatchAcceptanceError; // (message, playerStatus)
     public static event Action<string> onMatchAcceptanceSuccess; // (message)
 
+    public static event Action<string, string> onChatPrivateMessageReceived;
     // Evento cuando el servidor rechaza la solicitud
     //recibir match
     public static event Action onConnectMatchSent;
@@ -61,12 +62,16 @@ public static class MultiplayerGameEvents
     public static event Action<string, string> onQuitMatchSuccess; // (playerStatus, message)
     public static event Action<string> onQuitMatchError; // (message)
 
+    public static event Action<string, string> onShowPrivateMessagePanel;
+
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
     public static void triggerConnectionError(string error) => onConnectionError?.Invoke(error);
     public static void  triggerPlayerConnected(string id) => onPlayerConnected?.Invoke(id);
     public static void triggerPlayerDisconnected(string id) => onPlayerDisconnected?.Invoke(id);
     public static void triggerChatMessageReceived(string id, string msg) => onChatMessageReceived?.Invoke(id, msg);
+
+    public static void triggerPrivateChatMessageReceived(string id, string msg) => onChatPrivateMessageReceived?.Invoke(id, msg);
     public static void triggerGameStarted() => onGameStarted?.Invoke();
     public static void triggerPlayerReadyStateChanged(string playerId, bool isReady)
     {
@@ -208,4 +213,10 @@ public static class MultiplayerGameEvents
     {
         onQuitMatchError?.Invoke(message);
     }
+
+    public static void triggerShowPrivateMessagePanel(string playerId, string playerName)
+    {
+        onShowPrivateMessagePanel?.Invoke(playerId, playerName);
+    }
+
 }

@@ -30,6 +30,13 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private GameObject playersReadyPanel; // �Arrastra tu panel desde el Inspector de Unity!
     [SerializeField] private TextMeshProUGUI playersReadyInfoText; // Para mostrar el mensaje "Both players are ready..."
     [SerializeField] private TextMeshProUGUI playerIdText;
+    [SerializeField] private TextMeshProUGUI privateChatDisplay;
+    [SerializeField] private GameObject PrivateMessagePanel;
+
+    [SerializeField] private TextMeshProUGUI privateMessageRecipientText; // El texto "Enviando a..."
+    [SerializeField] private TMP_InputField privateMessageInput; // El campo para escribir
+    [SerializeField] private Button sendPrivateMessageButton; // El botón "Enviar"
+    [SerializeField] private Button closePrivateMessagePanelButton; // El botón "Cerrar"
 
     const string CYAN_COLOR = "<color=#00FFFF>";
     const string GREEN_COLOR = "<color=#008000>";
@@ -42,6 +49,7 @@ public class LobbyUIManager : MonoBehaviour
     
     private string matchId;
     private string playerId;
+    private string privateMessageRecipientId;
 
     private bool isReady = false;
     private List<string> connectedPlayers = new List<string>();
@@ -74,6 +82,7 @@ public class LobbyUIManager : MonoBehaviour
         // Subscribe to all events
         MultiplayerGameEvents.onConnectedToServer += handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived += handleChatMessage;
+        MultiplayerGameEvents.onChatPrivateMessageReceived += handlePrivateChatMessage;
         MultiplayerGameEvents.onPlayerConnected += handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected += handlePlayerDisconnected;
         MultiplayerGameEvents.onPlayersListCleared += handlePlayersListCleared;
@@ -124,6 +133,16 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onQuitMatchSent += HandleQuitMatchSent;
         MultiplayerGameEvents.onQuitMatchSuccess += HandleQuitMatchSuccess;
         MultiplayerGameEvents.onQuitMatchError += HandleQuitMatchError;
+
+
+        MultiplayerGameEvents.onShowPrivateMessagePanel += HandleShowPrivateMessagePanel;
+
+        // Listeners para el panel de mensaje privado
+        sendPrivateMessageButton.onClick.AddListener(SendPrivateMessage);
+        closePrivateMessagePanelButton.onClick.AddListener(ClosePrivateMessagePanel);
+
+        // Asegurarse de que el panel está cerrado al inicio
+
 
         // Configura los botones y los listeners
         acceptButton.onClick.AddListener(OnAcceptClick);
@@ -190,7 +209,30 @@ public class LobbyUIManager : MonoBehaviour
   
     }
 
+    private void handlePrivateChatMessage(string playerId, string message)
+    {
+        Debug.Log($"Handling chat message: {playerId}: {message}");
 
+        if (!this || !privateChatDisplay) return;
+
+        // Check if it's your own message by comparing with your player name or ID
+        string displayName;
+        if (playerId == NetworkManager.Instance.PlayerName || playerId == NetworkManager.Instance.PlayerId)
+        {
+            displayName = $"{GREEN_COLOR}{NetworkManager.Instance.PlayerName}You</color>";
+        }
+        else
+        {
+            displayName = $"{BLUE_COLOR}{playerId}</color>";
+        }
+
+        string formattedMessage = $"\n{displayName}: {message}";
+        privateChatDisplay.text += formattedMessage;
+
+        // Force UI update and scroll
+        Canvas.ForceUpdateCanvases();
+
+    }
     private void handlePlayersListCleared()
     {
         connectedPlayers.Clear();
@@ -199,7 +241,7 @@ public class LobbyUIManager : MonoBehaviour
 
     private void handleConnectedToServer()
     {
-        chatDisplay.text = "Connected to chat room";
+        chatDisplay.text = "Conn    ected to chat room";
         connectedPlayers.Clear();
         updatePlayerList();
         NetworkManager.Instance.getConnectedPlayers(); // Request player list after connection
@@ -290,7 +332,16 @@ public class LobbyUIManager : MonoBehaviour
                 chatDisplay.text += $"\n{CYAN_COLOR}Solicitud enviada a {player.name}</color>";
             });
 
-             
+            var messageButton = buttonObj.transform.Find("PMButton")?.GetComponent<Button>();
+            if (messageButton != null)
+            {
+                messageButton.onClick.RemoveAllListeners();
+                messageButton.onClick.AddListener(() =>
+                {
+                    // Dispara el evento para mostrar el panel
+                    MultiplayerGameEvents.triggerShowPrivateMessagePanel(player.id, player.name);
+                });
+            }
             matchButton.interactable = (player.status == "AVAILABLE");
 
             Debug.Log($"Agregado: {player.name} - {player.status}");
@@ -604,11 +655,49 @@ public class LobbyUIManager : MonoBehaviour
         chatDisplay.text += $"\n{RED_COLOR}Error al salir de la partida: {message}</color>";
     }
 
+    private void HandleShowPrivateMessagePanel(string recipientId, string recipientName)
+    {
+        // Guarda los datos del destinatario
+        privateMessageRecipientId = recipientId;
+        
+        // Actualiza la UI del panel
+        privateMessageRecipientText.text = $"Mensaje para: <color=yellow>{recipientName}</color>";
+        privateMessageInput.text = ""; // Limpia el texto anterior
+
+        // Muestra el panel
+        PrivateMessagePanel.SetActive(true);
+        privateMessageInput.Select(); // Pone el foco en el campo de texto
+        privateMessageInput.ActivateInputField();
+    }
+
+    private void SendPrivateMessage()
+    {
+        string message = privateMessageInput.text;
+
+        // Valida que el mensaje y el destinatario no estén vacíos
+        if (!string.IsNullOrEmpty(message) && !string.IsNullOrEmpty(privateMessageRecipientId))
+        {
+            // Usa el NetworkManager para enviar el mensaje
+            NetworkManager.Instance.sendPrivateMessage(privateMessageRecipientId, message);
+
+            // Opcional: Muestra tu propio mensaje en el chat localmente
+            privateChatDisplay.text += $"\n<color=#4CAF50>Tú (a {privateMessageRecipientId})</color>: {message}";
+
+
+        }
+    }
+
+    private void ClosePrivateMessagePanel()
+    {
+        PrivateMessagePanel.SetActive(false);
+    }
+
     private void OnDestroy()
     {
         // Unsubscribe from all events
         MultiplayerGameEvents.onConnectedToServer -= handleConnectedToServer;
         MultiplayerGameEvents.onChatMessageReceived -= handleChatMessage;
+        MultiplayerGameEvents.onChatPrivateMessageReceived -= handlePrivateChatMessage;
         MultiplayerGameEvents.onPlayerConnected -= handlePlayerConnected;
         MultiplayerGameEvents.onPlayerDisconnected -= handlePlayerDisconnected;
         MultiplayerGameEvents.onPlayersListCleared -= handlePlayersListCleared;
@@ -645,7 +734,7 @@ public class LobbyUIManager : MonoBehaviour
         MultiplayerGameEvents.onQuitMatchSent -= HandleQuitMatchSent;
         MultiplayerGameEvents.onQuitMatchSuccess -= HandleQuitMatchSuccess;
         MultiplayerGameEvents.onQuitMatchError -= HandleQuitMatchError;
-
+        MultiplayerGameEvents.onShowPrivateMessagePanel -= HandleShowPrivateMessagePanel;
         // Remueve el listener del bot�n de ping
         if (pingButton != null)
         {
