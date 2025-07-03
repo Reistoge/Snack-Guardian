@@ -1358,7 +1358,7 @@ public class PlayersReadyData
     public string matchId;
 }
 
-[Serializable]
+[Serializable]  
 public class PlayersReadyEvent
 {
     public string @event;
