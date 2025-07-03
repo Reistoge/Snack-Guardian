@@ -18,17 +18,10 @@ public class AudioManager : GenericSingleton<AudioManager>
     {
         GameManager.OnGameSceneLoaded += playGamePlayMusic;
         GameEvents.onGameOver += playGameOverMusic;
-        
-
     }
-    
-
     private void playGameOverMusic()
     {
-
-
         playSFX(snackGuardianMusic.GameOverMusic);
-
     }
 
     private void playGamePlayMusic()
