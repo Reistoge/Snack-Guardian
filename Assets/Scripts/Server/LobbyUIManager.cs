@@ -580,6 +580,9 @@ public class LobbyUIManager : MonoBehaviour
         }
         else
         {
+
+        }
+        {
             Debug.LogError("[LobbyUIManager] GameManager.Instance no est� disponible. No se puede cargar la escena.");
         }
 
