@@ -17,6 +17,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
     Coroutine leavingSpiralTrayRoutine;
     [SerializeField] float initScale = 0.5f;
     [SerializeField] float leaveDuration = 1f;
+    GameObject particles;
 
     public bool Landed { get => landed; set => landed = value; }
 
@@ -88,14 +89,18 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
     public void destroySnack()
     {
-        detroyParticles();
+        destructionParticles();
         stopLeavingSpiralTrayCorutine();
         StartCoroutine(destroyObjectCorutine());
     }
 
-    private void detroyParticles()
+    private void destructionParticles()
     {
-        Instantiate(snackConfig.destroyParticlesPrefab, transform.position, Quaternion.identity);
+        particles = Instantiate(snackConfig.destroyParticlesPrefab, transform.position, Quaternion.identity);
+    }
+    public void destroyParticles()
+    {
+        Destroy(particles);
     }
 
     IEnumerator startLeavingSpiralTrayCorutine()
@@ -113,6 +118,7 @@ public class Snack : MonoBehaviour, IInteractable, IInteractor
 
         animatorHandler.playDestroyAnimation();
         yield return new WaitUntil(() => animatorHandler.getReadyToDestroy());
+        destroyParticles();
         Destroy(gameObject);
     }
 

@@ -13,7 +13,9 @@ public class SnackConfig : ScriptableObject
     public GameObject destroyParticlesPrefab;
     public Sprite icon;
     public bool destroyOnFall = false;
+
     public bool isRock = false;
+    public GameObject alertPrefab;
 
    
     

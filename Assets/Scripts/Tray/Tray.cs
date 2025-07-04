@@ -13,7 +13,9 @@ public class Tray : MonoBehaviour, ITray
     Coroutine waitForSnack;
     [SerializeField] string id;
     bool platformDestroyedOnStart = false;
+     
     TrayConfig trayConfig;
+    LeaveAlert leaveAlert;
 
     void OnEnable()
     {
@@ -30,6 +32,8 @@ public class Tray : MonoBehaviour, ITray
 
         initializePlatform();
         initializeSnackSpawner();
+        
+        
     }
     public int getEmptyCount()
     {
@@ -40,7 +44,7 @@ public class Tray : MonoBehaviour, ITray
         }
         return snackSpawnerLoaded.getEmptyCount();
     }
- 
+
 
     // void Start()
     // {
@@ -60,8 +64,13 @@ public class Tray : MonoBehaviour, ITray
             Debug.LogError($"SnackSpawner not initialized for tray {id}");
             return null;
         }
+        Snack snack = snackSpawnerLoaded.addRockSnack(trayConfig.rockConfig, true);
 
-        return snackSpawnerLoaded.addRockSnack(trayConfig.rockConfig, true);
+        // leaveAlert.playAlert();
+
+        // waitForSnackToLeave(snack);
+
+        return snack;
     }
     public void fillTray()
     {
@@ -97,7 +106,7 @@ public class Tray : MonoBehaviour, ITray
         snackSpawnerLoaded = Instantiate(trayConfig.spawnerPrefabTemplate, transform);
         snackSpawnerLoaded.initialize(trayConfig.spawnerConfigs[Random.Range(0, trayConfig.spawnerConfigs.Length)]);
         snackSpawnerLoaded.transform.SetParent(platformLoaded.getPlatformAnimHandler().transform);
-
+        
         //Debug.Log($"SnackSpawner initialized for tray {id}");
     }
 
@@ -109,7 +118,27 @@ public class Tray : MonoBehaviour, ITray
 
     // }
 
+    public void initializeAlert()
+    {
+        leaveAlert = Instantiate(snackSpawnerLoaded.AlertPrefab,transform).GetComponent<LeaveAlert>();
 
+    }
+
+    public void startAlert()
+    {
+        if (leaveAlert==null)
+        {
+            initializeAlert();
+        }
+        leaveAlert.playAlert();
+    }
+    public void stopAlert()
+    {
+        if (leaveAlert)
+        {
+            leaveAlert.stopAlert();
+        }
+    }
     private void initializePlatform()
     {
         platformLoaded = Instantiate(trayConfig.platformPrefabTemplate, transform);
@@ -154,6 +183,7 @@ public class Tray : MonoBehaviour, ITray
     {
         //yield return new WaitForSeconds(snack.getLeaveDuration());
         yield return new WaitUntil(() => snack.isReadyToFall());
+        stopAlert();
         waitForSnack = null;
 
 
@@ -177,6 +207,7 @@ public class Tray : MonoBehaviour, ITray
             if (snack != null)
             {
                 //snack.startLeavingSpiralTray();
+                startAlert();
                 waitForSnackToLeave(snack);
                 //Debug.Log("Snack releasing from tray: " + id);
             }

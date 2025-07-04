@@ -12,6 +12,7 @@ public class TrayConfig : ScriptableObject
     public  SnackConfig rockConfig;
     public float chanceToReleaseRandomSnack = 0.5f; // 50% chance to release a random snack.
     public float platformShouldBreakOnStartChance = 0.5f; // 50% chance to be broken.
+    public GameObject alertPrefab;
 
 
 }

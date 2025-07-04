@@ -19,3 +19,4 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 7ae808b6e02078b4d817ab9bae1d0d2e, type: 3}
   destroyOnFall: 1
   isRock: 0
+  alertPrefab: {fileID: 6570338003009260053, guid: 9f4b7766217c3fb4b92ac2b5afc6f37a, type: 3}

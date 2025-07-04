@@ -20,8 +20,9 @@ public class SnackSpawner : MonoBehaviour
     SpawnerConfig spawnerConfig;
 
     Stack<Snack> snackStack = new Stack<Snack>();
+    GameObject alertPrefab;
 
-
+    public GameObject AlertPrefab => alertPrefab;
 
     public void initialize()
     {
@@ -52,6 +53,7 @@ public class SnackSpawner : MonoBehaviour
         spawnDelay = spawnerConfig.spawnDelay;
         spawnChance = spawnerConfig.spawnChance;
         scaleFactor = maxScale / maxSnacks;
+        
 
 
     }
@@ -62,6 +64,7 @@ public class SnackSpawner : MonoBehaviour
             spawnPoint = transform;
             loadConfig(spawnerConfig);
             fillSnacks();
+            //alertPrefab = Instantiate(snackConfigs)
             // spawnSnacks(maxSnacks, 0);
             //releaseSnackRoutine = StartCoroutine(randomLeaveSnackRoutine());
 
@@ -190,6 +193,9 @@ public class SnackSpawner : MonoBehaviour
         }
 
         SnackConfig config = snackConfigs[index];
+        if (alertPrefab != null) Destroy(alertPrefab);
+        alertPrefab = config.alertPrefab;
+
         for (int i = 0; i < amount; i++)
         {
             addSnack(index);
