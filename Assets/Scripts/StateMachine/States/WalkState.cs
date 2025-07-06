@@ -1,21 +1,31 @@
+using System.Collections;
 using UnityEngine;
 
 public class WalkState : PlayerBaseState
 {
-    public WalkState(Player player) : base(player) {
-         stateName= "Walk";
-     }
+    Coroutine coroutine;
+    public WalkState(Player player) : base(player)
+    {
+        stateName = "Walk";
+    }
 
     public override void Enter()
     {
         base.Enter();
         player.PlayerAnimation.playEnterWalk();
+
+        player.playParticle(PlayerVisualEffectHandler.ParticleType.walk);
+      
+        
     }
     public override void Exit()
     {
+        player.stopParticle(PlayerVisualEffectHandler.ParticleType.walk);
         base.Exit();
         // No specific cleanup needed
     }
+ 
+
 
     protected override void CheckTransitions()
     {
@@ -45,6 +55,6 @@ public class WalkState : PlayerBaseState
             return;
         }
 
- 
+
     }
 }

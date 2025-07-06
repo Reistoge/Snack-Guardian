@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.VFX;
 using UnityEngine.Video;
 
 public class Player : MonoBehaviour, IInteractor, IInteractable
@@ -16,11 +17,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     [SerializeField] HealthSystem healthSystem;
     [SerializeField] ObjectEffect playerEffect;
     [SerializeField] PlayerAudio playerAudio;
-    
-
-    
-
-
+    [SerializeField] PlayerVisualEffectHandler visualEffectHandler;
 
 
 
@@ -33,7 +30,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     public PlayerMovement Movement { get => movement; set => movement = value; }
     public PlayerAnimHandler PlayerAnimation { get => anim; set => anim = value; }
     public PlayerStateMachine StateMachine { get => stateMachine; set => stateMachine = value; }
-    
+
 
     private void Awake()
     {
@@ -57,7 +54,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
         //movement.stopMovement();
         //anim.playGameOverAnimation();
         stateMachine.ChangeState(new GameOverState(this));
-        
+
         //gameObject.SetActive(false);
 
     }
@@ -140,11 +137,6 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         healthSystem.setIsInvincible(isInvincible);
     }
-
-
-
-
-
     public void resetMovementStats()
     {
         // reset to the default movements stats
@@ -157,16 +149,14 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     }
     public void playDamagedAnimation()
     {
-        
+
         anim.playDamagedAnimation();
     }
     public void playDamagedAudio()
     {
-        
+
         AudioManager.Instance.playSFX(playerAudio.DamageAudio);
     }
-   
- 
     public void playDashAudio()
     {
         AudioManager.Instance.playSFX(playerAudio.DashAudio);
@@ -188,31 +178,49 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
         // here we play the audio config
         AudioManager.Instance.playSFX(audioConfig);
     }
-
- 
-   
-
-
     public void stopMovement()
     {
 
         movement.stopMovement();
     }
- 
     public bool isDashing()
     {
         // here we check if the player is dashing
         return stateMachine.CurrentState is DashState;
     }
 
+    public void playParticle(PlayerVisualEffectHandler.ParticleType type)
+    {
+        // using the PlayerVisualEffectSystem instance.
+        if (visualEffectHandler)
+        {
+            visualEffectHandler.playParticle(type);
+        }
+    }
+    public void playParticle(PlayerVisualEffectHandler.ParticleType type, Transform t)
+    {
+
+        if (visualEffectHandler)
+        {
+            visualEffectHandler.playParticle(type, t);
+        }
+    }
+    public void stopParticle(PlayerVisualEffectHandler.ParticleType type)
+    {
+        if (visualEffectHandler)
+        {
+            visualEffectHandler.stopParticle(type);
+        }
+    }
+
+
+
     #region Bump
-
-
     public void initiateBumpTimer()
     {
         bumpTimerRoutine = StartCoroutine(bumpTimer());
     }
- 
+
     public void bump()
     {
         if (bumpTimerRoutine != null)
@@ -233,7 +241,7 @@ public class Player : MonoBehaviour, IInteractor, IInteractable
     {
         return movement.moveStats.bumpEffect.impactDuration;
     }
-     
+
 
     // Add this getter method
     public bool getIsBumping()

@@ -291,7 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15284aba1740d5a4e8d170a1657dee3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snackConfig: {fileID: 11400000, guid: 2c37a8407e66683408622cf8ad5a383c, type: 2}
+  snackConfig: {fileID: 11400000, guid: ada44408cd6c03649b11c6bfb6f33be9, type: 2}
   fall: {fileID: 7930278489831744563}
   animatorHandler: {fileID: 3315465292840821790}
   catchDetector: {fileID: 4053112428503254058}

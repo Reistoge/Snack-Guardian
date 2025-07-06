@@ -10,9 +10,11 @@ public class RunState : PlayerBaseState
     {
         base.Enter();
         player.PlayerAnimation.playEnterRun();
+        player.playParticle(PlayerVisualEffectHandler.ParticleType.run);
     }
     public override void Exit()
     {
+        player.stopParticle(PlayerVisualEffectHandler.ParticleType.run);
         base.Exit();
     }
 

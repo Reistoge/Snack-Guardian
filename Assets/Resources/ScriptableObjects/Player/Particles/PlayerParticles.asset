@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99298fd4f38436640a6c10c802b66b0d, type: 3}
+  m_Name: PlayerParticles
+  m_EditorClassIdentifier: 
+  jumpParticle: {fileID: 4575320036005146182, guid: ba5fec12f54f0884eb572678bbce2869, type: 3}
+  runParticles: {fileID: 3012080815121709133, guid: 34a83c24f60e7f84ea8d29b0e066bc09, type: 3}
+  walkParticles: {fileID: 3012080815121709133, guid: 5a2faf6b89fbd2e48842cd96c7f32e70, type: 3}
+  landParticles: {fileID: 0}
+  dashParticles: {fileID: 4575320036005146182, guid: 60a25d1a986ef384eb1190b7403d87f1, type: 3}

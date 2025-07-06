@@ -13,13 +13,17 @@ public class JumpState : PlayerBaseState
     {
         base.Enter();
         player.PlayerAnimation.playEnterJump();
+        player.playParticle(PlayerVisualEffectHandler.ParticleType.jump);
+
         
          
         
         
         // player.initiateJump(1);
     }
-    public override void Exit(){
+    
+    public override void Exit()
+    {
         base.Exit();
         // player.IsJumping= false;
     }
