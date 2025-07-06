@@ -71,7 +71,7 @@ public class GameManager : GenericSingleton<GameManager>
         if (scene.name.Contains("GameScene"))
         {
             OnGameSceneLoaded?.Invoke();
-            spawnPlayer();
+            spawnPlayer();  
         }
  
     }
@@ -79,7 +79,13 @@ public class GameManager : GenericSingleton<GameManager>
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (SceneManager.GetActiveScene().name.Contains("GameScene"))
+            {
+                // GameEvents.triggerGameSceneEnded();
+                // MultiplayerGameEvents.triggerGameSceneEnded();
+            }
             loadScene("MainMenu");
+            
         }
         else if (Input.GetKeyDown(KeyCode.F1))
         {
@@ -132,7 +138,8 @@ public class GameManager : GenericSingleton<GameManager>
 
         Debug.Log($"[GameManager] Intentando cargar escena: '{sceneName}'"); // �A�ade esta l�nea!
         //SceneManager.LoadScene(sceneName);
-        StartCoroutine(playTransition(()=> SceneManager.LoadScene(sceneName)));
+        StartCoroutine(playTransition(() => SceneManager.LoadScene(sceneName)));
+        
     }
     IEnumerator playTransition(Action action)
     {

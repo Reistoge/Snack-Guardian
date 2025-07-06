@@ -31,6 +31,7 @@ public class MultiplayerPoints : MonoBehaviour
         {
             trySendAttack();
         }
+
         // if (Input.GetKeyDown(KeyCode.R))
         // {
         //     fillUp();
@@ -46,15 +47,15 @@ public class MultiplayerPoints : MonoBehaviour
         }
         if (fillLevel >= attack1Cost && fillLevel < attack2Cost)
         {
-            sendAttack(attack1Cost, AttackType.Attack1);
+            sendAttack(attack1Cost, AttackType.weak);
         }
         else if (fillLevel >= attack2Cost && fillLevel < attack3Cost)
         {
-            sendAttack(attack2Cost, AttackType.Attack2);
+            sendAttack(attack2Cost, AttackType.medium);
         }
         else if (fillLevel >= attack3Cost)
         {
-            sendAttack(attack3Cost, AttackType.Attack3);
+            sendAttack(attack3Cost, AttackType.strong);
 
         }
         
@@ -64,22 +65,22 @@ public class MultiplayerPoints : MonoBehaviour
 
     }
 
-    private void sendAttack(int attackCost)
-    {
-        fillLevel -= attackCost;
-        fillToLevel(fillLevel);
+    // private void sendAttack(int attackCost)
+    // {
+    //     fillLevel -= attackCost;
+    //     fillToLevel(fillLevel);
         
-        MultiplayerGameEvents.triggerPlayerSendAttack(attackCost.ToString());
-        print("Sending attack with fill amount: " + fillLevel);
+    //     MultiplayerGameEvents.triggerPlayerSendAttack(attackType);
+    //     print("Sending attack with fill amount: " + fillLevel);
 
         
-    }
+    // }
     private void sendAttack(int attackCost, AttackType attackType)
     {
         fillLevel -= attackCost;
         fillToLevel(fillLevel);
         
-        MultiplayerGameEvents.triggerPlayerSendAttack(attackType.ToString());
+        MultiplayerGameEvents.triggerPlayerSendAttack(attackType);
         print("Sending attack with fill amount: " + fillLevel +" and attack type: " + attackType.ToString());
 
         
@@ -114,9 +115,9 @@ public class MultiplayerPoints : MonoBehaviour
     }
     public enum AttackType
     {
-        Attack1,
-        Attack2,
-        Attack3
+        weak,
+        medium,
+        strong
     }
     public void fillPointsBar(float current, float max)
     {

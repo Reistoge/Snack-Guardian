@@ -576,7 +576,7 @@ public class LobbyUIManager : MonoBehaviour
         // Llama a GameManager para cambiar la escena
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.loadScene("GameSceneMultiplayer"); // Llama a tu m�todo para cargar la escena
+            GameManager.Instance.loadScene("GameSceneMultiplayer");
         }
         else
         {

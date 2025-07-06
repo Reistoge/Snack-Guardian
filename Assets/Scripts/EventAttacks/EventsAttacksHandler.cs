@@ -8,10 +8,22 @@ public class EventsAttacksHandler : MonoBehaviour
     [SerializeField] GameObject[] gameDebuffPrefab;
     List<GameDebuff> gameDebuffs = new List<GameDebuff>();
     [SerializeField] Queue<GameDebuff> debuffExecutionQueue = new Queue<GameDebuff>();
-  
+
     GameDebuff currentDebuff;
     Coroutine executionCoroutine;
 
+    public static EventsAttacksHandler Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+        Instance = this;
+        // Do NOT call DontDestroyOnLoad, so it won't persist between scenes
+    }
     [SerializeField] int maxDebuffs = 5; // Maximum number of debuffs that can be active at once
     void Start()
     {
@@ -33,8 +45,8 @@ public class EventsAttacksHandler : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.U))
         {
-            
-            applyRandomDebuff();
+
+            // applyRandomDebuff();
         }
     }
     // public void applyRandomDebuff()
@@ -76,10 +88,53 @@ public class EventsAttacksHandler : MonoBehaviour
         {
             Debug.LogWarning("Debuff queue is full. Cannot apply new debuff: " + gameDebuff.getDebuffName());
         }
-    
- 
+
+
+
+    }
+    private void applyDebuff(debuffType type)
+    {
+        // Find the GameDebuff instance that matches the given debuffType
+        GameDebuff gameDebuff = gameDebuffs.Find(d => d.getDebuffName() == type.ToString());
+
+        if (gameDebuff == null)
+        {
+            Debug.LogWarning("No GameDebuff found for type: " + type);
+            return;
+        }
+
+        if (debuffExecutionQueue.Count == 0 && executionCoroutine == null)
+        {
+            Debug.Log("Starting debuff execution coroutine for: " + type);
+            debuffExecutionQueue.Enqueue(gameDebuff);
+            executionCoroutine = StartCoroutine(handleDebuffExecutionQueueCoroutine());
+        }
+        else if (debuffExecutionQueue.Count > 0 && debuffExecutionQueue.Count < maxDebuffs && executionCoroutine != null)
+        {
+            Debug.Log("Adding debuff to queue: " + gameDebuff.getDebuffName());
+            debuffExecutionQueue.Enqueue(gameDebuff);
+        }
+        else
+        {
+            Debug.LogWarning("Debuff queue is full. Cannot apply new debuff: " + gameDebuff.getDebuffName());
+        }
+    }
+    public void applyWeakDebuff()
+    {
+        applyDebuff(debuffType.flipCamera);
+
+    }
+    public void applyMediumDebuff()
+    {
+        applyDebuff(debuffType.turnOffLights);
     
     }
+    public void applyStrongDebuff()
+    {
+        applyDebuff(debuffType.spawnRocks);
+    }
+
+
 
     IEnumerator handleDebuffExecutionQueueCoroutine()
     {
@@ -115,5 +170,12 @@ public class EventsAttacksHandler : MonoBehaviour
             yield return new WaitUntil(() => debuff.DebuffIsActive == false);
 
         }
+    }
+    public enum debuffType
+    {
+        flipCamera,
+        spawnRocks,
+        turnOffLights,
+
     }
 }

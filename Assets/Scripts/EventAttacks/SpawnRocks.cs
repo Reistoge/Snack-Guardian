@@ -71,6 +71,6 @@ public class SpawnRocks : MonoBehaviour, GameDebuff
 
     public string getDebuffName()
     {
-        return "Spawn Rocks";
+        return "spawnRocks";
     }
 }

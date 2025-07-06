@@ -13,9 +13,10 @@ public static class MultiplayerGameEvents
     public static event Action<string, string> onChatMessageReceived;
     public static event Action<string, bool> onPlayerReadyStateChanged;
 
-    public static event Action<string> onPlayerSendAttack;
+    public static event Action<MultiplayerPoints.AttackType> onPlayerSendAttack;
     public static event Action<string> onPlayerReceiveAttack;
-   public static event Action<string, string> onMatchRequestReceived;
+
+    public static event Action<string, string> onMatchRequestReceived;
     public static event Action onGameStarted;
     public static event Action onPlayersListCleared;
     public static event Action<string, string> onPlayerLoggedIn;
@@ -30,6 +31,7 @@ public static class MultiplayerGameEvents
 
     ///enviar match
     public static Action<List<ConnectionData>> onOnlinePlayersReceived;
+    public static event Action onGameSceneEnded;
 
     public static event Action<string> onMatchAccept;
     public static event Action<string> onMatchReject;
@@ -67,7 +69,7 @@ public static class MultiplayerGameEvents
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
     public static void triggerConnectionError(string error) => onConnectionError?.Invoke(error);
-    public static void  triggerPlayerConnected(string id) => onPlayerConnected?.Invoke(id);
+    public static void triggerPlayerConnected(string id) => onPlayerConnected?.Invoke(id);
     public static void triggerPlayerDisconnected(string id) => onPlayerDisconnected?.Invoke(id);
     public static void triggerChatMessageReceived(string id, string msg) => onChatMessageReceived?.Invoke(id, msg);
 
@@ -82,9 +84,9 @@ public static class MultiplayerGameEvents
         onMatchRequestSent?.Invoke(matchId);
     }
 
-    public static void triggerPlayerSendAttack(string attackData) => onPlayerSendAttack?.Invoke(attackData);
+    public static void triggerPlayerSendAttack(MultiplayerPoints.AttackType attackData) => onPlayerSendAttack?.Invoke(attackData);
     public static void triggerPlayerReceiveAttack(string attackData) => onPlayerReceiveAttack?.Invoke(attackData);
-    public static void triggerPlayersListCleared() => onPlayersListCleared?.Invoke(); 
+    public static void triggerPlayersListCleared() => onPlayersListCleared?.Invoke();
     public static void triggerPlayerLoggedIn(string playerId, string playerName) => onPlayerLoggedIn?.Invoke(playerId, playerName);
     public static void triggerLoginFailed(string errorMessage) => onLoginFailed?.Invoke(errorMessage);
 
@@ -128,7 +130,7 @@ public static class MultiplayerGameEvents
         onMatchRejectionReceived?.Invoke(playerId, message);
     }
 
-    // Agregar estos métodos trigger:
+    // Agregar estos mï¿½todos trigger:
     public static void triggerMatchAcceptanceSent()
     {
         onMatchAcceptanceSent?.Invoke();
@@ -219,4 +221,9 @@ public static class MultiplayerGameEvents
         onShowPrivateMessagePanel?.Invoke(playerId, playerName);
     }
 
+  
+    public static void triggerGameSceneEnded()
+    {
+        onGameSceneEnded?.Invoke();
+    }
 }

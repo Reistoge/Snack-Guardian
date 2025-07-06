@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Text;
+using UnityEngine.InputSystem.UI;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -37,10 +38,6 @@ public class NetworkManager : MonoBehaviour
         initializeSingleton();
     }
 
-    private void Update()
-    {
-        handleDebugInput();
-    }
 
     private void OnDestroy()
     {
@@ -70,7 +67,19 @@ public class NetworkManager : MonoBehaviour
 
         SetupWebSocketEvents();
     }
+    void OnEnable()
+    {
+        // Subscribe to multiplayer events here
+        MultiplayerGameEvents.onGameSceneEnded += sendQuitMatchRequest;
+        // ... other event subscriptions
+    }
 
+    void OnDisable()
+    {
+        // Unsubscribe from multiplayer events here
+        MultiplayerGameEvents.onGameSceneEnded -=sendQuitMatchRequest;
+        // ... other event unsubscriptions
+    }
     private void SetupWebSocketEvents()
     {
         webSocket.On.Open(onWebSocketOpen);
@@ -130,11 +139,9 @@ public class NetworkManager : MonoBehaviour
 
         switch (eventName)
         {
+            #region login Events 
             case "connected-to-server":
                 handleConnectedToServer(jsonData);
-                break;
-            case "login":
-                handleLoginResponse(jsonData);
                 break;
             case "player-connected":
                 handlePlayerConnected(jsonData);
@@ -142,11 +149,20 @@ public class NetworkManager : MonoBehaviour
             case "player-disconnected":
                 handlePlayerDisconnected(jsonData);
                 break;
+            case "login":
+                handleLoginResponse(jsonData);
+                break;
+            #endregion
+
+            #region server lobby Events
             case "public-message":
                 handlePublicMessage(jsonData);
                 break;
             case "private-message":
                 handlePrivateMessage(jsonData);
+                break;
+            case "online-players":
+                handleOnlinePlayers(jsonData);
                 break;
             case "send-public-message":
                 handleSendPublicMessage(jsonData);
@@ -154,26 +170,64 @@ public class NetworkManager : MonoBehaviour
             case "send-private-message":
                 handleSendPrivateMessage(jsonData);
                 break;
-            //case "online-players":
-              //  handleGetConnectedPlayers(jsonData);
-                //break;
+            #endregion
+
+            #region server player events
             case "player-name-changed":
                 handlePlayerNameChanged(jsonData);
-                break;
-            case "change-name":
-                handleChangeNameResponse(jsonData);
                 break;
             case "player-data":
                 handlePlayerDataResponse(jsonData);
                 break;
+            case "change-name":
+                handleChangeNameResponse(jsonData);
+                break;
+            #endregion
+
+            #region server game match request 
+            case "players-ready":
+                HandlePlayersReady(data);
+                break;
+            case "match-start":
+                HandleMatchStart(data);
+                break;
+
+            case "send-game-data":
+                handleSendGameDataResponse(jsonData);
+                break;
+            case "receive-game-data":
+                handleReceiveGameData(jsonData);
+                break;
+            case "game-ended":
+                break;
+            case "rematch-request":
+                break;
+            case "close-match":
+                break;
+            case "connect-match":
+                HandleConnectMatchResponse(data);
+                break;
+            case "ping-match":
+                HandlePingMatchResponse(data);
+                break;
+            case "finish-game":
+                HandleFinishGameResponse(data);
+                break;
             case "send-match-request":
                 handleSendMatchRequest(jsonData);
                 break;
-            case "online-players":
-                handleOnlinePlayers2(jsonData);
+            case "quit-match":
+                HandleQuitMatchResponse(data);
                 break;
+            #endregion
+
+
+
+            #region server match events
             case "match-request-received":
                 HandleMatchRequestReceived(data);
+                break;
+            case "match-canceled-by-sender":
                 break;
             case "match-accepted":
                 HandleMatchAccepted(data);
@@ -181,30 +235,17 @@ public class NetworkManager : MonoBehaviour
             case "match-rejected":
                 HandleMatchRejected(data);
                 break;
+            // case "send-match-request": ----> repeated
+            //     break;
+            case "cancel-match-request":
+                break;
             case "accept-match":
                 HandleAcceptMatchResponse(data);
                 break;
             case "reject-match":
                 SendMatchRejectNotification(data);
                 break;
-            case "connect-match":
-                HandleConnectMatchResponse(data);
-                break;
-            case "players-ready":
-                    HandlePlayersReady(data);
-                break;
-            case "ping-match":
-                HandlePingMatchResponse(data);
-                break;
-            case "match-start":
-                HandleMatchStart(data);
-                break;
-            case "finish-game":
-                HandleFinishGameResponse(data);
-                break;
-            case "quit-match":
-                HandleQuitMatchResponse(data);
-                break;
+            #endregion
 
             default:
                 Debug.LogWarning($"Unhandled event: {eventName}");
@@ -212,6 +253,67 @@ public class NetworkManager : MonoBehaviour
         }
 
     }
+    private void handleReceiveGameData(string jsonData)
+    {
+        var receiveGameDataResponse = JsonUtility.FromJson<ReceiveGameDataResponse>(jsonData);
+
+        if (receiveGameDataResponse?.data != null)
+        {
+            Debug.Log($"[NetworkManager] Received Game Data: subEvent={receiveGameDataResponse.data.subEvent}, attackType={receiveGameDataResponse.data.attackType}");
+
+            // Trigger the event to handle the received attack
+            MultiplayerGameEvents.triggerPlayerReceiveAttack(receiveGameDataResponse.data.attackType);
+        }
+        else
+        {
+            Debug.LogWarning("[NetworkManager] Failed to parse receive-game-data response");
+        }
+    }
+    private void handleSendGameDataResponse(string jsonData)
+    {
+        var sendGameDataResponse = JsonUtility.FromJson<SendGameDataResponse>(jsonData);
+
+        if (sendGameDataResponse != null)
+        {
+            Debug.Log($"[NetworkManager] Send game data response - Status: {sendGameDataResponse.status}, Message: {sendGameDataResponse.msg}");
+
+            if (sendGameDataResponse.status == "OK")
+            {
+                Debug.Log("[NetworkManager] Attack sent successfully to opponent");
+            }
+            else
+            {
+                Debug.LogError($"[NetworkManager] Failed to send attack: {sendGameDataResponse.msg}");
+            }
+        }
+    }
+    public void sendAttackToServer(MultiplayerPoints.AttackType attackType)
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send attack - WebSocket not connected");
+            return;
+        }
+
+        // Create attack data following server documentation format
+        var attackData = new GameData
+        {
+            subEvent = "attack",
+            attackType = attackType.ToString().ToLower() // "weak", "medium", "strong"
+        };
+
+        var serverMessage = new ServerMessage<GameData>
+        {
+            @event = "send-game-data",
+            data = attackData
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"[NetworkManager] Sending attack to server: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);
+    }
+
 
     private void handleConnectedToServer(string jsonData)
     {
@@ -287,6 +389,10 @@ public class NetworkManager : MonoBehaviour
             MultiplayerGameEvents.triggerLoginFailed(loginResponse.msg);
         }
     }
+
+
+
+
 
     private void handlePlayerConnected(string jsonData)
     {
@@ -418,28 +524,28 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.Log($"Match request sent! Match ID: {response.data.matchId}");
             MultiplayerGameEvents.triggerMatchRequestSent(response.data.matchId);
-        }   
+        }
         else
         {
             Debug.LogError("Failed to send match request or invalid response.");
         }
     }
 
-    private void handleOnlinePlayers(string jsonData)
-    {
-        var response = JsonUtility.FromJson<OnlinePlayersResponse>(jsonData);
-        if (response != null && response.status == "OK" && response.data != null)
-        {
-            Debug.Log($"Received list of {response.data.Count} online players:");
-            MultiplayerGameEvents.triggerOnlinePlayersReceived(response.data);
-        }
-        else
-        {
-            Debug.LogWarning("Failed to parse online players list");
-        }
-    }
+    // private void handleOnlinePlayers(string jsonData)
+    // {
+    //     var response = JsonUtility.FromJson<OnlinePlayersResponse>(jsonData);
+    //     if (response != null && response.status == "OK" && response.data != null)
+    //     {
+    //         Debug.Log($"Received list of {response.data.Count} online players:");
+    //         MultiplayerGameEvents.triggerOnlinePlayersReceived(response.data);
+    //     }
+    //     else
+    //     {
+    //         Debug.LogWarning("Failed to parse online players list");
+    //     }
+    // }
 
-    private void handleOnlinePlayers2(string jsonData)
+    private void handleOnlinePlayers(string jsonData)
     {
         var response = JsonUtility.FromJson<OnlinePlayersResponse>(jsonData);
         if (response != null && response.status == "OK" && response.data != null)
@@ -500,13 +606,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    private void handleDebugInput()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            getConnectedPlayers();
-        }
-    }
+
 
     private void HandleMatchRequestReceived(byte[] data)
     {
@@ -713,7 +813,7 @@ public class NetworkManager : MonoBehaviour
     }
 
     // Crea este nuevo método para enviar el evento quit-match
-    public void sendQuitMatchRequest(string matchId = null) // matchId es opcional en la solicitud
+    public void sendQuitMatchRequest() // matchId es opcional en la solicitud
     {
         if (!webSocket.IsOpened)
         {
@@ -803,7 +903,7 @@ public class NetworkManager : MonoBehaviour
         Debug.Log($"Sending accept match request: {json}");
 
         webSocket.To.Data(json, HTTP.Text);
-    
+
         // Disparar evento local
         MultiplayerGameEvents.triggerMatchAcceptanceSent();
     }
@@ -961,10 +1061,6 @@ public class NetworkManager : MonoBehaviour
         webSocket.To.Data(json, HTTP.Text);
     }
 
-    public void receiveAttackFromPlayer(string attackData)
-    {
-        MultiplayerGameEvents.triggerPlayerReceiveAttack(attackData);
-    }
 
     public void changePlayerName(string newName)
     {
@@ -1084,6 +1180,32 @@ public class LoginResponse
 
 
 #region Data Models
+
+
+[Serializable]
+public class GameData
+{
+    public string subEvent;
+    public string attackType;
+    // Add more fields as needed for different game events
+}
+
+[Serializable]
+public class SendGameDataResponse
+{
+    public string @event;
+    public string status;
+    public string msg;
+    public object data; // Server returns null for successful sends
+}
+
+[Serializable]
+public class ReceiveGameDataResponse
+{
+    public string @event;
+    public string msg;
+    public GameData data;
+}
 [Serializable]
 public class ConnectionData
 {
@@ -1116,6 +1238,24 @@ public class ConnectedToServerResponse
 
 
 [Serializable]
+public class ReceiveGameData
+{
+    public string subEvent;
+    public string attackType;
+}
+
+[Serializable]
+public class ReceiveGameDataEvent
+{
+    public string @event;
+    public string msg;
+    public ReceiveGameData data;
+}
+
+
+
+
+[Serializable]
 public class MessageData
 {
     public string message;
@@ -1142,7 +1282,7 @@ public class ReadyStateData
     public bool isReady;
 }
 
- 
+
 
 [Serializable]
 public class PlayerConnectedResponse
@@ -1358,7 +1498,7 @@ public class PlayersReadyData
     public string matchId;
 }
 
-[Serializable]  
+[Serializable]
 public class PlayersReadyEvent
 {
     public string @event;

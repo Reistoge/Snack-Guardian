@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class MultiplayerAttacksHandler : MonoBehaviour
@@ -18,34 +19,41 @@ public class MultiplayerAttacksHandler : MonoBehaviour
             Debug.LogWarning("Received empty attack data");
             return;
         }
-        obj = obj.Trim();
         Debug.Log($"Received attack data: {obj}");
-
-        switch (obj)
+        if (System.Enum.TryParse(obj, out MultiplayerPoints.AttackType attackType))
         {
-            case "1":
-                Debug.Log("Player 1 attack received");
-                // Handle player 1 attack logic here
-                
-                break;
-            case "2":
-                Debug.Log("Player 2 attack received");
-                // Handle player 2 attack logic here
-                break;
-            case "3":
-                Debug.Log("Player 3 attack received");
-                // Handle player 3 attack logic here
-                
-                break;
+            EventsAttacksHandler eventsInstance = EventsAttacksHandler.Instance;
+            if (eventsInstance)
+            {
+                    switch (attackType)
+                    {
+                        case MultiplayerPoints.AttackType.weak:
+                        eventsInstance.applyWeakDebuff();
+                            break;
+                        case MultiplayerPoints.AttackType.medium:
+                        eventsInstance.applyMediumDebuff();
+                            break;
+                        case MultiplayerPoints.AttackType.strong:
+                        eventsInstance.applyStrongDebuff();
+                            break;
+                    }
+            }
+
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to parse attack type from string: {obj}");
         }
 
 
-    }
- 
 
-    private void handlePlayerSendAttack(string obj)
+
+
+    }
+
+    private void handlePlayerSendAttack(MultiplayerPoints.AttackType attack)
     {
-
+        NetworkManager.Instance.sendAttackToServer(attack);
     }
-    
+
 }

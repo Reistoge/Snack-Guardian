@@ -3,6 +3,7 @@ using UnityEngine;
 
 public static class GameEvents
 {
+    public static event Action onGameSceneEnded;
 
 
     // Health events
@@ -110,5 +111,10 @@ public static class GameEvents
     {
         Debug.Log("Turn off lights");
         turnOffLight?.Invoke();
+    }
+
+    public static void triggerGameSceneEnded()
+    {
+        onGameSceneEnded?.Invoke();
     }
 }

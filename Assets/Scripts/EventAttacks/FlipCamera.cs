@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FlipCamera : MonoBehaviour, GameDebuff
 {
+     
     [SerializeField] RuntimeAnimatorController animatorController;
     public static readonly string ON_ENTER = "onEnter";
     public static readonly string ON_EXIT = "onExit";
@@ -50,6 +51,6 @@ public class FlipCamera : MonoBehaviour, GameDebuff
 
     public string getDebuffName()
     {
-        return "Flip Camera";
+        return "flipCamera";
     }
 }

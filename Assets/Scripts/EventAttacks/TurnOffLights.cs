@@ -74,7 +74,7 @@ public class TurnOffLights : MonoBehaviour, GameDebuff
     
     public string getDebuffName()
     {
-        return "Turn Off Lights";
+        return "turnOffLights";
     }
     
 }
