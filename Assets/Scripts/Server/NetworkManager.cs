@@ -77,7 +77,7 @@ public class NetworkManager : MonoBehaviour
     void OnDisable()
     {
         // Unsubscribe from multiplayer events here
-        MultiplayerGameEvents.onGameSceneEnded -=sendQuitMatchRequest;
+        MultiplayerGameEvents.onGameSceneEnded -= sendQuitMatchRequest;
         // ... other event unsubscriptions
     }
     private void SetupWebSocketEvents()
@@ -1149,6 +1149,10 @@ public class NetworkManager : MonoBehaviour
     public bool IsPlayerLoggedIn() => currentPlayerData?.status != "NO_LOGIN";
     #endregion
 }
+
+
+
+
 [Serializable]
 public class ServerMessage<T>
 {
