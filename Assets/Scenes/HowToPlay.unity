@@ -1159,9 +1159,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
-    width: 0.99973613
-    height: 1
+    y: 0.2652482
+    width: 1
+    height: 0.46835104
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -1830,6 +1830,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 6329384649287051715, guid: c2a25338b213b724db4ce74a654c8ab4, type: 3}
   defaultMovementStats: {fileID: 11400000, guid: 9fe520151b0e35e4e87bab610d31e094, type: 2}
   gameData: {fileID: 0}
+  transitionAnimPrefab: {fileID: 0}
 --- !u!4 &1004561425
 Transform:
   m_ObjectHideFlags: 0

@@ -17,5 +17,6 @@ MonoBehaviour:
   spatialBlend: 0.5
   stereoPan: 0.5
   pitch: 1
+  randomPitch: 0
   loop: 0
-  clip: {fileID: 8300000, guid: 1d1cf86f054099447953a450e4c24c85, type: 3}
+  clip: {fileID: 8300000, guid: cfa67cda9a719174eaa2e2ad7d35efb1, type: 3}

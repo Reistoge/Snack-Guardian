@@ -8,6 +8,7 @@ public class SnackGuardianMusic : ScriptableObject
     public AudioConfig MainMenuMusic;
     public AudioConfig GameOverMusic;
     public AudioConfig VictoryMusic;
+    public AudioConfig HowToPlayMusic;
     
 
 

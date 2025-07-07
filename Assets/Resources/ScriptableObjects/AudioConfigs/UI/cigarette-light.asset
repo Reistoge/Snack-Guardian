@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 986814f6a234a3648a2132280067a221, type: 3}
   m_Name: cigarette-light
   m_EditorClassIdentifier: 
-  sfxVolume: 0.7
-  priority: 128
+  sfxVolume: 1
+  priority: 256
   spatialBlend: 0.5
   stereoPan: 0.5
   pitch: 0.5
+  randomPitch: 0
   loop: 0
   clip: {fileID: 8300000, guid: 23935f35ab12e9e439effd4ff85593db, type: 3}

@@ -43,10 +43,10 @@ public class FlipCamera : MonoBehaviour, GameDebuff
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            applyDebuff();
-        }
+        // if (Input.GetKeyDown(KeyCode.F))
+        // {
+        //     applyDebuff();
+        // }
     }
 
     public string getDebuffName()

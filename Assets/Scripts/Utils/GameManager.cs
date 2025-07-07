@@ -71,7 +71,11 @@ public class GameManager : GenericSingleton<GameManager>
         if (scene.name.Contains("GameScene"))
         {
             OnGameSceneLoaded?.Invoke();
-            spawnPlayer();  
+            spawnPlayer();
+        }
+        if (scene.name.Equals("HowToPlay"))
+        {
+            AudioManager.Instance.playHowToPlayMusic();
         }
  
     }
@@ -81,8 +85,8 @@ public class GameManager : GenericSingleton<GameManager>
         {
             if (SceneManager.GetActiveScene().name.Contains("GameScene"))
             {
-                // GameEvents.triggerGameSceneEnded();
-                // MultiplayerGameEvents.triggerGameSceneEnded();
+                GameEvents.triggerGameSceneEnded();
+                MultiplayerGameEvents.triggerGameSceneEnded();
             }
             loadScene("MainMenu");
             
@@ -92,6 +96,7 @@ public class GameManager : GenericSingleton<GameManager>
             loadScene("GameScene");
 
         }
+        
         else if (Input.GetKeyDown(KeyCode.Backspace))
         {
             currentPlayer = GameObject.FindGameObjectWithTag("Player");

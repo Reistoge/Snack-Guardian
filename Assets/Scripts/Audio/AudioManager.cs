@@ -106,7 +106,11 @@ public class AudioManager : GenericSingleton<AudioManager>
 
         }
     }
-    
+
+    internal void playHowToPlayMusic()
+    {
+        playSFX(snackGuardianMusic.HowToPlayMusic);
+    }
 
     public SnackGuardianMusic SnackGuardianMusic { get => snackGuardianMusic; set => snackGuardianMusic = value; }
 }

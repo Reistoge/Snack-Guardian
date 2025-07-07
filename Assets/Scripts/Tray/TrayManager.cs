@@ -14,11 +14,13 @@ public class TrayManager : MonoBehaviour
     public static event Action onTraysRegistered;
     const string trayIdPath = "ScriptableObjects/TrayIds";
 
-   
 
 
-  
-  
+    void Start()
+    {
+        InvokeRepeating("addRandomRock", 2, 4);
+    }
+
     public void triggerOnTraysRegistered()
     {
         onTraysRegistered?.Invoke();
@@ -150,6 +152,10 @@ public class TrayManager : MonoBehaviour
          
         }
     }
+    public void addRandomRock()
+    {
+        getRandomTray().addRockSnack();
+    }
     public List<Snack> addRocksOnTrays(char row)
     {
         GameEvents.triggerRocksAdded();
@@ -163,10 +169,10 @@ public class TrayManager : MonoBehaviour
             }
             else
             {
-               // Debug.LogWarning($"Tray {tray.getTrayId()} has no snacks available or does not match row {row}.");
+                // Debug.LogWarning($"Tray {tray.getTrayId()} has no snacks available or does not match row {row}.");
             }
         }
         return rocks;
-         
+
     }
 }

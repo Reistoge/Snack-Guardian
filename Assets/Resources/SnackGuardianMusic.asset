@@ -16,3 +16,4 @@ MonoBehaviour:
   MainMenuMusic: {fileID: 11400000, guid: 1f675056251893543bdbdd4051b18b4e, type: 2}
   GameOverMusic: {fileID: 11400000, guid: 83e793b7a994600458132e0cbd2b778b, type: 2}
   VictoryMusic: {fileID: 0}
+  HowToPlayMusic: {fileID: 11400000, guid: ed13499d862d6d041b7e99cd1734942d, type: 2}
