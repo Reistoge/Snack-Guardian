@@ -12,7 +12,8 @@ public class GameOverState : PlayerBaseState
     {
 
         base.Enter();
-         GameEvents.triggerGameOver();
+        GameEvents.triggerGameOver();
+        MultiplayerGameEvents.triggerPlayerLost();
         player.PlayerAnimation.playGameOverAnimation();
         player.Movement.stopMovement(); // Stop player movement
         player.Movement.enabled = false; // Reset player movement state

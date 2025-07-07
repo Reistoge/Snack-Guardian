@@ -13,8 +13,8 @@ public class GameManager : GenericSingleton<GameManager>
     public static Action OnMainMenuLoaded;
     public static Action OnPlayerSpawned;
 
-    
-    
+    Coroutine c;
+
 
 
 
@@ -42,7 +42,7 @@ public class GameManager : GenericSingleton<GameManager>
             return "DefaultPlayer";
         }
     }
-    
+
 
 
     private void tryUpdateHighScore()
@@ -77,7 +77,29 @@ public class GameManager : GenericSingleton<GameManager>
         {
             AudioManager.Instance.playHowToPlayMusic();
         }
- 
+        if (scene.name.Contains("MainMenu"))
+        {
+            if (NetworkManager.Instance)
+            {
+                NetworkManager.Instance.destroy();
+            }
+        }
+
+    }
+    IEnumerator loadSceneInSeconds(string sceneName, float seconds)
+    {
+
+
+
+        yield return new WaitForSeconds(seconds);
+        loadScene(sceneName);
+        c = null;
+
+
+      
+
+
+
     }
     void Update()
     {
@@ -85,18 +107,33 @@ public class GameManager : GenericSingleton<GameManager>
         {
             if (SceneManager.GetActiveScene().name.Contains("GameScene"))
             {
-                GameEvents.triggerGameSceneEnded();
-                MultiplayerGameEvents.triggerGameSceneEnded();
+                // GameEvents.triggerGameSceneEnded();
+
+                MultiplayerGameEvents.triggerPlayerLost();
+
             }
-            loadScene("MainMenu");
-            
-        }
-        else if (Input.GetKeyDown(KeyCode.F1))
-        {
-            loadScene("GameScene");
+            if (SceneManager.GetActiveScene().name.Contains("Multiplayer"))
+            {
+                if (c == null)
+                {
+                    c = StartCoroutine(loadSceneInSeconds("MainMenu", 1f));
+                    
+                }
+            }
+            else
+            {
+                loadScene("MainMenu");
+            }
+
+
 
         }
-        
+        // else if (Input.GetKeyDown(KeyCode.F1))
+        // {
+        //     loadScene("GameScene");
+
+        // }
+
         else if (Input.GetKeyDown(KeyCode.Backspace))
         {
             currentPlayer = GameObject.FindGameObjectWithTag("Player");
@@ -144,20 +181,20 @@ public class GameManager : GenericSingleton<GameManager>
         Debug.Log($"[GameManager] Intentando cargar escena: '{sceneName}'"); // �A�ade esta l�nea!
         //SceneManager.LoadScene(sceneName);
         StartCoroutine(playTransition(() => SceneManager.LoadScene(sceneName)));
-        
+
     }
     IEnumerator playTransition(Action action)
     {
         GameObject transition = Instantiate(transitionAnimPrefab);
         yield return new WaitForSeconds(2f); // Wait for the transition to start
         action?.Invoke(); // Invoke the action after the transition delay
-   
- 
+
+
 
 
 
     }
- 
 
-     
+
+
 }

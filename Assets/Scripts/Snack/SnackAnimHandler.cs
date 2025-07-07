@@ -142,7 +142,7 @@ public class SnackAnimHandler : MonoBehaviour
     IEnumerator changeScale(float targetScale, float duration)
     {
 
-        // change the scale when the object is leaving the spiral tray.
+
         Vector3 startScale = transform.localScale;
         Vector3 endScale = new Vector3(targetScale, targetScale, targetScale);
         float elapsedTime = 0f;
@@ -161,10 +161,18 @@ public class SnackAnimHandler : MonoBehaviour
 
 
         transform.localScale = endScale;
+
+        // change the scale when the object is leaving the spiral tray.
+
         playFlipAnimation();
         spriteRenderer.sortingOrder = 200; // reset the sorting order to 0 when leaving the spiral tray
-        snack.canBeCatched(true);
+        if (snack.getConfig().isRock == false)
+        {
+            snack.canBeCatched(true);
+
+        }
         yield return new WaitForSeconds(getClipDuration(FLIP_ANIMATION_STATE));
+        snack.canBeCatched(true);
         readyToFall = true;
     }
 

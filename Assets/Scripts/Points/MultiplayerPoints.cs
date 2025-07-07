@@ -27,9 +27,10 @@ public class MultiplayerPoints : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.P))
+        if (InputManager.multiplayerAttackPressed)
         {
             trySendAttack();
+
         }
 
         // if (Input.GetKeyDown(KeyCode.R))

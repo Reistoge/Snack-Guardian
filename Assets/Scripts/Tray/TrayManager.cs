@@ -18,7 +18,7 @@ public class TrayManager : MonoBehaviour
 
     void Start()
     {
-        InvokeRepeating("addRandomRock", 2, 4);
+        InvokeRepeating("addRandomRock", 2, 5);
     }
 
     public void triggerOnTraysRegistered()

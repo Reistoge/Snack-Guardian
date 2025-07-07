@@ -9,7 +9,7 @@ public class PointsTextUI : MonoBehaviour
     [SerializeField] Animator anim;
     private static readonly string ON_ENTER_ANIMATION = "onEnter";
     private static readonly int ON_ENTER_ANIMATION_HASH = Animator.StringToHash(ON_ENTER_ANIMATION);
-    [SerializeField] float waitTime = 0.01f;
+    [SerializeField] float waitTime = 0.001f;
     [SerializeField] float pointsToAddPerSecond = 1f; // How many points to add per second during the animation
     Coroutine updateCoinText;
  
@@ -57,7 +57,6 @@ public class PointsTextUI : MonoBehaviour
 
                     }
                 }
-
                 yield return new WaitForSeconds(waitTime);
                 pointsText.text = temp.ToString();
 

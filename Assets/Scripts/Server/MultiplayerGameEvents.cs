@@ -65,7 +65,20 @@ public static class MultiplayerGameEvents
     public static event Action<string> onQuitMatchError; // (message)
 
     public static event Action<string, string> onShowPrivateMessagePanel;
+    public static event Action onPlayerWon;    // Player achieved victory condition
+    public static event Action onPlayerLost;   // Player lost/died/failed
+    public static event Action onOpponentLost; // Opponent told you they lost
+    public static event Action onGameWon;      // Successfully sent finish-game (you won)
+    public static event Action<string> onGameLost; // Received game-ended (you lost)
 
+    // ... existing trigger methods ...
+
+    // New trigger methods
+    public static void triggerPlayerWon() => onPlayerWon?.Invoke();
+    public static void triggerPlayerLost() => onPlayerLost?.Invoke();
+    public static void triggerOpponentLost() => onOpponentLost?.Invoke();
+    public static void triggerGameWon() => onGameWon?.Invoke();
+    public static void triggerGameLost(string message) => onGameLost?.Invoke(message);
     public static void triggerConnectedToServer() => onConnectedToServer?.Invoke();
     public static void triggerDisconnectedFromServer() => onDisconnectedFromServer?.Invoke();
     public static void triggerConnectionError(string error) => onConnectionError?.Invoke(error);
@@ -221,7 +234,7 @@ public static class MultiplayerGameEvents
         onShowPrivateMessagePanel?.Invoke(playerId, playerName);
     }
 
-  
+
     public static void triggerGameSceneEnded()
     {
         onGameSceneEnded?.Invoke();

@@ -69,16 +69,24 @@ public class NetworkManager : MonoBehaviour
     }
     void OnEnable()
     {
-        // Subscribe to multiplayer events here
-        MultiplayerGameEvents.onGameSceneEnded += sendQuitMatch;
-        // ... other event subscriptions
+        // Remove the old subscription
+        // MultiplayerGameEvents.onGameSceneEnded -= sendQuitMatch;
+
+        // Add new subscriptions for win/lose events
+        MultiplayerGameEvents.onPlayerWon += sendPlayerWinEvent;
+        MultiplayerGameEvents.onPlayerLost += sendPlayerLoseEvent;
+        MultiplayerGameEvents.onOpponentLost += sendPlayerWinEvent; // When opponent loses, you win
     }
 
     void OnDisable()
     {
-        // Unsubscribe from multiplayer events here
-        MultiplayerGameEvents.onGameSceneEnded -= sendQuitMatch;
-        // ... other event unsubscriptions
+        // Remove the old unsubscription
+        // MultiplayerGameEvents.onGameSceneEnded -= sendQuitMatch;
+
+        // Add new unsubscriptions
+        MultiplayerGameEvents.onPlayerWon -= sendPlayerWinEvent;
+        MultiplayerGameEvents.onPlayerLost -= sendPlayerLoseEvent;
+        MultiplayerGameEvents.onOpponentLost -= sendPlayerWinEvent;
     }
     private void SetupWebSocketEvents()
     {
@@ -192,6 +200,7 @@ public class NetworkManager : MonoBehaviour
                 HandleMatchStart(data);
                 break;
 
+
             case "send-game-data":
                 handleSendGameDataResponse(jsonData);
                 break;
@@ -199,6 +208,7 @@ public class NetworkManager : MonoBehaviour
                 handleReceiveGameData(jsonData);
                 break;
             case "game-ended":
+                handleGameEnded(jsonData);
                 break;
             case "rematch-request":
                 break;
@@ -253,6 +263,21 @@ public class NetworkManager : MonoBehaviour
         }
 
     }
+
+    private void handleGameEnded(string jsonData)
+    {
+        var gameEndedEvent = JsonUtility.FromJson<GameEndedEvent>(jsonData);
+
+        if (gameEndedEvent != null)
+        {
+            Debug.Log($"[NetworkManager] Game Ended - You lost! {gameEndedEvent.msg}");
+
+            // Trigger event that you lost (opponent won)
+            MultiplayerGameEvents.triggerGameLost(gameEndedEvent.msg);
+        }
+    }
+
+    // Replace your current handleReceiveGameData method:
     private void handleReceiveGameData(string jsonData)
     {
         var receiveGameDataResponse = JsonUtility.FromJson<ReceiveGameDataResponse>(jsonData);
@@ -260,14 +285,26 @@ public class NetworkManager : MonoBehaviour
         if (receiveGameDataResponse?.data != null)
         {
             Debug.Log($"[NetworkManager] Received Game Data: subEvent={receiveGameDataResponse.data.subEvent}, attackType={receiveGameDataResponse.data.attackType}");
-            if (receiveGameDataResponse.data.subEvent == "quit")
-            {
-                sendFinishGameRequest();
-                return;
-            }
 
-            // Trigger the event to handle the received attack
-            MultiplayerGameEvents.triggerPlayerReceiveAttack(receiveGameDataResponse.data.attackType);
+            switch (receiveGameDataResponse.data.subEvent)
+            {
+                case "attack":
+                    // Handle attack
+                    MultiplayerGameEvents.triggerPlayerReceiveAttack(receiveGameDataResponse.data.attackType);
+                    break;
+
+                case "lose":
+                    // Opponent lost = You won!
+                    Debug.Log("[NetworkManager] Opponent lost - You won!");
+                    MultiplayerGameEvents.triggerOpponentLost(); // This will trigger sendPlayerWinEvent
+                    
+                    
+                    break;
+
+                default:
+                    Debug.LogWarning($"[NetworkManager] Unknown subEvent: {receiveGameDataResponse.data.subEvent}");
+                    break;
+            }
         }
         else
         {
@@ -292,26 +329,49 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
-    void sendQuitMatch()
+    public void sendPlayerLoseEvent()
     {
-        // Create attack data following server documentation format
-        var attackData = new GameData
+        if (!webSocket.IsOpened)
         {
-            subEvent = "quit",
-            attackType = null // "weak", "medium", "strong"
+            Debug.LogWarning("Cannot send lose event - WebSocket not connected");
+            return;
+        }
+
+        // Send game data to tell opponent you lost
+        var loseData = new GameData
+        {
+            subEvent = "lose",
+            attackType = null
         };
 
         var serverMessage = new ServerMessage<GameData>
         {
             @event = "send-game-data",
-            data = attackData
+            data = loseData
         };
 
         string json = JsonUtility.ToJson(serverMessage);
-        Debug.Log($"[NetworkManager] Sending attack to server: {json}");
+        Debug.Log($"[NetworkManager] Sending lose event to opponent: {json}");
 
         webSocket.To.Data(json, HTTP.Text);
 
+        // Show defeat screen locally
+        MultiplayerGameEvents.triggerGameLost("You lost the game!");
+    }
+    // When YOUR player wins - send finish-game to server
+    public void sendPlayerWinEvent()
+    {
+        if (!webSocket.IsOpened)
+        {
+            Debug.LogWarning("Cannot send win event - WebSocket not connected");
+            return;
+        }
+
+        // Send finish-game to declare yourself as winner
+        sendFinishGameRequest();
+
+        // Show victory screen locally
+        MultiplayerGameEvents.triggerGameWon();
     }
     public void sendAttackToServer(MultiplayerPoints.AttackType attackType)
     {
@@ -814,6 +874,7 @@ public class NetworkManager : MonoBehaviour
     }
 
     // Crea este nuevo método para enviar el evento finish-game (si el jugador lo inicia)
+
     private void HandleFinishGameResponse(byte[] data)
     {
         string jsonString = System.Text.Encoding.UTF8.GetString(data);
@@ -822,19 +883,18 @@ public class NetworkManager : MonoBehaviour
         if (finishGameResponse.status == "OK")
         {
             Debug.Log($"[NetworkManager] Game Finished: {finishGameResponse.msg}, Match ID: {finishGameResponse.data.matchId}");
-            // Dispara un evento de éxito con los datos relevantes
+
             MultiplayerGameEvents.triggerFinishGameSuccess(
                 finishGameResponse.data.matchId,
                 finishGameResponse.msg
-            // Puedes añadir más parámetros como el ganador si FinishGameResponseData los tiene
-            // finishGameResponse.data.winnerPlayerId,
-            // finishGameResponse.data.winnerPlayerName
             );
+
+            // **IMPORTANT: Auto-quit after finishing game**
             sendQuitMatchRequest();
         }
         else
         {
-            Debug.LogError($"[NetworkManager] Game Finish failed or error: {finishGameResponse.msg}");
+            Debug.LogError($"[NetworkManager] Game Finish failed: {finishGameResponse.msg}");
             MultiplayerGameEvents.triggerFinishGameError(finishGameResponse.msg);
         }
     }
@@ -862,6 +922,7 @@ public class NetworkManager : MonoBehaviour
         MultiplayerGameEvents.triggerQuitMatchSent();
     }
 
+    // Update your existing HandleQuitMatchResponse method:
     private void HandleQuitMatchResponse(byte[] data)
     {
         string jsonString = System.Text.Encoding.UTF8.GetString(data);
@@ -870,6 +931,14 @@ public class NetworkManager : MonoBehaviour
         if (quitMatchResponse.status == "OK")
         {
             Debug.Log($"[NetworkManager] Quit Match successful: {quitMatchResponse.msg}, Player Status: {quitMatchResponse.data.playerStatus}");
+
+            // **FIX: Update local player status when quitting**
+            if (currentPlayerData != null)
+            {
+                currentPlayerData.status = quitMatchResponse.data.playerStatus;
+                Debug.Log($"[NetworkManager] Local player status updated to: {currentPlayerData.status}");
+            }
+
             MultiplayerGameEvents.triggerQuitMatchSuccess(quitMatchResponse.data.playerStatus, quitMatchResponse.msg);
         }
         else
@@ -1174,6 +1243,11 @@ public class NetworkManager : MonoBehaviour
     public GameInfo GetGameInfo() => currentPlayerData?.game;
     public string GetPlayerStatus() => currentPlayerData?.status;
     public bool IsPlayerLoggedIn() => currentPlayerData?.status != "NO_LOGIN";
+
+    public void destroy()
+    {
+        Destroy(this.gameObject);
+    }
     #endregion
 }
 
@@ -1211,7 +1285,20 @@ public class LoginResponse
 
 
 #region Data Models
+// Add this to your #region Data Models section:
+[Serializable]
+public class GameEndedEvent
+{
+    public string @event;
+    public string msg;
+    public GameEndedData data;
+}
 
+[Serializable]
+public class GameEndedData
+{
+    public string matchStatus; // "FINISHED"
+}
 
 [Serializable]
 public class GameData

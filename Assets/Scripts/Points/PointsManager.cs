@@ -35,6 +35,7 @@ public class PointsManager : MonoBehaviour
 
 
 
+
     void Update()
     {
         // if (Input.GetKeyDown(KeyCode.P))
@@ -53,7 +54,11 @@ public class PointsManager : MonoBehaviour
         GameEvents.onSnackLandedOnGround += resetStreak;
         GameEvents.onTraysCleared += addTraysClearedPoints;
 
+
+
+
     }
+
 
     private void addTraysClearedPoints()
     {
@@ -77,7 +82,8 @@ public class PointsManager : MonoBehaviour
 
     }
 
-    private void addPoints(bool wasInDash)
+
+    public void addPoints(bool wasInDash)
     {
 
         snackStreak++;
@@ -119,4 +125,5 @@ public class PointsManager : MonoBehaviour
 
 
     }
+    
 }

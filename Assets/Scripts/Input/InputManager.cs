@@ -11,12 +11,14 @@ public class InputManager : MonoBehaviour
     public static bool jumpIsHeld;
     public static bool jumpWasReleased;
     public static bool dashWasPressed;
+    public static bool multiplayerAttackPressed;
 
     public static bool runIsHeld;
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction runAction;
     private InputAction dashAction;
+    private InputAction sendMultiplayerAttack;
 
     private void Awake()
     {
@@ -26,16 +28,21 @@ public class InputManager : MonoBehaviour
         jumpAction = playerInput.actions["Jump"];
         runAction = playerInput.actions["Run"];
         dashAction = playerInput.actions["Dash"];
+        sendMultiplayerAttack = playerInput.actions["SendMultiplayerAttack"];
+
     }
 
     private void Update()
     {
-        
+
         movement = moveAction.ReadValue<Vector2>();
         jumpWasPressed = jumpAction.WasPerformedThisFrame();
         jumpIsHeld = jumpAction.IsPressed();
         jumpWasReleased = jumpAction.WasReleasedThisFrame();
-        runIsHeld = runAction.IsPressed(); 
+        runIsHeld = runAction.IsPressed();
         dashWasPressed = dashAction.WasPerformedThisFrame();
+        multiplayerAttackPressed = sendMultiplayerAttack.WasPerformedThisFrame();
+
+        
     }
 }
