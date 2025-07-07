@@ -70,14 +70,14 @@ public class NetworkManager : MonoBehaviour
     void OnEnable()
     {
         // Subscribe to multiplayer events here
-        MultiplayerGameEvents.onGameSceneEnded += sendQuitMatchRequest;
+        MultiplayerGameEvents.onGameSceneEnded += sendQuitMatch;
         // ... other event subscriptions
     }
 
     void OnDisable()
     {
         // Unsubscribe from multiplayer events here
-        MultiplayerGameEvents.onGameSceneEnded -= sendQuitMatchRequest;
+        MultiplayerGameEvents.onGameSceneEnded -= sendQuitMatch;
         // ... other event unsubscriptions
     }
     private void SetupWebSocketEvents()
@@ -260,6 +260,11 @@ public class NetworkManager : MonoBehaviour
         if (receiveGameDataResponse?.data != null)
         {
             Debug.Log($"[NetworkManager] Received Game Data: subEvent={receiveGameDataResponse.data.subEvent}, attackType={receiveGameDataResponse.data.attackType}");
+            if (receiveGameDataResponse.data.subEvent == "quit")
+            {
+                sendFinishGameRequest();
+                return;
+            }
 
             // Trigger the event to handle the received attack
             MultiplayerGameEvents.triggerPlayerReceiveAttack(receiveGameDataResponse.data.attackType);
@@ -286,6 +291,27 @@ public class NetworkManager : MonoBehaviour
                 Debug.LogError($"[NetworkManager] Failed to send attack: {sendGameDataResponse.msg}");
             }
         }
+    }
+    void sendQuitMatch()
+    {
+        // Create attack data following server documentation format
+        var attackData = new GameData
+        {
+            subEvent = "quit",
+            attackType = null // "weak", "medium", "strong"
+        };
+
+        var serverMessage = new ServerMessage<GameData>
+        {
+            @event = "send-game-data",
+            data = attackData
+        };
+
+        string json = JsonUtility.ToJson(serverMessage);
+        Debug.Log($"[NetworkManager] Sending attack to server: {json}");
+
+        webSocket.To.Data(json, HTTP.Text);
+
     }
     public void sendAttackToServer(MultiplayerPoints.AttackType attackType)
     {
@@ -804,6 +830,7 @@ public class NetworkManager : MonoBehaviour
             // finishGameResponse.data.winnerPlayerId,
             // finishGameResponse.data.winnerPlayerName
             );
+            sendQuitMatchRequest();
         }
         else
         {
@@ -1210,6 +1237,7 @@ public class ReceiveGameDataResponse
     public string msg;
     public GameData data;
 }
+
 [Serializable]
 public class ConnectionData
 {
