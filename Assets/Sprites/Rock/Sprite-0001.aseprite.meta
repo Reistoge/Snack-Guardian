@@ -77,7 +77,6 @@ ScriptedImporter:
     defaultPivotSpace: 0
     defaultPivotAlignment: 7
     customPivotPosition: {x: 0.5, y: 0.5}
-    mosaicPadding: 4
     spritePadding: 0
     generateModelPrefab: 1
     generateAnimationClips: 1
@@ -90,7 +89,6 @@ ScriptedImporter:
     defaultPivotSpace: 0
     defaultPivotAlignment: 7
     customPivotPosition: {x: 0.5, y: 0.5}
-    mosaicPadding: 4
     spritePadding: 0
     generateModelPrefab: 1
     generateAnimationClips: 1
@@ -332,7 +330,6 @@ ScriptedImporter:
     cells:
     - name: Sprite-0001_Frame_0
       frameIndex: 0
-      additiveSortOrder: 0
       cellRect:
         x: 7
         y: 0
@@ -341,7 +338,6 @@ ScriptedImporter:
       spriteId: 1926b658208a7f948abbe5fd9bc77417
     - name: Sprite-0001_Frame_1
       frameIndex: 1
-      additiveSortOrder: 0
       cellRect:
         x: 4
         y: 6
@@ -350,7 +346,6 @@ ScriptedImporter:
       spriteId: d8c8a63a409a0034d842b9499361e6bd
     - name: Sprite-0001_Frame_2
       frameIndex: 2
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -359,7 +354,6 @@ ScriptedImporter:
       spriteId: 6ceade520b3b70d47b76ba4d3b1cd0ab
     - name: Sprite-0001_Frame_3
       frameIndex: 3
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -368,7 +362,6 @@ ScriptedImporter:
       spriteId: b846f1c5f211bd946b0e947f43c5fb44
     - name: Sprite-0001_Frame_4
       frameIndex: 4
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -377,7 +370,6 @@ ScriptedImporter:
       spriteId: db13aa956aefd57498606ac69ab48760
     - name: Sprite-0001_Frame_5
       frameIndex: 5
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -386,7 +378,6 @@ ScriptedImporter:
       spriteId: e9634968c374f974dafef70b776a94ec
     - name: Sprite-0001_Frame_6
       frameIndex: 6
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -395,7 +386,6 @@ ScriptedImporter:
       spriteId: 3f7282a9d8233684599697a418098afb
     - name: Sprite-0001_Frame_7
       frameIndex: 7
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -404,7 +394,6 @@ ScriptedImporter:
       spriteId: 862aa71d0c2628e4a97ceab247360fda
     - name: Sprite-0001_Frame_8
       frameIndex: 8
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -413,7 +402,6 @@ ScriptedImporter:
       spriteId: 228c6cca373e98843906cc63983751e8
     - name: Sprite-0001_Frame_9
       frameIndex: 9
-      additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
@@ -435,7 +423,6 @@ ScriptedImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     androidETC2FallbackOverride: 0
-  generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 48, y: 48}
